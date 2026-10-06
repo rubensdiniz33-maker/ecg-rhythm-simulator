@@ -1,0 +1,3 @@
+export type RhythmId='sinus'|'sinus-brady'|'sinus-tachy'|'afib'|'flutter'|'svt'|'vt'|'vf'|'av-block-complete'|'junctional';
+export type Rhythm={id:RhythmId;name:string;category:string;defaultRate:number;rateRange:[number,number];defaultAmplitude:number;qrsWidth:number;regularity:'regular'|'irregular'|'chaotic';atrialActivity:'p'|'fibrillatory'|'flutter'|'hidden'|'independent'|'none';};
+export type SimParams={rate:number;amplitude:number;paperSpeed:25|50;gain:5|10|20;paused:boolean;running:boolean;challenge:boolean;avConduction:number;};
