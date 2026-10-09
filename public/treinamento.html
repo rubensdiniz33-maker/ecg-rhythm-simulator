@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ECG Rhythm Simulator · Treinamento Kahoot</title>
+  <title>ECG Rhythm Simulator · Arena ECG</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2'><path d='M22 12h-4l-3 9L9 3l-3 9H2'/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -13,9 +13,16 @@
       0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2), inset 0 0 15px rgba(16, 185, 129, 0.05); }
       50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.45), inset 0 0 25px rgba(16, 185, 129, 0.12); }
     }
-    .ecg-glow {
-      animation: pulseGlow 3s infinite ease-in-out;
-    }
+    .ecg-glow { animation: none; }
+    .answer-tile { min-height: 76px; border: 0; border-radius: 14px; color: white; font-weight: 800; box-shadow: 0 5px 0 rgba(0,0,0,.28); transition: transform .12s, filter .12s; }
+    .answer-tile:hover { transform: translateY(-2px); filter: brightness(1.07); }
+    .answer-tile:active { transform: translateY(2px); box-shadow: none; }
+    .answer-tile:disabled { opacity: .68; }
+    .answer-red { background:#e34d4d; } .answer-blue { background:#3478d4; }
+    .answer-yellow { background:#e6a927; color:#1f2937; } .answer-green { background:#2eaa78; }
+    .pin-pop { color:#ffd166; text-shadow:0 2px 0 rgba(0,0,0,.25); }
+    .score-chip { background:#202b40; border:1px solid #34415a; border-radius:999px; padding:.35rem .7rem; font-weight:800; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
     .num-display {
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum";
@@ -49,9 +56,9 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-sm font-bold tracking-wider text-slate-100 uppercase">ECG Rhythm Simulator</h1>
-            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Treinamento Kahoot</span>
+            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Arena ECG</span>
           </div>
-          <p class="text-xs text-slate-400">Treinamento Interativo de Eletrocardiograma em Tempo Real</p>
+          <p class="text-xs text-slate-400">Desafio interativo de ritmos cardíacos em tempo real</p>
         </div>
       </div>
 
@@ -74,18 +81,18 @@
       <div class="text-center mb-10">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/50 text-emerald-400 text-xs font-semibold mb-4">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Salas em Tempo Real P2P · Sem Cadastro
+          PARTIDA AO VIVO · ENTRADA RÁPIDA
         </div>
         <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-4">
-          Treinamento de ECG Estilo Kahoot
+          Desafio de Ritmos Cardíacos
         </h2>
         <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto">
-          O instrutor projeta o ritmo na tela principal com o PIN e QR Code, e os participantes respondem pelos seus smartphones em tempo real.
+          O apresentador projeta o ritmo na tela principal com o PIN e QR Code, e os jogadores respondem pelos seus smartphones em tempo real.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Card 1: Instrutor -->
+        <!-- Card 1: Apresentador -->
         <div class="relative group bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-950/40">
           <div>
             <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
@@ -97,13 +104,13 @@
               <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Apresentador</span>
               <span class="text-xs text-slate-500">• Projetor / Tela Cheia</span>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-3">Criar Sala de Treinamento</h3>
+            <h3 class="text-2xl font-bold text-white mb-3">Abrir uma sala</h3>
             <p class="text-slate-400 text-sm leading-relaxed mb-6">
-              Gera um PIN de 6 dígitos e um QR Code na tela. Conforme os alunos entram com o celular, seus nomes aparecem na lista ao vivo.
+              Gera um PIN de 6 dígitos e um QR Code na tela. Conforme os jogadores entram com o celular, seus nomes aparecem na lista ao vivo.
             </p>
           </div>
-          <button id="btnStartHost" class="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/50 flex items-center justify-center gap-2 transition-all">
-            <span>Criar Sala e Gerar PIN</span>
+          <button id="btnStartHost" class="w-full py-3.5 px-6 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm tracking-wide shadow-lg shadow-amber-900/30 hover:shadow-amber-700/30 flex items-center justify-center gap-2 transition-all">
+            <span>Abrir sala</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
@@ -119,12 +126,12 @@
               </svg>
             </div>
             <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Participante</span>
+              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Jogador</span>
               <span class="text-xs text-slate-500">• Celular / Tablet</span>
             </div>
             <h3 class="text-2xl font-bold text-white mb-3">Entrar em uma Sala</h3>
             <p class="text-slate-400 text-sm leading-relaxed mb-6">
-              Digite o PIN exibido na tela do apresentador e escolha seu nome para se conectar à sessão de treinamento.
+              Digite o PIN da tela principal e escolha seu nome de jogador.
             </p>
           </div>
           <button id="btnGoToJoin" class="w-full py-3.5 px-6 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-cyan-900/40 hover:shadow-cyan-700/50 flex items-center justify-center gap-2 transition-all">
@@ -145,9 +152,9 @@
         <div class="flex items-center gap-3">
           <div id="hostNetBadge" class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Sala Ativa · Aguardando Participantes</span>
+            <span>Sala Ativa · Aguardando Jogadors</span>
           </div>
-          <span class="text-xs text-slate-400 hidden sm:inline">Conexão em Tempo Real Pronta</span>
+          <span class="text-xs text-slate-400 hidden sm:inline">Partida pronta</span>
         </div>
 
         <div class="flex items-center gap-3">
@@ -164,22 +171,22 @@
       <!-- Main Host Lobby Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        <!-- Left Column: PIN & QR Code Box (Estilo Kahoot Big Display) -->
+        <!-- PIN e QR Code da sala -->
         <div class="lg:col-span-5 bg-gradient-to-b from-slate-900/95 to-slate-950 border border-slate-800/90 rounded-3xl p-6 md:p-8 flex flex-col justify-between ecg-glow">
           <div>
             <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Entre com o Celular</span>
-              <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Acesso Rápido</span>
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">ENTRE NA PARTIDA</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">ENTRADA</span>
             </div>
 
             <p class="text-slate-300 text-sm mb-6">
-              Aponte a câmera do celular para o QR Code ou insira o PIN no site:
+              Escaneie o código ou digite o PIN para entrar:
             </p>
 
             <!-- Big PIN Display -->
-            <div class="bg-black/70 border-2 border-emerald-500/40 rounded-2xl p-5 mb-6 text-center">
-              <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-widest mb-1">PIN DA SALA</div>
-              <div id="hostPinDisplay" class="text-5xl md:text-6xl font-black tracking-[0.2em] text-white num-display text-emerald-400 select-all">
+            <div class="bg-[#0b1220] border-2 border-amber-400/50 rounded-2xl p-5 mb-6 text-center">
+              <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-widest mb-1">CÓDIGO DA PARTIDA</div>
+              <div id="hostPinDisplay" class="text-5xl md:text-6xl font-black tracking-[0.2em] num-display pin-pop select-all">
                 --- ---
               </div>
               <div class="mt-3 flex items-center justify-center gap-2">
@@ -213,16 +220,16 @@
         </div>
 
         <!-- Right Column: Connected Participants Live Roster -->
-        <div class="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-3xl p-6 md:p-8 flex flex-col justify-between">
+        <div class="lg:col-span-7 bg-[#111827] border border-[#293750] rounded-3xl p-6 md:p-8 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
               <div class="flex items-center gap-3">
-                <h3 class="text-xl font-bold text-white">Participantes Conectados</h3>
+                <h3 class="text-xl font-bold text-white">Jogadores na sala</h3>
                 <span id="participantBadgeCount" class="px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs num-display">
-                  0 alunos
+                  0 jogadores
                 </span>
               </div>
-              <span class="text-xs text-slate-400 hidden sm:inline">Atualização ao vivo via WebRTC</span>
+              <span class="text-xs text-slate-400 hidden sm:inline">Conectados agora</span>
             </div>
 
             <!-- Participants Roster Area -->
@@ -232,9 +239,9 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <h4 class="text-base font-semibold text-slate-300 mb-1">Aguardando participantes...</h4>
+              <h4 class="text-base font-semibold text-slate-300 mb-1">Aguardando jogadores...</h4>
               <p class="text-xs text-slate-500 max-w-sm">
-                Assim que os alunos digitarem o PIN ou escanearem o QR Code no celular, seus nomes aparecerão aqui na tela grande.
+                Quando os jogadores entrarem com o PIN ou QR Code, seus nomes aparecerão aqui.
               </p>
             </div>
 
@@ -244,15 +251,15 @@
             </div>
           </div>
 
-          <!-- Bottom Action Bar (Iniciar Jogo) -->
+          <!-- Bottom Action Bar (Começar partida) -->
           <div class="pt-6 border-t border-slate-800/90 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="text-xs text-slate-400 text-center sm:text-left">
-              <span id="readySummary">0 participantes prontos.</span>
-              <p class="text-slate-500 text-[11px]">No celular, os participantes verão apenas os 4 ícones coloridos do Kahoot para responder.</p>
+              <span id="readySummary">0 jogadores prontos.</span>
+              <p class="text-slate-500 text-[11px]">No celular, os jogadores recebem opções rápidas para identificar o ritmo.</p>
             </div>
 
-            <button id="btnStartGame" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm tracking-wider uppercase shadow-xl shadow-emerald-500/20 hover:shadow-emerald-400/30 flex items-center justify-center gap-2 transition-all transform active:scale-95">
-              <span>Iniciar Treinamento</span>
+            <button id="btnStartGame" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm tracking-wider uppercase shadow-xl shadow-amber-500/20 hover:shadow-amber-400/30 flex items-center justify-center gap-2 transition-all transform active:scale-95">
+              <span>Começar partida</span>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -268,7 +275,7 @@
     <!-- VIEW 3: STUDENT JOIN FORM (ENTRADA DO PARTICIPANTE / MOBILE-FIRST) -->
     <div id="viewStudentJoin" class="hidden w-full max-w-md mx-auto my-auto py-6">
       
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+      <div class="bg-[#111827] border border-[#293750] rounded-3xl p-6 sm:p-8 shadow-2xl">
         
         <div class="text-center mb-6">
           <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto mb-3">
@@ -277,7 +284,7 @@
             </svg>
           </div>
           <h2 class="text-2xl font-black text-white">Entrar na Sala</h2>
-          <p class="text-xs text-slate-400 mt-1">Insira os dados exibidos na tela do apresentador</p>
+          <p class="text-xs text-slate-400 mt-1">Digite o código e escolha seu nome</p>
         </div>
 
         <form id="formStudentJoin" class="flex flex-col gap-4">
@@ -302,7 +309,7 @@
 
           <!-- Name Input Field -->
           <div>
-            <label for="inputName" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Seu Nome ou Apelido</label>
+            <label for="inputName" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Nome de jogador</label>
             <input 
               type="text" 
               id="inputName" 
@@ -311,7 +318,7 @@
               class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3.5 text-slate-100 font-semibold outline-none transition-colors"
               required
             >
-            <span class="text-[11px] text-slate-500 mt-1 block">Este nome aparecerá na tela do projetor</span>
+            <span class="text-[11px] text-slate-500 mt-1 block">Este nome aparecerá na tela principal</span>
           </div>
 
           <!-- Connection Status Error Message Box -->
@@ -323,7 +330,7 @@
             id="btnSubmitJoin" 
             class="w-full py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm tracking-wider uppercase shadow-lg shadow-cyan-950/50 flex items-center justify-center gap-2 transition-all mt-2"
           >
-            <span id="btnSubmitJoinText">ENTRAR NO TREINAMENTO</span>
+            <span id="btnSubmitJoinText">ENTRAR NA SESSÃO</span>
             <span id="btnSubmitJoinSpinner" class="hidden w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
           </button>
 
@@ -340,7 +347,7 @@
     <!-- VIEW 4: STUDENT WAITING LOBBY (SALA DE ESPERA NO CELULAR) -->
     <div id="viewStudentLobby" class="hidden w-full max-w-md mx-auto my-auto py-6">
       
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+      <div class="bg-[#111827] border border-[#293750] rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
         
         <!-- Background ECG Sweep Line -->
         <div class="absolute inset-0 opacity-10 pointer-events-none flex items-center">
@@ -361,12 +368,12 @@
           </div>
 
           <h2 class="text-3xl font-black text-white mb-1">Você está dentro!</h2>
-          <p class="text-slate-400 text-sm mb-6">Veja seu nome na tela do projetor</p>
+          <p class="text-slate-400 text-sm mb-6">Seu nome aparece na tela principal</p>
 
           <!-- Student ID Card -->
           <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 mb-6 text-left">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Participante</span>
+              <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Jogador</span>
               <span id="studentLobbyPin" class="text-xs font-mono font-bold text-cyan-400">PIN: ------</span>
             </div>
             <div id="studentLobbyName" class="text-2xl font-bold text-white truncate">
@@ -376,15 +383,22 @@
               <span>Status:</span>
               <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                Aguardando o instrutor
+                Aguardando a próxima rodada
               </span>
             </div>
           </div>
 
           <!-- Pulsing Pulse info -->
           <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-900/40 text-xs text-cyan-300/90 leading-relaxed mb-6">
-            📱 Fique atento à tela do instrutor. Quando a questão iniciar, os 4 botões geométricos do Kahoot aparecerão aqui na sua tela para você responder!
+            📱 Fique atento à tela do apresentador. Quando a questão iniciar, as opções de resposta aparecerão aqui para você responder!
           </div>
+
+          <section id="studentRoundPanel" class="hidden mt-5 rounded-2xl border border-slate-700 bg-[#0b1220] p-4 text-left">
+            <div class="mb-3 flex items-center justify-between"><span class="score-chip text-amber-300">RODADA <span id="studentRoundNumber">1</span></span><span id="studentRoundTimer" class="text-xl font-black text-amber-300">20</span></div>
+            <h3 id="studentQuestion" class="mb-4 text-lg font-black text-white">Qual é o ritmo?</h3>
+            <div id="studentAnswerOptions" class="grid grid-cols-2 gap-3"></div>
+            <p id="studentAnswerStatus" class="mt-3 text-center text-sm text-slate-400"></p>
+          </section>
 
           <button type="button" id="btnLeaveStudentLobby" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">
             Sair da Sala ou Trocar de Nome
@@ -529,7 +543,7 @@
       // Setup Local BroadcastChannel
       try {
         if (state.channel) state.channel.close();
-        state.channel = new BroadcastChannel('ecg-kahoot-room-' + state.pin);
+        state.channel = new BroadcastChannel('ecg-rhythm-room-' + state.pin);
         state.channel.onmessage = (event) => {
           handleHostIncomingMessage(event.data, null);
         };
@@ -565,7 +579,7 @@
         state.peer.on('open', (id) => {
           document.getElementById('hostNetBadge').innerHTML = `
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-            <span>Sala Aberta · PIN: ${pin.slice(0, 3)} ${pin.slice(3)}</span>
+            <span>SALA ABERTA · PIN: ${pin.slice(0, 3)} ${pin.slice(3)}</span>
           `;
           showToast(`Sala criada com sucesso! PIN: ${pin}`, '🎉');
         });
@@ -626,6 +640,9 @@
           updateParticipantsUI();
           showToast(`${studentName} entrou na sala!`, '👋');
         }
+      } else if (msg.type === 'ANSWER') {
+        answeredCount++;
+        document.getElementById('answerCount').textContent = answeredCount + (answeredCount === 1 ? ' resposta' : ' respostas');
       } else if (msg.type === 'LEAVE') {
         handleStudentDisconnected(msg.studentId);
       }
@@ -662,8 +679,8 @@
       const grid = document.getElementById('participantsGrid');
       const summary = document.getElementById('readySummary');
 
-      countEl.textContent = `${count} ${count === 1 ? 'aluno' : 'alunos'}`;
-      summary.textContent = `${count} ${count === 1 ? 'participante conectado.' : 'participantes conectados.'}`;
+      countEl.textContent = `${count} ${count === 1 ? 'jogador' : 'jogadores'}`;
+      summary.textContent = `${count} ${count === 1 ? 'jogador conectado.' : 'jogadores conectados.'}`;
 
       if (count === 0) {
         emptyState.classList.remove('hidden');
@@ -684,7 +701,7 @@
               </div>
               <span class="text-sm font-semibold text-slate-200 truncate" title="${p.name}">${p.name}</span>
             </div>
-            <button type="button" class="text-slate-500 hover:text-rose-400 p-1 text-xs shrink-0 transition-colors" title="Remover aluno" onclick="kickParticipant('${p.id}')">
+            <button type="button" class="text-slate-500 hover:text-rose-400 p-1 text-xs shrink-0 transition-colors" title="Remover jogador" onclick="kickParticipant('${p.id}')">
               ✕
             </button>
           `;
@@ -741,7 +758,7 @@
       // 1. BroadcastChannel (local tabs instant connection)
       try {
         if (state.channel) state.channel.close();
-        state.channel = new BroadcastChannel('ecg-kahoot-room-' + pin);
+        state.channel = new BroadcastChannel('ecg-rhythm-room-' + pin);
         state.channel.onmessage = (event) => {
           const msg = event.data;
           if (msg && msg.type === 'JOIN_ACK' && (msg.studentId === state.studentId || msg.studentName === state.studentName)) {
@@ -820,7 +837,7 @@
       setTimeout(() => {
         if (!ackReceived) {
           setStudentButtonLoading(false);
-          errBox.textContent = 'Aguardando resposta do instrutor... Verifique se o PIN está correto e tente novamente.';
+          errBox.textContent = 'Aguardando resposta do apresentador... Verifique se o PIN está correto e tente novamente.';
           errBox.classList.remove('hidden');
         }
       }, 5000);
@@ -849,7 +866,7 @@
         text.textContent = 'CONECTANDO...';
         spinner.classList.remove('hidden');
       } else {
-        text.textContent = 'ENTRAR NO TREINAMENTO';
+        text.textContent = 'ENTRAR NA SESSÃO';
         spinner.classList.add('hidden');
       }
     }
@@ -870,7 +887,7 @@
     document.getElementById('formStudentJoin').addEventListener('submit', submitStudentJoin);
 
     document.getElementById('btnLeaveHost').addEventListener('click', () => {
-      if (confirm('Deseja realmente encerrar a sala de treinamento?')) {
+      if (confirm('Deseja realmente encerrar a sala?')) {
         if (state.peer) state.peer.destroy();
         if (state.channel) state.channel.close();
         switchView('home');
@@ -878,7 +895,7 @@
     });
 
     document.getElementById('btnLeaveStudentLobby').addEventListener('click', () => {
-      if (confirm('Deseja sair da sala de treinamento?')) {
+      if (confirm('Deseja sair da sala?')) {
         if (state.channel) {
           state.channel.postMessage({ type: 'LEAVE', studentId: state.studentId });
           state.channel.close();
@@ -911,16 +928,206 @@
       }
     });
 
-    document.getElementById('btnStartGame').addEventListener('click', () => {
-      const count = state.participants.size;
-      playAudioTone('start');
-      showToast('Preparando rodada com ' + count + ' participante(s)...', '🚀');
-      const startMsg = { type: 'ROUND_START', round: 1 };
-      if (state.channel) state.channel.postMessage(startMsg);
+    const ECG_RHYTHMS = [{"id": "sinus", "name": "Ritmo sinusal", "short": "Sinusal", "feature": "P antes de cada QRS, PR constante"}, {"id": "sinus-brady", "name": "Bradicardia sinusal", "short": "Brad. sinusal", "feature": "Ritmo sinusal com FC abaixo de 60"}, {"id": "sinus-tachy", "name": "Taquicardia sinusal", "short": "Taq. sinusal", "feature": "Ritmo sinusal com FC acima de 100"}, {"id": "afib", "name": "Fibrilação atrial", "short": "FA", "feature": "RR irregularmente irregular, sem onda P"}, {"id": "flutter", "name": "Flutter atrial", "short": "Flutter", "feature": "Ondas F em serrote, condução AV fixa"}, {"id": "svt", "name": "Taquicardia supraventricular", "short": "TSV", "feature": "Taquicardia regular de QRS estreito, P oculta"}, {"id": "pvc", "name": "Extrassístole ventricular", "short": "ESV", "feature": "Batimento precoce, QRS largo, pausa compensatória"}, {"id": "vt", "name": "Taquicardia ventricular monomórfica", "short": "TV", "feature": "Taquicardia regular de QRS largo"}, {"id": "vt-poly", "name": "Taquicardia ventricular polimórfica", "short": "TV polimórfica", "feature": "QRS largo com amplitude e polaridade variáveis"}, {"id": "vf", "name": "Fibrilação ventricular", "short": "FV", "feature": "Atividade caótica, sem QRS identificável"}, {"id": "idioventricular", "name": "Ritmo idioventricular", "short": "Idioventricular", "feature": "Escape ventricular lento, QRS largo, sem P"}, {"id": "avb1", "name": "BAV de 1º grau", "short": "BAV 1º grau", "feature": "PR prolongado (> 200 ms) e constante"}, {"id": "avb2-1", "name": "BAV de 2º grau Mobitz I", "short": "Mobitz I", "feature": "PR aumenta progressivamente até um P bloqueado"}, {"id": "avb2-2", "name": "BAV de 2º grau Mobitz II", "short": "Mobitz II", "feature": "PR constante com P bloqueado de forma súbita"}, {"id": "avb3", "name": "BAV total", "short": "BAVT", "feature": "Dissociação AV: P e QRS independentes"}, {"id": "junctional", "name": "Ritmo juncional", "short": "Juncional", "feature": "QRS estreito regular sem P sinusal"}, {"id": "aesp", "name": "AESP", "short": "AESP", "feature": "Atividade elétrica organizada sem pulso"}, {"id": "asystole", "name": "Assistolia", "short": "Assistolia", "feature": "Ausência de atividade elétrica: linha isoelétrica"}];
+    const ANSWER_COLORS = ['answer-red', 'answer-blue', 'answer-yellow', 'answer-green'];
+    const ANSWER_SHAPES = ['▲', '◆', '●', '■'];
+    let roundIndex = -1;
+    let roundTimerHandle = null;
+    let roundChoices = [];
+    let answeredCount = 0;
+    let ecgAnimation = null;
+
+    function drawRhythm(canvas, id) {
+      if (!canvas) return;
+      const rhythm = ECG_RHYTHMS.find(item => item.id === id) || ECG_RHYTHMS[0];
+      const dpr = window.devicePixelRatio || 1;
+      const width = Math.max(300, canvas.clientWidth || 600);
+      const height = Math.max(120, canvas.clientHeight || 160);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      let offset = 0;
+
+      const draw = () => {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#071411';
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = 'rgba(62,119,99,.25)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < width; x += 20) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        }
+        for (let y = 0; y < height; y += 20) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+        ctx.strokeStyle = '#ff6678';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#ff425d';
+        ctx.shadowBlur = 7;
+        ctx.beginPath();
+        const cycle = 140;
+        const baseline = height * 0.52;
+        for (let x = 0; x <= width; x += 2) {
+          const t = ((x + offset) % cycle) / cycle;
+          let y = baseline;
+          if (rhythm.id === 'asystole') {
+            y = baseline + Math.sin(x * 0.025) * 0.8;
+          } else if (rhythm.id === 'vf') {
+            y = baseline + Math.sin(x * 0.27) * 13 + Math.sin(x * 0.61) * 7 + Math.sin(x * 0.11) * 8;
+          } else if (rhythm.id === 'afib') {
+            y = baseline + Math.sin(x * 0.18) * 2.5;
+          } else if (t > 0.18 && t < 0.32) {
+            y = baseline - 8 * Math.sin((t - 0.18) / 0.14 * Math.PI);
+          } else if (t > 0.40 && t < 0.44) {
+            y = baseline + 8 * (t - 0.40) / 0.04;
+          } else if (t > 0.44 && t < 0.48) {
+            y = baseline - 58 + 116 * (t - 0.44) / 0.04;
+          } else if (t > 0.48 && t < 0.52) {
+            y = baseline + 58 - 58 * (t - 0.48) / 0.04;
+          } else if (t > 0.65 && t < 0.82) {
+            y = baseline - 13 * Math.sin((t - 0.65) / 0.17 * Math.PI);
+          }
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      };
+
+      if (ecgAnimation) cancelAnimationFrame(ecgAnimation);
+      const animate = () => {
+        offset = (offset + 1.2) % 140;
+        draw();
+        ecgAnimation = requestAnimationFrame(animate);
+      };
+      animate();
+    }
+
+    function sendRoomMessage(message) {
+      if (state.channel) state.channel.postMessage(message);
       state.participants.forEach(p => {
-        if (p.conn && p.conn.open) p.conn.send(startMsg);
+        if (p.conn && p.conn.open) p.conn.send(message);
       });
+    }
+
+    function chooseQuestion() {
+      roundIndex = (roundIndex + 1) % ECG_RHYTHMS.length;
+      const correct = ECG_RHYTHMS[roundIndex];
+      const wrong = ECG_RHYTHMS.filter(r => r.id !== correct.id).sort(() => Math.random() - 0.5).slice(0, 3);
+      roundChoices = [correct, ...wrong].sort(() => Math.random() - 0.5);
+      answeredCount = 0;
+
+      document.getElementById('hostRoundBoard').classList.remove('hidden');
+      document.getElementById('roundReveal').classList.add('hidden');
+      document.getElementById('roundNumber').textContent = String(roundIndex + 1);
+      document.getElementById('roundProgress').textContent = `${roundIndex + 1} / ${ECG_RHYTHMS.length}`;
+      document.getElementById('roundCategory').textContent = 'Desafio de Ritmo';
+      document.getElementById('answerCount').textContent = '0 respostas';
+      document.getElementById('btnNextRound').classList.add('hidden');
+
+      document.getElementById('hostAnswerOptions').innerHTML = roundChoices.map((choice, i) => `
+        <div class="answer-tile ${ANSWER_COLORS[i]} flex items-center gap-2 px-3 py-3 text-xs">
+          <span class="text-xl font-black">${ANSWER_SHAPES[i]}</span>
+          <span class="font-bold">${choice.short}</span>
+        </div>
+      `).join('');
+
+      drawRhythm(document.getElementById('roundEcg'), correct.id);
+
+      sendRoomMessage({
+        type: 'ROUND_QUESTION',
+        round: roundIndex + 1,
+        correctId: correct.id,
+        choices: roundChoices.map((r, i) => ({
+          id: r.id,
+          label: r.name,
+          short: r.short,
+          color: ANSWER_COLORS[i],
+          shape: ANSWER_SHAPES[i]
+        })),
+        seconds: 20
+      });
+
+      let sec = 20;
+      document.getElementById('roundTimer').textContent = String(sec);
+      if (roundTimerHandle) clearInterval(roundTimerHandle);
+      roundTimerHandle = setInterval(() => {
+        sec--;
+        document.getElementById('roundTimer').textContent = String(Math.max(0, sec));
+        if (sec <= 0) {
+          clearInterval(roundTimerHandle);
+          revealQuestion(correct);
+        }
+      }, 1000);
+    }
+
+    function revealQuestion(correct) {
+      document.getElementById('roundReveal').classList.remove('hidden');
+      document.getElementById('roundCorrectName').textContent = 'Ritmo Correto: ' + correct.name;
+      document.getElementById('roundFeature').textContent = correct.feature;
+      document.getElementById('btnNextRound').classList.remove('hidden');
+      sendRoomMessage({
+        type: 'ROUND_REVEAL',
+        correctId: correct.id,
+        name: correct.name,
+        feature: correct.feature
+      });
+    }
+
+    function renderStudentQuestion(msg) {
+      const panel = document.getElementById('studentRoundPanel');
+      panel.classList.remove('hidden');
+      document.getElementById('studentRoundNumber').textContent = String(msg.round);
+      document.getElementById('studentAnswerStatus').textContent = 'Toque em uma opção para responder:';
+      document.getElementById('studentAnswerOptions').innerHTML = msg.choices.map(choice => `
+        <button type="button" class="answer-tile ${choice.color} flex flex-col items-center justify-center gap-1.5 p-3 active:scale-95 transition-all" data-choice="${choice.id}" aria-label="${choice.label}">
+          <span class="text-3xl font-black">${choice.shape}</span>
+          <span class="text-xs font-bold leading-tight">${choice.short}</span>
+        </button>
+      `).join('');
+
+      document.querySelectorAll('#studentAnswerOptions button').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('#studentAnswerOptions button').forEach(item => {
+            item.disabled = true;
+            item.classList.add('opacity-50');
+          });
+          button.classList.remove('opacity-50');
+          button.classList.add('ring-4', 'ring-white');
+          document.getElementById('studentAnswerStatus').textContent = '✅ Resposta enviada! Aguarde a revelação...';
+
+          try {
+            if (navigator.vibrate) navigator.vibrate(40);
+          } catch(e) {}
+
+          const answer = {
+            type: 'ANSWER',
+            studentId: state.studentId,
+            choiceId: button.dataset.choice,
+            round: Number(msg.round)
+          };
+          if (state.peerConn && state.peerConn.open) state.peerConn.send(answer);
+          if (state.channel) state.channel.postMessage(answer);
+        });
+      });
+
+      let sec = Number(msg.seconds) || 20;
+      document.getElementById('studentRoundTimer').textContent = String(sec);
+      if (window.studentTimer) clearInterval(window.studentTimer);
+      window.studentTimer = setInterval(() => {
+        sec--;
+        document.getElementById('studentRoundTimer').textContent = String(Math.max(0, sec));
+        if (sec <= 0) clearInterval(window.studentTimer);
+      }, 1000);
+    }
+
+    document.getElementById('btnStartGame').addEventListener('click', () => {
+      playAudioTone('start');
+      document.getElementById('btnStartGame').classList.add('hidden');
+      chooseQuestion();
     });
+
+    document.getElementById('btnNextRound').addEventListener('click', chooseQuestion);
 
     // --- INITIAL ROUTING CHECK ---
     window.addEventListener('DOMContentLoaded', () => {
