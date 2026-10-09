@@ -1,1 +1,13 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Simulador de ECG</title></head><body><p>Carregando simulador de ECG...</p><script>(async()=>{const files=["ecg-html-part-01.txt","ecg-html-part-02.txt","ecg-html-part-03.txt","ecg-html-part-04.txt","ecg-html-part-05.txt","ecg-html-part-06.txt","ecg-html-part-07.txt","ecg-html-part-08.txt"];const parts=await Promise.all(files.map(async f=>(await fetch("/"+f)).text()));document.open();document.write(parts.join(""));document.close()})().catch(e=>document.body.textContent="Erro ao carregar simulador: "+e.message);</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07111f" />
+    <title>ECG Rhythm Simulator</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
