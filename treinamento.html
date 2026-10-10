@@ -3,1791 +3,442 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#060a10" />
-  <title>Arena ECG · Modo Gamificado de Treinamento</title>
+  <meta name="theme-color" content="#05090e" />
+  <title>Arena ECG · Premium</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #060a10;
-      --panel: #0b121c;
-      --line: #192738;
-      --muted: #889bb2;
+      --bg: #05090e;
+      --panel: #0b121b;
+      --line: #1c2a3a;
+      --muted: #8294aa;
       --lime: #c5f36a;
       --mint: #54e7a8;
-      --red: #f25555;
-      --blue: #3b82f6;
-      --yellow: #f59e0b;
-      --green: #10b981;
+      --cyan: #54d2e7;
+      --amber: #f0b64b;
+      --paper: #fff3f1;
+      --grid-small: #f7c8c6;
+      --grid-large: #ec8c89;
+      --trace: #111111;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(ellipse at top, #132233 0%, #060a10 50%);
-      color: #f3f6fa;
+      background: radial-gradient(ellipse at top, #142331 0%, #05090e 55%);
+      color: #f4f7f9;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow-x: hidden;
     }
     button, input, select { font: inherit; }
     button { cursor: pointer; }
-    .shell {
-      width: min(1500px, 100%);
-      margin: auto;
-      padding: clamp(14px, 2.5vw, 30px);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .brand-mark {
-      width: 44px; height: 44px;
-      display: grid; place-items: center;
-      border-radius: 14px;
-      color: #07100b;
-      background: var(--lime);
-      font-size: 24px;
-      box-shadow: 0 0 25px rgba(197, 243, 106, 0.35);
-      font-weight: 900;
-    }
-    .panel {
-      background: linear-gradient(145deg, rgba(14, 22, 34, 0.96), rgba(9, 15, 23, 0.96));
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-    }
-    .primary {
-      border: 0;
-      background: var(--lime);
-      color: #081105;
-      font-weight: 900;
-      border-radius: 14px;
-      padding: 13px 22px;
-      transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
-      box-shadow: 0 8px 24px rgba(197, 243, 106, 0.25);
-    }
-    .primary:hover {
-      background: #d6ff7d;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(197, 243, 106, 0.35);
-    }
-    .muted-btn {
-      border: 1px solid #233447;
-      background: #0f1926;
-      color: #d2deeb;
-      border-radius: 13px;
-      padding: 10px 16px;
-      font-weight: 700;
-      transition: all 0.16s ease;
-    }
-    .muted-btn:hover {
-      border-color: #4a6480;
-      background: #172638;
-      transform: translateY(-1px);
-    }
-    .section-label {
-      color: #8da4bc;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-size: 11px;
-      font-weight: 800;
-    }
-    .field {
-      width: 100%;
-      border: 1px solid #243549;
-      background: #08101a;
-      border-radius: 14px;
-      padding: 13px 16px;
-      color: #ffffff;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .field:focus {
-      border-color: var(--lime);
-      box-shadow: 0 0 0 3px rgba(197, 243, 106, 0.15);
-    }
-    .rhythm-card {
-      border: 1px solid #203144;
-      background: #0a131e;
-      border-radius: 14px;
-      padding: 12px 14px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      transition: all 0.15s ease;
-      cursor: pointer;
-      user-select: none;
-    }
-    .rhythm-card:hover {
-      border-color: #4f6f91;
-      transform: translateY(-1px);
-    }
-    .rhythm-card.selected {
-      border-color: var(--lime);
-      background: #152419;
-      box-shadow: 0 0 0 1px rgba(197, 243, 106, 0.3) inset;
-    }
-    .rhythm-card input {
-      accent-color: #c5f366;
-      width: 18px; height: 18px;
-      flex: none;
-    }
-    .category-block {
-      border: 1px solid #1a2838;
-      background: #09111b;
-      border-radius: 18px;
-      padding: 16px;
-    }
-    .answer-tile {
-      min-height: clamp(84px, 12vh, 140px);
-      border-radius: 20px;
-      border: 0;
-      color: #ffffff;
-      font-weight: 900;
-      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
-      transition: transform 0.14s, filter 0.14s, box-shadow 0.14s, opacity 0.2s;
-    }
-    .answer-tile:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.08);
-    }
-    .answer-red { background: linear-gradient(145deg, #ef5350, #c62828); }
-    .answer-blue { background: linear-gradient(145deg, #42a5f5, #1565c0); }
-    .answer-yellow { background: linear-gradient(145deg, #fbbf24, #d97706); color: #1c1303; }
-    .answer-green { background: linear-gradient(145deg, #34d399, #059669); }
-    .student-choice {
-      min-height: 27vh;
-      border-radius: 22px;
-    }
-    .ecg-monitor {
-      background: #020705;
-      border: 2px solid #163e30;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 0 60px rgba(16, 185, 129, 0.12), 0 20px 40px rgba(0, 0, 0, 0.6);
-      position: relative;
-    }
-    #roundEcgCanvas {
-      width: 100%;
-      height: clamp(340px, 52vh, 640px);
-      display: block;
-    }
-    .timer-ring {
-      font-variant-numeric: tabular-nums;
-      font-size: clamp(24px, 3.4vw, 42px);
-      font-weight: 900;
-      line-height: 1;
-    }
-    .avatar-option {
-      width: 54px; height: 54px;
-      border: 1px solid #233447;
-      border-radius: 16px;
-      background: #09121c;
-      font-size: 26px;
-      transition: all 0.15s ease;
-      display: grid;
-      place-items: center;
-    }
-    .avatar-option:hover {
-      transform: scale(1.09);
-      border-color: #6385a7;
-    }
-    .avatar-option.selected {
-      border: 2px solid var(--lime);
-      background: #172718;
-      box-shadow: 0 0 20px rgba(197, 243, 106, 0.35);
-      transform: scale(1.06);
-    }
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #54e7a8;
-      box-shadow: 0 0 10px #54e7a8;
-    }
-    .toast {
-      position: fixed;
-      z-index: 100;
-      bottom: 24px;
-      left: 50%;
-      transform: translate(-50%, 20px);
-      opacity: 0;
-      pointer-events: none;
-      background: #f0fdf4;
-      color: #062013;
-      padding: 12px 20px;
-      border-radius: 14px;
-      font-weight: 800;
-      transition: all 0.25s ease;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-    }
-    .toast.show {
-      transform: translate(-50%, 0);
-      opacity: 1;
-    }
+    .shell { width: min(1560px, 100%); margin: auto; padding: clamp(12px, 2vw, 28px); min-height: 100vh; display: flex; flex-direction: column; }
+    .brand-mark { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; color: #07100c; background: var(--lime); font-size: 22px; font-weight: 900; box-shadow: 0 0 25px #c5f36644; }
+    .panel { background: linear-gradient(145deg, rgba(14,22,33,.95), rgba(8,14,22,.96)); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+    .primary { border: 0; background: var(--lime); color: #09120a; font-weight: 900; border-radius: 14px; padding: 13px 20px; transition: .18s ease; box-shadow: 0 8px 24px #c5f36625; }
+    .primary:hover { background: #d5ff7b; transform: translateY(-2px); box-shadow: 0 12px 32px #c5f36644; }
+    .muted-btn { border: 1px solid #29394b; background: rgba(13,23,35,.8); color: #d5e0eb; border-radius: 12px; padding: 9px 13px; font-weight: 700; transition: .18s; }
+    .muted-btn:hover { border-color: #607b94; background: #172536; }
+    .section-label { color: #8fa3b9; text-transform: uppercase; letter-spacing: .15em; font-size: 10px; font-weight: 900; }
+    .field { width: 100%; border: 1px solid #2b3c50; background: #08111a; border-radius: 13px; padding: 13px 15px; color: #fff; outline: none; }
+    .field:focus { border-color: var(--lime); box-shadow: 0 0 0 3px #c5f36622; }
+    .rhythm-card { border: 1px solid #26374a; background: #0a121c; border-radius: 13px; padding: 10px 13px; display: flex; gap: 10px; align-items: center; transition: .14s; cursor: pointer; user-select: none; }
+    .rhythm-card:hover { border-color: #68819b; transform: translateY(-1px); }
+    .rhythm-card.selected { border-color: var(--lime); background: #192617; box-shadow: 0 0 0 1px #c5f36633 inset; }
+    .rhythm-card input { accent-color: #c5f366; width: 18px; height: 18px; flex: none; }
+    .category-block { border: 1px solid #1d2c3b; background: #09111a; border-radius: 17px; padding: 14px; }
+    .answer-tile { border-radius: 18px; border: 0; color: white; font-weight: 900; box-shadow: 0 6px 0 #0005, 0 12px 24px #0002; transition: transform .14s, filter .14s, opacity .2s, box-shadow .2s; }
+    .answer-tile:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .answer-tile:active { transform: translateY(3px) scale(.98); box-shadow: 0 2px 0 #0005; }
+    .answer-red { background: linear-gradient(145deg, #f26761, #c52e39); }
+    .answer-blue { background: linear-gradient(145deg, #5596ee, #315fc4); }
+    .answer-yellow { background: linear-gradient(145deg, #f3c252, #d58c18); color: #241805; }
+    .answer-green { background: linear-gradient(145deg, #51d19a, #208d66); }
+    .student-choice { height: calc((100dvh - 72px) / 2); min-height: 120px; max-height: 46dvh; width: 100%; }
+    .ecg-monitor { border: 2px solid #1d493b; border-radius: 20px; overflow: hidden; box-shadow: 0 0 46px #2ac37a17; background: #020806; position: relative; }
+    #roundEcgCanvas { width: 100%; height: 100%; display: block; }
+    .projection-layout { height: 100dvh; width: 100vw; position: fixed; inset: 0; z-index: 5; padding: 14px 24px 12px; display: grid; grid-template-rows: 60px minmax(0,1fr) auto auto; gap: 10px; background: var(--bg); overflow: hidden; }
+    .projection-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+    .projection-ecg { min-height: 0; border-radius: 20px; position: relative; user-select: none; }
+    .projection-question { font-size: clamp(28px, 3vw, 50px); font-weight: 1000; letter-spacing: .04em; text-align: center; white-space: nowrap; }
+    .projection-options { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; min-height: clamp(105px, 18vh, 185px); }
+    .projection-options .answer-tile { display: flex; align-items: center; gap: 16px; padding: 12px 18px; text-align: left; font-size: clamp(16px, 1.6vw, 27px); }
+    .projection-options .shape { font-size: clamp(46px, 5vw, 82px); line-height: 1; }
+    .projection-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 36px; opacity: 0; transition: opacity .25s; }
+    .projection-layout:hover .projection-footer, .projection-footer:focus-within, .projection-layout.controls-visible .projection-footer { opacity: 1; }
+    .progress-track { height: 5px; background: #192739; border-radius: 20px; overflow: hidden; width: min(240px, 22vw); }
+    .progress-fill { height: 100%; width: 0%; background: var(--mint); transition: width .25s; }
+    .timer-disc { width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--amber); display: grid; place-items: center; font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 12px #f0b64b17; }
+    .timer-disc.urgent { color: #ff7272; border-color: #ff5454; animation: pulse 700ms infinite; }
+    @keyframes pulse { 50% { transform: scale(1.07); box-shadow: 0 0 18px #ff545466; } }
+    .answer-enter { animation: tileIn .3s backwards; }
+    .answer-enter:nth-child(2) { animation-delay: 50ms; }
+    .answer-enter:nth-child(3) { animation-delay: 100ms; }
+    .answer-enter:nth-child(4) { animation-delay: 150ms; }
+    @keyframes tileIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+    .avatar-option { width: 50px; height: 50px; border: 1px solid #2a3b4e; border-radius: 15px; background: #09111b; font-size: 24px; transition: .15s; }
+    .avatar-option:hover { transform: scale(1.08); border-color: #7d91a8; }
+    .avatar-option.selected { border: 2px solid var(--lime); background: #192619; box-shadow: 0 0 15px #c5f36633; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #54e7a8; box-shadow: 0 0 10px #54e7a8; display: inline-block; }
+    .toast { position: fixed; z-index: 100; bottom: 20px; left: 50%; transform: translate(-50%,20px); opacity: 0; pointer-events: none; background: #ecfff4; color: #0a2014; padding: 12px 18px; border-radius: 13px; font-weight: 800; transition: .25s; box-shadow: 0 10px 36px #0006; }
+    .toast.show { transform: translate(-50%,0); opacity: 1; }
     .hidden { display: none !important; }
-    .scroll-list {
-      max-height: 48vh;
-      overflow-y: auto;
-      scrollbar-color: #3b5066 transparent;
-    }
-    @media(max-width: 768px) {
+    .scroll-list { max-height: 48vh; overflow: auto; scrollbar-color: #3c5168 transparent; }
+    .student-fullscreen { position: fixed; inset: 0; z-index: 15; background: #080d14; padding: max(8px, env(safe-area-inset-top)) 9px max(8px, env(safe-area-inset-bottom)); display: grid; grid-template-rows: 34px minmax(0,1fr); gap: 8px; }
+    .student-topline { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; color: #9babbd; font-size: 12px; }
+    .student-topline .timer { font-variant-numeric: tabular-nums; font-size: 17px; font-weight: 900; color: var(--amber); }
+    .student-answer-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; min-height: 0; }
+    .student-answer-grid .answer-tile { min-height: 0; display: grid; place-items: center; position: relative; overflow: hidden; }
+    .student-answer-grid .shape { font-size: clamp(68px, 15vw, 130px); line-height: 1; text-shadow: 0 3px 12px #0003; }
+    .student-answer-grid .answer-status { position: absolute; inset: auto 0 12px; text-align: center; font-size: 13px; font-weight: 900; opacity: 0; transform: translateY(5px); transition: .2s; }
+    .student-answer-grid.answered .answer-status { opacity: 1; transform: none; }
+    .explain-overlay { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.92); display: grid; place-items: center; padding: 24px; }
+    .zoom-box { width: min(96vw, 1400px); height: min(86vh, 900px); position: relative; background: var(--bg); border: 1px solid #41566d; border-radius: 16px; overflow: hidden; }
+    #zoomCanvas { width: 100%; height: 100%; display: block; }
+    .zoom-controls { position: absolute; top: 12px; right: 12px; display:flex; gap:8px; z-index: 2; }
+    .zoom-ruler { position: absolute; left: 15%; right: 15%; bottom: 15%; border-top: 2px solid var(--lime); height: 20px; opacity: .85; pointer-events:none; }
+    .zoom-ruler:before { content:''; display:block; height:10px; border-left:2px solid var(--lime); border-right:2px solid var(--lime); }
+    .zoom-selecting { position: absolute; inset: 0; cursor: crosshair; z-index: 3; }
+    .select-rect { position: absolute; border: 2px dashed var(--lime); background: #c5f36a20; pointer-events: none; }
+    .theme-light { --bg: #fff3f1; --panel: #fffaf9; --line: #f0d2cf; --muted: #64585a; color: #1c1515; background: #fff3f1; }
+    .theme-light #roundEcgCanvas { background:#fff3f1; }
+    @media(max-width: 760px) {
       .shell { padding: 12px; }
-      .student-choice { min-height: 22vh; }
-      .panel { border-radius: 18px; }
+      .projection-layout { padding: 8px 9px; grid-template-rows: 48px minmax(0,1fr) auto auto; gap: 7px; }
+      .projection-header { grid-template-columns: auto 1fr auto; }
+      .projection-question { font-size: 21px; }
+      .projection-options { grid-template-columns: repeat(2,1fr); grid-template-rows: 1fr 1fr; min-height: 140px; gap: 7px; }
+      .projection-options .answer-tile { padding: 8px; gap: 8px; font-size: 15px; }
+      .projection-options .shape { font-size: 36px; }
+      .projection-footer { opacity: 1; }
+      .student-choice { height: calc((100dvh - 56px)/2); }
     }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
   </style>
 </head>
 <body>
   <main class="shell">
-    <!-- Top Global Header -->
-    <header class="flex items-center justify-between gap-4 mb-6">
-      <a href="./" class="flex items-center gap-3 no-underline text-white">
-        <span class="brand-mark">⌁</span>
-        <span>
-          <span class="block text-xl font-black tracking-tight">ARENA <span style="color:var(--lime)">ECG</span></span>
-          <span class="block text-[11px] text-slate-400">Simulação clínica competitiva em tempo real</span>
-        </span>
-      </a>
-      <div class="flex items-center gap-2">
-        <span class="status-dot"></span>
-        <span id="globalHeaderStatus" class="text-xs text-slate-400">Modo Gamificado</span>
-      </div>
+    <header id="globalHeader" class="flex items-center justify-between gap-4 mb-7">
+      <a href="./" class="flex items-center gap-3 no-underline text-white"><span class="brand-mark">⌁</span><span><span class="block text-xl font-black tracking-tight">ECG <span style="color:var(--lime)">ARENA</span></span><span class="block text-[11px] text-slate-400">Treino de interpretação em tempo real</span></span></a>
+      <span class="inline-flex items-center gap-2 text-xs text-slate-400"><span class="status-dot"></span> Modo jogo premium</span>
     </header>
 
-    <!-- SECTION 1: HOME WELCOME -->
     <section id="viewHome" class="my-auto">
-      <div class="max-w-3xl mx-auto text-center mb-10">
-        <p class="section-label mb-3">Arena Interativa de Eletrocardiograma</p>
-        <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4 leading-tight">
-          Interprete ritmos reais.<br>
-          <span style="color:var(--lime)">Decida sob pressão.</span>
-        </h1>
-        <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
-          Projete o traçado no telão da aula enquanto os alunos jogam e respondem instantaneamente pelo celular.
-        </p>
-      </div>
-
-      <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        <article class="panel p-7 sm:p-9 flex flex-col">
-          <div class="text-4xl mb-4">🎛️</div>
-          <p class="section-label mb-2">Painel do Docente</p>
-          <h2 class="text-2xl font-black mb-3">Criar Sessão da Arena</h2>
-          <p class="text-sm text-slate-400 leading-relaxed mb-8">
-            Selecione ritmos específicos para sua aula (sinusais, bloqueios, taquiarritmias ou PCR), ou deixe o sistema sortear aleatoriamente.
-          </p>
-          <button id="btnStartHost" class="primary mt-auto text-base">
-            CONFIGURAR E CRIAR SALA <span class="ml-2">↗</span>
-          </button>
-        </article>
-
-        <article class="panel p-7 sm:p-9 flex flex-col">
-          <div class="text-4xl mb-4">📲</div>
-          <p class="section-label mb-2" style="color:#70c9f5">Acesso do Participante</p>
-          <h2 class="text-2xl font-black mb-3">Entrar em uma Sala</h2>
-          <p class="text-sm text-slate-400 leading-relaxed mb-8">
-            Escaneie o QR Code projetado ou digite o código de 6 dígitos da sala, escolha seu nome e ícone de jogador.
-          </p>
-          <button id="btnGoToJoin" class="muted-btn mt-auto text-base">
-            ENTRAR COM CÓDIGO DA SALA →
-          </button>
-        </article>
+      <div class="max-w-3xl mx-auto text-center mb-10"><p class="section-label mb-3">Aula prática · competição saudável</p><h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4">Leia o traçado.<br><span style="color:var(--lime)">Acerte em equipe.</span></h1><p class="text-slate-400 max-w-xl mx-auto">O docente apresenta o ECG na tela. Cada participante responde pelo seu dispositivo.</p></div>
+      <div class="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+        <article class="panel p-7 sm:p-9 flex flex-col"><div class="text-4xl mb-4">🎛️</div><p class="section-label mb-2">Docente</p><h2 class="text-2xl font-black mb-3">Configure a sessão</h2><p class="text-sm text-slate-400 leading-relaxed mb-8">Escolha os ritmos, organize a ordem das rodadas, defina a dificuldade e acompanhe o desempenho da turma.</p><button id="btnStartHost" class="primary mt-auto">CRIAR SALA DA ARENA →</button></article>
+        <article class="panel p-7 sm:p-9 flex flex-col"><div class="text-4xl mb-4">📲</div><p class="section-label mb-2" style="color:#70c9f5">Participante</p><h2 class="text-2xl font-black mb-3">Entre pelo celular</h2><p class="text-sm text-slate-400 leading-relaxed mb-8">Escaneie o QR Code ou digite o PIN, escolha seu nome de usuário e um ícone para a partida.</p><button id="btnGoToJoin" class="muted-btn mt-auto">ENTRAR COM PIN →</button></article>
       </div>
     </section>
 
-    <!-- SECTION 2: PROFESSOR SETUP (CUSTOMIZATION) -->
     <section id="viewHostSetup" class="hidden my-auto">
-      <div class="flex items-start justify-between gap-4 mb-6">
-        <div>
-          <p class="section-label mb-1">Personalização da Partida</p>
-          <h1 class="text-3xl sm:text-4xl font-black">Configure o Conteúdo da Aula</h1>
-          <p class="text-sm text-slate-400 mt-1">
-            Escolha os ritmos que participarão da sessão ou deixe o sorteio automático do sistema.
-          </p>
-        </div>
-        <button id="btnSetupBack" class="muted-btn">← Voltar</button>
-      </div>
-
-      <div class="grid lg:grid-cols-[1fr_330px] gap-6">
-        <div class="panel p-5 sm:p-7">
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-5 border-b border-slate-800 pb-4">
-            <div>
-              <h2 class="font-black text-lg">Biblioteca de Ritmos Clínicos</h2>
-              <p class="text-xs text-slate-400 mt-0.5"><span id="selectedCount" class="font-bold text-lime-400">0</span> selecionados para a partida</p>
-            </div>
-            <div class="flex gap-2 flex-wrap">
-              <button id="btnFilterAll" class="muted-btn text-xs py-1.5 px-3">Todos (18)</button>
-              <button id="btnFilterBlocks" class="muted-btn text-xs py-1.5 px-3">Só Bloqueios</button>
-              <button id="btnFilterPcr" class="muted-btn text-xs py-1.5 px-3">Só PCR & Ventriculares</button>
-              <button id="btnClearSelection" class="muted-btn text-xs py-1.5 px-3 text-rose-300">Limpar</button>
-            </div>
-          </div>
-          <div id="rhythmLibrary" class="grid sm:grid-cols-2 gap-3 scroll-list pr-1"></div>
-        </div>
-
-        <aside class="panel p-5 sm:p-7 h-fit flex flex-col gap-4">
-          <p class="section-label">Regras do Jogo</p>
-          <label class="block">
-            <span class="text-sm font-bold">Ordem de Exibição</span>
-            <select id="gameMode" class="field mt-1.5">
-              <option value="random">Aleatória / Sorteio pelo Sistema</option>
-              <option value="sequence">Sequencial na ordem da lista</option>
-            </select>
-          </label>
-          <label class="block">
-            <span class="text-sm font-bold">Tempo por Pergunta</span>
-            <select id="roundDurationSelect" class="field mt-1.5">
-              <option value="15">15 segundos · Resposta relâmpago</option>
-              <option value="25" selected>25 segundos · Padrão recomendado</option>
-              <option value="40">40 segundos · Tempo para discussão</option>
-              <option value="60">60 segundos · Aula comentada</option>
-            </select>
-          </label>
-          <label class="block">
-            <span class="text-sm font-bold">Quantidade de Rodadas</span>
-            <select id="roundCountSelect" class="field mt-1.5">
-              <option value="all" selected>Todos os ritmos selecionados</option>
-              <option value="5">5 rodadas rápidas</option>
-              <option value="10">10 rodadas</option>
-              <option value="15">15 rodadas</option>
-            </select>
-          </label>
-
-          <div id="setupError" class="hidden text-sm text-rose-300 bg-rose-950/40 border border-rose-900 rounded-xl p-3">
-            ⚠️ Selecione pelo menos 1 ritmo para iniciar a partida.
-          </div>
-
-          <button id="btnCreateConfiguredRoom" class="primary w-full mt-2 text-base">
-            ABRIR SALA DA ARENA <span class="ml-1">→</span>
-          </button>
-        </aside>
+      <div class="flex items-start justify-between gap-4 mb-6"><div><p class="section-label mb-1">Configuração da partida</p><h1 class="text-3xl sm:text-4xl font-black">Personalize sua sessão</h1><p class="text-sm text-slate-400 mt-1">Selecione ritmos, personalize a sequência e defina a dificuldade.</p></div><button id="btnSetupBack" class="muted-btn">← Voltar</button></div>
+      <div class="grid lg:grid-cols-[1fr_335px] gap-5">
+        <div class="panel p-5 sm:p-6"><div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><h2 class="font-black text-lg">Biblioteca de ritmos</h2><p class="text-xs text-slate-400 mt-1"><span id="selectedCount">0</span> selecionados</p></div><div class="flex flex-wrap gap-2"><button id="btnSelectAll" class="muted-btn text-xs">Selecionar todos</button><button id="btnSelectBlocks" class="muted-btn text-xs">Bloqueios</button><button id="btnSelectPcr" class="muted-btn text-xs">PCR/Ventriculares</button><button id="btnClearSelection" class="muted-btn text-xs">Limpar</button></div></div><div id="rhythmLibrary" class="grid sm:grid-cols-2 gap-3 scroll-list pr-1"></div></div>
+        <aside class="panel p-5 sm:p-6 h-fit"><p class="section-label mb-3">Regras da sessão</p><div class="space-y-4"><label class="block"><span class="text-sm font-bold">Ordem</span><select id="gameMode" class="field mt-2"><option value="random">Sorteio aleatório pelo sistema</option><option value="sequence">Sequência personalizada</option></select></label><div id="sequenceEditor" class="hidden rounded-xl border border-slate-700 bg-slate-950/70 p-3"><div class="flex items-center justify-between mb-2"><span class="text-xs font-black text-slate-300">ORDEM DAS RODADAS</span><span class="text-[10px] text-slate-500">Arraste ou use setas</span></div><ol id="selectedRhythmOrder" class="space-y-2 max-h-64 overflow-y-auto"></ol><p id="sequenceEmpty" class="hidden text-xs text-amber-300 mt-2">Selecione ritmos na lista para montar a sequência.</p></div><label class="block"><span class="text-sm font-bold">Dificuldade</span><select id="difficultySelect" class="field mt-2"><option value="easy">Fácil · ritmos visualmente distintos</option><option value="hard">Difícil · ritmos semelhantes</option></select></label><label class="block"><span class="text-sm font-bold">Tempo de resposta</span><select id="roundDurationSelect" class="field mt-2"><option value="15">15 segundos</option><option value="25" selected>25 segundos</option><option value="40">40 segundos</option><option value="60">60 segundos</option></select></label><label class="block"><span class="text-sm font-bold">Quantidade de rodadas</span><select id="roundCountSelect" class="field mt-2"><option value="all">Todos os ritmos selecionados</option><option value="5">5 rodadas</option><option value="10">10 rodadas</option><option value="15">15 rodadas</option></select></label><div id="setupError" class="hidden text-sm text-rose-300 bg-rose-950/40 border border-rose-900 rounded-xl p-3">Selecione pelo menos um ritmo.</div><button id="btnCreateRoom" class="primary w-full">CRIAR SALA →</button></div></aside>
       </div>
     </section>
 
-    <!-- SECTION 3: PROFESSOR PRESENTATION SCREEN (TELÃO) -->
     <section id="viewHost" class="hidden flex-col gap-4">
-      <!-- Minimalist top control bar for teacher -->
-      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-2.5">
-        <div class="flex items-center gap-3">
-          <span class="status-dot"></span>
-          <span id="hostNetBadge" class="text-sm font-bold text-slate-200">Sala ativa</span>
-          <span id="hostSyncBadge" class="hidden text-xs text-lime-300 bg-lime-950/40 px-3 py-1 rounded-full font-mono">SIMULADOR SINCRONIZADO</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button id="btnToggleSound" class="muted-btn text-xs py-1.5">
-            <span id="soundIcon">🔔</span> <span id="soundLabel">Som ligado</span>
-          </button>
-          <button id="btnFullscreen" class="muted-btn text-xs py-1.5">⛶ Tela Cheia</button>
-          <button id="btnLeaveHost" class="muted-btn text-xs py-1.5 text-rose-300 hover:text-rose-200">Encerrar Sala</button>
-        </div>
-      </div>
-
-      <!-- 3A: LOBBY WITH BIG QR CODE & CONNECTED PLAYERS -->
-      <div id="hostLobbySection" class="grid lg:grid-cols-[400px_1fr] gap-6 my-auto">
-        <div class="panel p-6 sm:p-8 text-center flex flex-col items-center justify-center">
-          <p class="section-label mb-2">Escaneie com a câmera do celular</p>
-          <div id="qrCodeContainer" class="bg-white p-4 rounded-2xl w-[280px] h-[280px] flex items-center justify-center shadow-2xl mx-auto my-2"></div>
-          
-          <div class="mt-4">
-            <p class="text-xs text-slate-400 uppercase tracking-widest font-bold">Código da Sala</p>
-            <div id="hostPinDisplay" class="font-black tracking-[.22em] text-5xl sm:text-6xl mt-1 font-mono" style="color:var(--lime)">
-              ------
-            </div>
-          </div>
-
-          <div class="flex justify-center gap-2 mt-4">
-            <button id="btnCopyPin" class="muted-btn text-xs">Copiar Código</button>
-            <button id="btnCopyLink" class="muted-btn text-xs">Copiar Link</button>
-          </div>
-          <p class="text-[11px] text-slate-500 mt-3 break-all font-mono" id="hostDirectUrl"></p>
-        </div>
-
-        <div class="panel p-6 sm:p-8 flex flex-col min-h-[460px]">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-            <div>
-              <h2 class="text-2xl font-black">Turma Conectada</h2>
-              <p class="text-xs text-slate-400 mt-1">Os participantes aparecem aqui em tempo real com seus ícones.</p>
-            </div>
-            <span id="participantBadgeCount" class="px-4 py-1.5 rounded-full bg-slate-800 text-lime-300 text-sm font-black font-mono">
-              0 participantes
-            </span>
-          </div>
-
-          <div id="participantsEmptyState" class="m-auto text-center py-12">
-            <div class="text-6xl mb-4 animate-bounce">📡</div>
-            <p class="text-lg font-bold">Aguardando a turma entrar...</p>
-            <p class="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
-              Aponte a câmera para o QR Code ou digite o código de 6 dígitos no celular.
-            </p>
-          </div>
-
-          <div id="participantsGrid" class="hidden grid sm:grid-cols-2 xl:grid-cols-3 gap-3 scroll-list"></div>
-
-          <div class="mt-auto pt-5 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p id="readySummary" class="text-sm font-bold text-slate-200">0 conectados</p>
-              <p id="selectedRhythmsSummary" class="text-xs text-slate-400 mt-0.5">18 ritmos na partida</p>
-            </div>
-            <button id="btnStartGame" class="primary text-lg px-7 py-3.5">
-              INICIAR PARTIDA <span class="ml-2">▶</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3B: GAME DISPLAY - ULTRA CLEAN & IMMERSIVE SCREEN -->
-      <section id="hostGameSection" class="hidden flex-col gap-4">
-        <!-- Clean header with QUESTION in large evidence, subtle round & timer -->
-        <div class="flex items-center justify-between gap-4 px-2">
-          <div class="flex items-center gap-3">
-            <span class="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-black tracking-wider text-slate-300">
-              RODADA <b id="roundNumber" class="text-lime-400 text-sm">1</b><span id="roundTotalLabel" class="text-slate-500"></span>
-            </span>
-            <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300">
-              ⚡ <b id="answerCount" class="text-white text-sm">0</b>/<b id="totalStudentsCount" class="text-slate-400">0</b> responderam
-            </span>
-          </div>
-
-          <!-- QUESTION TITLE: PROMINENT & CENTERED -->
-          <h1 class="text-center font-black text-2xl sm:text-4xl lg:text-5xl tracking-tight text-white m-0">
-            QUE RITMO É ESSE?
-          </h1>
-
-          <div class="flex items-center gap-2">
-            <div class="flex items-center gap-2 px-4 py-1.5 rounded-2xl bg-black/80 border border-amber-500/40 shadow-lg">
-              <span class="text-xs font-black text-amber-400">⏱️</span>
-              <span id="roundTimer" class="timer-ring text-white font-mono">25</span>
-              <span class="text-xs text-slate-400">s</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- MAIN ECG TRACE CANVAS: MAX EVIDENCE, NO LEAKED TEXT OR FC -->
-        <div class="ecg-monitor">
-          <canvas id="roundEcgCanvas"></canvas>
-          <div class="absolute top-4 left-5 flex items-center gap-2 pointer-events-none">
-            <span class="rounded-full bg-black/80 border border-emerald-900/80 px-3 py-1 text-[11px] text-emerald-400 font-mono tracking-wider">
-              DERIVAÇÃO DII · 25 mm/s · 10 mm/mV
-            </span>
-          </div>
-        </div>
-
-        <!-- 4 LARGE ANSWER TILES (COLORED WITH ICONS) -->
-        <div id="hostAnswerOptions" class="grid grid-cols-2 gap-3 sm:gap-5"></div>
-
-        <!-- REVEAL & CLINICAL DEBRIEFING PANEL -->
-        <div id="roundRevealPanel" class="hidden panel p-6 sm:p-8 animate-fade-in border-emerald-500/30">
-          <div class="grid lg:grid-cols-[1fr_380px] gap-6">
-            <div>
-              <div class="flex items-center gap-3 mb-2">
-                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-black">
-                  DIAGNÓSTICO CORRETO
-                </span>
-                <span id="revealBpmBadge" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-mono"></span>
-              </div>
-              <h2 id="revealRhythmName" class="text-3xl sm:text-4xl font-black mb-3" style="color:var(--lime)"></h2>
-              <p id="revealRhythmFeature" class="text-base text-slate-200 leading-relaxed bg-slate-950/60 p-4 rounded-xl border border-slate-800"></p>
-
-              <div class="mt-4 pt-4 border-t border-slate-800">
-                <p class="section-label mb-1.5" style="color:#70c9f5">Conduta Clínica Recomendada (ACLS / Diretrizes)</p>
-                <p id="revealConduct" class="text-sm text-slate-300 leading-relaxed"></p>
-              </div>
-
-              <div class="mt-5">
-                <p class="section-label mb-2">Distribuição das Respostas da Turma</p>
-                <div id="voteDistributionBars" class="space-y-2"></div>
-              </div>
-            </div>
-
-            <!-- LEADERBOARD / RANKING -->
-            <div class="panel p-5 bg-black/40 border-slate-800 flex flex-col">
-              <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-                <h3 class="font-black text-sm uppercase tracking-wider text-amber-400">🏆 Top da Rodada</h3>
-                <span class="text-xs text-slate-500">Pontuação</span>
-              </div>
-              <div id="leaderboardList" class="space-y-2 flex-1 scroll-list"></div>
-              <button id="btnNextQuestion" class="primary w-full mt-4 text-base py-3">
-                PRÓXIMO RITMO ❯
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- DISCRETE FLOATING CONTROLS FOR THE PROFESSOR -->
-        <div class="flex items-center justify-between gap-2 panel px-4 py-2 mt-1 bg-black/50 border-slate-800">
-          <div class="text-xs text-slate-400">
-            Atalhos: <span class="font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">[Espaço]</span> pausar/revelar · <span class="font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">[N]</span> próximo
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="btnRestartTimer" class="muted-btn text-xs py-1.5">↻ Reiniciar 25s</button>
-            <button id="btnRevealNow" class="muted-btn text-xs py-1.5 text-lime-300 border-lime-800/60 bg-lime-950/30">
-              👁️ Revelar Resposta
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3C: FINAL PODIUM SCREEN -->
-      <section id="hostPodiumSection" class="hidden panel p-8 sm:p-12 text-center my-auto">
-        <div class="text-6xl mb-4">🏆</div>
-        <p class="section-label mb-2">Fim da Sessão</p>
-        <h1 class="text-4xl sm:text-6xl font-black mb-6" style="color:var(--lime)">PÓDIO DOS CAMPEÕES</h1>
-        <div id="podiumDisplay" class="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto my-8 items-end"></div>
-        <div class="flex justify-center gap-4 mt-8">
-          <button id="btnPodiumRestart" class="primary text-base">NOVA PARTIDA</button>
-          <button id="btnPodiumLeave" class="muted-btn text-base">Sair da Sala</button>
-        </div>
-      </section>
-    </section>
-
-    <!-- SECTION 4: STUDENT PARTICIPANT SIGN-UP -->
-    <section id="viewStudentJoin" class="hidden w-full max-w-lg mx-auto my-auto">
-      <form id="formStudentJoin" class="panel p-6 sm:p-9">
-        <div class="text-center mb-6">
-          <div class="text-5xl mb-2">⚡</div>
-          <p class="section-label">Participante da Arena</p>
-          <h1 class="text-3xl font-black mt-1">Entrar na Sala</h1>
-          <p class="text-sm text-slate-400 mt-1">Conecte-se para responder pelo celular ao vivo.</p>
-        </div>
-
-        <div id="pinVerifiedBadge" class="hidden mb-5 rounded-xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-300 flex items-center justify-between">
-          <span><span class="status-dot inline-block mr-2"></span>Código detectado: <b id="pinDisplayDetected" class="font-mono text-base tracking-widest text-white"></b></span>
-          <span class="text-xs text-emerald-400 font-bold">Verificado ✔</span>
-        </div>
-
-        <label id="pinInputFieldContainer" class="block mb-5">
-          <span class="text-sm font-bold">Código da Sala (PIN de 6 dígitos)</span>
-          <input id="inputPin" class="field mt-2 text-center font-black tracking-[.25em] text-2xl font-mono" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="off">
-        </label>
-
-        <label class="block mb-6">
-          <span class="text-sm font-bold">Nome de Usuário</span>
-          <input id="inputName" class="field mt-2 text-base font-semibold" maxlength="20" placeholder="Nome de Usuário" autocomplete="nickname" required>
-          <span class="block text-xs text-slate-500 mt-1.5">Esse nome de usuário aparecerá no telão da aula e no ranking.</span>
-        </label>
-
-        <fieldset class="mb-6">
-          <legend class="text-sm font-bold mb-3">Escolha seu Ícone</legend>
-          <div id="avatarPicker" class="grid grid-cols-8 gap-2"></div>
-        </fieldset>
-
-        <div id="joinErrorMessage" class="hidden mb-4 rounded-xl border border-rose-900 bg-rose-950/40 p-3.5 text-sm text-rose-300"></div>
-
-        <button id="btnSubmitJoin" class="primary w-full text-base py-3.5" type="submit">
-          <span id="btnSubmitJoinText">ENTRAR NA SALA →</span>
-          <span id="btnSubmitJoinSpinner" class="hidden">Conectando à sala...</span>
-        </button>
-
-        <button id="btnCancelJoin" type="button" class="w-full mt-3 text-sm text-slate-400 hover:text-white py-2">
-          ← Voltar para o início
-        </button>
-      </form>
-    </section>
-
-    <!-- SECTION 5: STUDENT LOBBY (WAITING SCREEN) -->
-    <section id="viewStudentLobby" class="hidden w-full max-w-lg mx-auto my-auto">
-      <div class="panel p-8 sm:p-10 text-center">
-        <div id="studentAvatarDisplay" class="text-7xl mb-4">🩺</div>
-        <div class="inline-flex gap-2 items-center text-emerald-400 text-xs font-black uppercase tracking-wider bg-emerald-950/60 border border-emerald-800/60 px-4 py-1.5 rounded-full mb-3">
-          <span class="status-dot"></span> CONECTADO À SALA
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-black mt-2">
-          Pronto, <span id="studentNameDisplay" style="color:var(--lime)"></span>!
-        </h1>
-        <p class="text-slate-400 mt-2 text-sm sm:text-base leading-relaxed">
-          Olhe para a tela do professor. A pergunta e o traçado de ECG vão aparecer lá!
-        </p>
-
-        <div class="mt-8 rounded-2xl bg-slate-950/80 border border-slate-800 p-5">
-          <p class="section-label">Sua Pontuação Atual</p>
-          <p id="studentCurrentScore" class="text-5xl font-black mt-1" style="color:var(--lime)">0</p>
-          <p class="text-xs text-slate-500 mt-1">Pontos são ganhos por acerto e rapidez</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 6: STUDENT QUESTION SCREEN (TOUCH CARDS) -->
-    <section id="viewStudentRound" class="hidden w-full max-w-3xl mx-auto my-auto">
-      <div class="text-center mb-3 flex items-center justify-between px-2">
-        <span class="text-xs font-bold text-slate-400">
-          Rodada <b id="studentRoundNumber" class="text-white text-sm">1</b>
-        </span>
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-amber-500/40">
-          <span class="text-xs">⏱️</span>
-          <span id="studentRoundTimer" class="font-mono font-black text-amber-300 text-lg">25</span>
-        </div>
-        <span class="text-xs font-bold text-slate-400">
-          ★ <b id="studentRoundScoreDisplay" class="text-lime-400 text-sm">0</b> pts
-        </span>
-      </div>
-
-      <h1 class="text-center font-black text-2xl sm:text-4xl mb-4 tracking-tight">
-        QUE RITMO É ESSE?
-      </h1>
-
-      <div id="studentAnswerGrid" class="grid grid-cols-2 gap-3 sm:gap-4"></div>
-
-      <p id="studentAnswerStatus" class="text-center text-sm font-bold text-slate-400 mt-4">
-        Toque na opção correspondente ao traçado do telão
-      </p>
-    </section>
-
-    <!-- SECTION 7: STUDENT REVEAL / SCORE SCREEN -->
-    <section id="viewStudentResult" class="hidden w-full max-w-lg mx-auto my-auto">
-      <div id="studentResultCard" class="panel p-8 sm:p-10 text-center">
-        <div id="studentResultIcon" class="text-7xl mb-3">🎉</div>
-        <h1 id="studentResultTitle" class="text-3xl sm:text-4xl font-black">VOCÊ ACERTOU!</h1>
-        <span id="studentResultPointsBadge" class="inline-block mt-3 rounded-full bg-emerald-400 text-slate-950 font-black text-sm px-6 py-2 shadow-lg">
-          +500 PONTOS
-        </span>
-
-        <div class="mt-6 p-4 rounded-xl bg-slate-950/70 border border-slate-800 text-left">
-          <p class="section-label mb-1">Ritmo Correto</p>
-          <p id="studentResultRhythmName" class="text-xl font-bold text-white"></p>
-          <p id="studentResultFeature" class="text-xs text-slate-400 mt-2 leading-relaxed"></p>
-        </div>
-
-        <p class="text-xs text-slate-500 mt-6">Aguarde o professor avançar para a próxima rodada...</p>
-      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-3"><div class="flex items-center gap-3"><span class="status-dot"></span><span id="hostNetBadge" class="text-sm font-bold">Abrindo sala...</span></div><div class="flex gap-2"><button id="btnThemeToggle" class="muted-btn text-xs">☀️ Claro</button><button id="btnFullscreen" class="muted-btn text-xs">⛶ Projeção</button><button id="btnLeaveHost" class="muted-btn text-xs text-rose-300">Encerrar</button></div></div>
+      <div id="hostLobby" class="grid lg:grid-cols-[350px_1fr] gap-5 my-auto"><div class="panel p-6 text-center"><p class="section-label mb-3">Escaneie para entrar</p><div id="qrCodeContainer" class="mx-auto w-[280px] h-[280px] bg-white p-3 rounded-2xl flex items-center justify-center"></div><p class="text-xs text-slate-400 mt-4">PIN DA SALA</p><div id="hostPinDisplay" class="font-black tracking-[.22em] text-5xl mt-1 font-mono" style="color:var(--lime)">------</div><div class="flex justify-center gap-2 mt-4"><button id="btnCopyPin" class="muted-btn text-xs">Copiar PIN</button><button id="btnCopyLink" class="muted-btn text-xs">Copiar link</button></div><p class="text-[10px] text-slate-500 mt-2 break-all" id="hostDirectUrl"></p></div><div class="panel p-6 flex flex-col min-h-[440px]"><div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4"><div><h2 class="text-xl font-black">Participantes ao vivo</h2><p class="text-xs text-slate-400 mt-1">Acompanhe as entradas e o ranking atualizado.</p></div><span id="participantCount" class="px-3 py-1 rounded-full bg-slate-800 text-lime-300 text-sm font-black">0</span></div><div id="participantsEmpty" class="m-auto text-center py-12"><div class="text-5xl mb-4">📡</div><p class="font-bold">Aguardando a turma</p></div><div id="participantsList" class="hidden grid sm:grid-cols-2 xl:grid-cols-3 gap-3 scroll-list"></div><div class="mt-auto pt-5 border-t border-slate-800 flex items-center justify-between gap-3"><p id="hostGameSummary" class="text-xs text-slate-400"></p><button id="btnStartGame" class="primary">INICIAR PARTIDA ▶</button></div></div></div>
     </section>
   </main>
 
+  <!-- GAME PROJECTION: fullscreen viewport, pure ECG question and answer options -->
+  <section id="projection" class="projection-layout hidden" aria-label="Projeção do jogo">
+    <div class="projection-header"><div class="flex items-center gap-3"><div id="roundBadge" class="text-xs font-black text-slate-400">RODADA <b id="roundNumber" class="text-white text-base">1</b><span id="roundTotal"></span></div><div><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span><b id="answerCount">0</b>/<b id="totalStudents">0</b> responderam</span></div><div class="progress-track"><div id="answerProgress" class="progress-fill"></div></div></div></div><h1 class="projection-question">QUE RITMO É ESSE?</h1><div class="flex justify-end"><div id="timerDisc" class="timer-disc"><span id="roundTimer">25</span></div></div></div>
+    <div id="ecgStage" class="ecg-monitor projection-ecg"><canvas id="roundEcgCanvas"></canvas></div>
+    <div id="projectionOptions" class="projection-options"></div>
+    <div class="projection-footer" id="projectionFooter"><div class="flex items-center gap-2"><button id="btnPause" class="muted-btn text-xs">⏸ Pausar / Retomar</button><button id="btnReveal" class="muted-btn text-xs">👁 Revelar</button><button id="btnNext" class="muted-btn text-xs">Próximo →</button><button id="btnAddTime" class="muted-btn text-xs">+10 s</button><button id="btnOpenZoom" class="muted-btn text-xs">🔍 Zoom</button><button id="btnThemeProjection" class="muted-btn text-xs">☀️/🌙</button></div><div class="text-[10px] text-slate-500">Arraste sobre o traçado para ampliar · Espaço pausa · Esc fecha zoom</div></div>
+  </section>
+
+  <!-- Teacher explanation controls -->
+  <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
+  <div id="revealPanel" class="hidden fixed z-20 left-1/2 -translate-x-1/2 bottom-4 w-[min(1080px,96vw)] panel p-5 sm:p-6 border-emerald-500/40 shadow-2xl"><div class="flex flex-wrap items-start justify-between gap-4"><div class="flex-1 min-w-[260px]"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] uppercase tracking-[.16em] font-black text-emerald-300">Gabarito</span><span id="revealRate" class="text-[10px] text-slate-400"></span></div><h2 id="revealName" class="text-2xl font-black text-lime-300"></h2><p id="revealFeature" class="text-sm text-slate-200 mt-2"></p><p id="revealConduct" class="text-xs text-slate-400 mt-2"></p></div><div class="min-w-[280px] flex-1"><div class="flex items-center justify-between mb-2"><p class="section-label">Ranking ao vivo</p><label class="text-[10px] text-slate-500 flex items-center gap-1"><input id="showRanking" type="checkbox" checked> mostrar ranking</label></div><div id="teacherLeaderboard" class="space-y-1 max-h-40 overflow-auto"></div></div></div></div>
+
+  <!-- Student input and game screens -->
+  <section id="viewStudentJoin" class="hidden w-full max-w-lg mx-auto my-auto shell"><form id="joinForm" class="panel p-6 sm:p-8"><p class="section-label mb-2">Perfil de participante</p><h1 class="text-3xl font-black mb-2">Entre na sala</h1><p class="text-sm text-slate-400 mb-6">Escolha como a turma vai identificar você.</p><div id="pinDetected" class="hidden mb-5 rounded-xl border border-emerald-900 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-300">Sala <b id="pinDetectedValue" class="font-mono tracking-widest"></b> detectada</div><label id="pinField" class="block mb-5"><span class="text-sm font-bold">Código da sala · 6 dígitos</span><input id="pinInput" class="field mt-2 text-center font-black tracking-[.25em] text-xl" inputmode="numeric" maxlength="6" placeholder="123456"></label><label class="block"><span class="text-sm font-bold">Nome de usuário</span><input id="userNameInput" class="field mt-2" maxlength="20" placeholder="Nome de usuário" autocomplete="nickname" required></label><fieldset class="mt-6"><legend class="text-sm font-bold mb-3">Escolha seu ícone</legend><div id="avatarPicker" class="flex flex-wrap gap-2"></div></fieldset><div id="joinError" class="hidden mt-4 text-sm text-rose-300"></div><button id="joinButton" class="primary w-full mt-6" type="submit">ENTRAR NA SALA →</button><button id="joinBack" class="w-full mt-3 text-sm text-slate-400">Voltar</button></form></section>
+  <section id="studentLobby" class="hidden fixed inset-0 z-10 bg-[#080e15] grid place-items-center p-6 text-center"><div class="panel p-8 max-w-md w-full"><div id="studentAvatarDisplay" class="text-6xl mb-3">🩺</div><span class="text-xs font-black text-emerald-300">● CONECTADO</span><h1 class="text-3xl font-black mt-3">Aguarde, <span id="studentNameDisplay"></span></h1><div class="mt-6 text-xs text-slate-400">PONTOS <b id="studentScoreLobby" class="text-2xl text-lime-300 block">0</b><span id="studentRankLobby" class="text-sm text-cyan-300">Posição: —</span></div></div></section>
+  <section id="studentGame" class="student-fullscreen hidden"><div class="student-topline"><span>RODADA <b id="studentRound">1</b> · ★ <b id="studentScore">0</b> · <b id="studentRank">#—</b></span><span class="timer" id="studentTimer">25</span></div><div id="studentChoices" class="student-answer-grid"></div><div id="studentWaitMessage" class="hidden absolute inset-0 bg-slate-950/85 z-20 grid place-items-center text-center"><div><div class="text-5xl mb-4">🧑‍🏫</div><p class="text-2xl font-black">Professor explicando…</p></div></div></section>
+  <section id="studentReveal" class="hidden fixed inset-0 z-30 grid place-items-center p-6 text-center"><div class="max-w-lg"><div id="studentRevealIcon" class="text-8xl mb-3">🎉</div><p id="studentRevealTitle" class="text-4xl sm:text-6xl font-black"></p><div id="pointsAnimation" class="text-5xl font-black mt-4 text-white">+0</div><p id="studentRevealName" class="text-2xl font-black mt-6"></p><p id="studentRevealFeature" class="text-sm opacity-80 mt-2"></p><p id="studentStreak" class="text-xl font-black mt-4"></p><p id="studentRevealRank" class="text-lg font-bold mt-4"></p><button id="studentRevealContinue" class="mt-6 px-6 py-3 rounded-xl bg-white/20 font-bold">Continuar aguardando</button></div></section>
+  <section id="hostPodium" class="hidden fixed inset-0 z-25 bg-[#05090e] grid place-items-center p-8 text-center"><div><div class="text-7xl mb-3">🏆</div><p class="section-label">Fim da partida</p><h1 class="text-5xl font-black text-lime-300 mb-8">PÓDIO DA ARENA</h1><div id="podiumPlaces" class="grid sm:grid-cols-3 gap-6 items-end"></div><button id="podiumBack" class="primary mt-8">NOVA SESSÃO</button></div></section>
   <div id="toast" class="toast"></div>
 
   <script>
-    const ECG_RHYTHMS = [{"id":"sinus","name":"Ritmo sinusal","short":"Sinusal","category":"sinusal","rate":75,"rateStr":"75 bpm","feature":"Onda P positiva em DII antes de cada QRS, intervalo PR constante e normal (120-200 ms), FC entre 60 e 100 bpm.","conduct":"Ritmo fisiológico normal. Não requer intervenção clínica."},{"id":"sinus-brady","name":"Bradicardia sinusal","short":"Brad. sinusal","category":"sinusal","rate":45,"rateStr":"45 bpm","feature":"Ritmo sinusal regular com frequência cardíaca abaixo de 60 bpm. Onda P, PR e QRS normais.","conduct":"Investigar sintomas (hipotensão, síncope, tontura). Se sintomático: Atropina 1 mg IV ou marca-passo transcutâneo."},{"id":"sinus-tachy","name":"Taquicardia sinusal","short":"Taq. sinusal","category":"sinusal","rate":130,"rateStr":"130 bpm","feature":"Ritmo sinusal regular com frequência cardíaca acima de 100 bpm (geralmente 100-160 bpm). Onda P normal presente.","conduct":"Tratar a causa subjacente (dor, febre, hipovolemia, ansiedade, sepse, anemia, hipertireoidismo)."},{"id":"afib","name":"Fibrilação atrial","short":"FA","category":"atrial","rate":130,"rateStr":"110-150 bpm","feature":"Intervalos R-R irregularmente irregulares, ausência de ondas P discerníveis e oscilações caóticas da linha de base (ondas f).","conduct":"Controle de frequência cardíaca (beta-bloqueador/diltiazem) ou controle de ritmo (cardioversão) + estratificação CHA2DS2-VASc para anticoagulação."},{"id":"flutter","name":"Flutter atrial","short":"Flutter","category":"atrial","rate":150,"rateStr":"150 bpm (condução 2:1)","feature":"Ondas F de flutter com aspecto clássico em 'dentes de serrote' contínuos e regulares em DII, DIII e aVF (~300 bpm atrial).","conduct":"Cardioversão elétrica sincronizada (50-100 J) se instável ou controle de FC e anticoagulação se estável."},{"id":"svt","name":"Taquicardia supraventricular (TPSV)","short":"TPSV","category":"atrial","rate":185,"rateStr":"185 bpm","feature":"Taquiarritmia regular com QRS estreito (< 120 ms) e frequência muito rápida (150-250 bpm). Onda P oculta ou retrógrada.","conduct":"Se estável: Manobra vagal modificada; se falhar: Adenosina 6 mg IV em bolus rápido com flush. Se instável: Cardioversão elétrica sincronizada."},{"id":"pvc","name":"Extrassístole ventricular (CVP)","short":"Extrassístole Ventricular","category":"ventricular","rate":72,"rateStr":"72 bpm (com ectopia)","feature":"Complexo QRS prematuro, bizarro, alargado (> 120 ms), não precedido por onda P, seguido de pausa compensatória completa.","conduct":"Se isolada e assintomática em coração estruturalmente normal: tranquilizar. Em coronariopatas: investigar isquemia e eletrólitos (K+, Mg++)."},{"id":"vt","name":"Taquicardia ventricular monomórfica","short":"TV Monomórfica","category":"pcr","rate":170,"rateStr":"170 bpm","feature":"Sequência rápida de complexos QRS largos (> 120 ms), morfologia idêntica e ritmo regular de origem ventricular.","conduct":"COM PULSO E ESTÁVEL: Amiodarona 150 mg IV em 10 min. COM PULSO E INSTÁVEL: Cardioversão elétrica sincronizada 100 J. SEM PULSO: PCR! Desfibrilação imediata 200 J bifásico."},{"id":"vt-poly","name":"Taquicardia ventricular polimórfica (Torsades)","short":"TV Polimórfica / Torsades","category":"pcr","rate":210,"rateStr":"210 bpm","feature":"Complexos QRS largos com amplitude e polaridade continuamente variáveis, aparentando torcer ao redor da linha isoelétrica (Torsades).","conduct":"Se associado a intervalo QT longo: Sulfato de Magnésio 2 g IV em 1-2 min. Se instável ou sem pulso: Desfibrilação assíncrona imediata."},{"id":"vf","name":"Fibrilação ventricular","short":"FV","category":"pcr","rate":0,"rateStr":"Caótica / Incontável","feature":"Atividade elétrica ventricular completamente caótica e desorganizada, sem ondas P, complexos QRS ou ondas T identificáveis.","conduct":"PCR - RITMO CHOCÁVEL! RCP de alta qualidade imediata + Desfibrilação precoce (200 J bifásico) + Adrenalina 1 mg a cada 3-5 min + Amiodarona 300 mg."},{"id":"idioventricular","name":"Ritmo idioventricular","short":"Idioventricular / RIVA","category":"ventricular","rate":40,"rateStr":"40 bpm","feature":"Ritmo de escape ventricular lento (20-40 bpm) ou acelerado (RIVA 60-110 bpm) com QRS alargado (> 120 ms) e ausência de onda P.","conduct":"Se RIVA pós-reperfusão no IAM: ritmo benigno de reperfusão, observar. Se ritmo agônico: marca-passo transcutâneo e suporte avançado."},{"id":"avb1","name":"BAV de 1º grau","short":"BAV 1º grau","category":"bloqueio","rate":65,"rateStr":"65 bpm","feature":"Prolongamento fixo e constante do intervalo PR > 200 ms (mais de 1 quadrado grande). Toda onda P conduz a um QRS (condução 1:1).","conduct":"Geralmente assintomático e benigno. Avaliar uso de medicações que deprimem o nó AV (beta-bloqueador, diltiazem, digoxina)."},{"id":"avb2-1","name":"BAV de 2º grau Mobitz I (Wenckebach)","short":"Mobitz I (Wenckebach)","category":"bloqueio","rate":55,"rateStr":"55 bpm","feature":"Aumento progressivo do intervalo PR a cada ciclo até que uma onda P é bloqueada (não conduz). O ciclo então recomeça.","conduct":"Geralmente benigno e de origem nodal. Se sintomático ou instável: Atropina 1 mg IV ou marca-passo temporário."},{"id":"avb2-2","name":"BAV de 2º grau Mobitz II","short":"Mobitz II","category":"bloqueio","rate":44,"rateStr":"44 bpm","feature":"Intervalo PR constante antes e depois da pausa, com bloqueio súbito de uma ou mais ondas P sem prolongamento progressivo prévio.","conduct":"Bloqueio infranodal de alto risco de progressão para BAVT! Indicação de marca-passo transcutâneo em prontidão e implante de marca-passo definitivo."},{"id":"avb3","name":"BAV total (3º grau)","short":"BAVT","category":"bloqueio","rate":35,"rateStr":"35 bpm","feature":"Dissociação atrioventricular completa: ondas P e complexos QRS batem em ritmos totalmente independentes. Frequência atrial > ventricular.","conduct":"EMERGÊNCIA MÉDICA! Marca-passo transcutâneo imediato, infusão de Adrenalina ou Dopamina se necessário e implante de Marca-passo definitivo."},{"id":"junctional","name":"Ritmo juncional de escape","short":"Ritmo Juncional","category":"bloqueio","rate":48,"rateStr":"48 bpm","feature":"Ritmo regular com origem no nó AV/feixe de His, frequência de 40-60 bpm, QRS estreito e ondas P ausentes, invertidas ou retrógradas.","conduct":"Investigar intoxicação digitálica, isquemia inferior ou doença do nó sinusal. Tratar causa básica."},{"id":"aesp","name":"Atividade elétrica sem pulso (AESP)","short":"AESP","category":"pcr","rate":60,"rateStr":"Sem pulso palpável","feature":"Atividade elétrica organizada presente no monitor (qualquer ritmo exceto FV/TV), porém na palpação arterial não existe pulso central.","conduct":"PCR - RITMO NÃO CHOCÁVEL! RCP contínua de alta qualidade + Adrenalina 1 mg IV a cada 3-5 min + Busca ativa e reversão das causas (5 Hs e 5 Ts)."},{"id":"asystole","name":"Assistolia","short":"Assistolia","category":"pcr","rate":0,"rateStr":"0 bpm","feature":"Linha isoelétrica contínua (ausência total de atividade elétrica ventricular). Confirmar pelo protocolo da Linha Reta (cabos, ganho, derivação).","conduct":"PCR - NÃO CHOCÁVEL (NÃO DESFIBRILAR!). RCP imediata de alta qualidade + Adrenalina 1 mg a cada 3-5 min + Identificar e tratar 5Hs e 5Ts."}];
-    const CATEGORY_META = {"sinusal":{"name":"Ritmos Sinusais e Fisiológicos","icon":"🟩"},"atrial":{"name":"Taquiarritmias Atriais e Supraventriculares","icon":"🟨"},"bloqueio":{"name":"Bloqueios Atrioventriculares e Juncionais","icon":"🟧"},"ventricular":{"name":"Arritmias Ventriculares e Ritmos de Parada (PCR)","icon":"🟥"}};
-    const AVATARS = [{"id":"stetho","emoji":"🩺","label":"Estetoscópio"},{"id":"heart","emoji":"🫀","label":"Coração"},{"id":"defib","emoji":"⚡","label":"Desfibrilador"},{"id":"ambu","emoji":"🚑","label":"Ambulância"},{"id":"doc_m","emoji":"👨‍⚕️","label":"Médico"},{"id":"doc_f","emoji":"👩‍⚕️","label":"Médica"},{"id":"micro","emoji":"🔬","label":"Microscópio"},{"id":"pill","emoji":"💊","label":"Medicamento"},{"id":"target","emoji":"🎯","label":"Alvo"},{"id":"rocket","emoji":"🚀","label":"Foguete"},{"id":"trophy","emoji":"🏆","label":"Troféu"},{"id":"lion","emoji":"🦁","label":"Leão"},{"id":"tiger","emoji":"🐯","label":"Tigre"},{"id":"eagle","emoji":"🦅","label":"Águia"},{"id":"wolf","emoji":"🐺","label":"Lobo"},{"id":"brain","emoji":"🧠","label":"Cérebro"}];
 
-    const ANSWER_COLORS = ['answer-red', 'answer-blue', 'answer-yellow', 'answer-green'];
-    const ANSWER_HEX = ['#ef5350', '#42a5f5', '#fbbf24', '#34d399'];
-    const ANSWER_SHAPES = ['▲', '◆', '●', '■'];
-
-    const state = {
-      role: null,
-      pin: null,
-      peer: null,
-      channel: null,
-      syncChannel: null,
-      studentConn: null,
-      participants: new Map(),
-      studentId: null,
-      studentName: null,
-      studentAvatar: 'stetho',
-      studentScore: 0,
-      studentLastChoice: null,
-      currentRhythm: null,
-      currentChoices: [],
-      roundNumber: 0,
-      roundDuration: 25,
-      timerHandle: null,
-      timeLeft: 25,
-      answersReceived: new Map(),
-      isRevealed: false,
-      selectedRhythmIds: [],
-      gameMode: 'random',
-      roundLimit: null,
-      roundQueue: [],
-      queueIndex: 0,
-      lastRoundId: null,
-      isPaused: false
-    };
-
-    const $ = id => document.getElementById(id);
-    let ecgAnimId = null;
-    let ecgOffset = 0;
-    let toastTimer = null;
-    let soundEnabled = true;
-
-    // Web Audio Synthesizer for rich audio gamification
-    let audioCtx = null;
-    function getAudioContext() {
-      if (!audioCtx) {
-        const AudioCtor = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtor) audioCtx = new AudioCtor();
-      }
-      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-      return audioCtx;
-    }
-
-    function playBeep(freq = 600, duration = 0.08, type = 'sine') {
-      if (!soundEnabled) return;
-      try {
-        const ctx = getAudioContext();
-        if (!ctx) return;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
-      } catch (e) {}
-    }
-
-    function playFanfare() {
-      if (!soundEnabled) return;
-      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-        setTimeout(() => playBeep(freq, 0.16, 'triangle'), i * 110);
-      });
-    }
-
-    function showToast(message) {
-      const el = $('toast');
-      el.textContent = message;
-      el.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
-    }
-
-    function switchView(name) {
-      const views = ['viewHome', 'viewHostSetup', 'viewHost', 'viewStudentJoin', 'viewStudentLobby', 'viewStudentRound', 'viewStudentResult'];
-      views.forEach(id => {
-        const el = $(id);
-        if (el) el.classList.add('hidden');
-      });
-      const target = $(name);
-      if (target) {
-        target.classList.remove('hidden');
-        if (name === 'viewHost') target.classList.add('flex');
-      }
-    }
-
-    function getAvatar(id) {
-      return AVATARS.find(a => a.id === id)?.emoji || AVATARS[0].emoji;
-    }
-
-    function escapeHtml(value) {
-      const div = document.createElement('div');
-      div.textContent = value;
-      return div.innerHTML;
-    }
-
-    // RHYTHM LIBRARY SETUP FOR PROFESSOR
-    function renderRhythmLibrary() {
-      const library = $('rhythmLibrary');
-      library.innerHTML = Object.keys(CATEGORY_META).map(category => {
-        const meta = CATEGORY_META[category];
-        const items = ECG_RHYTHMS.filter(r => r.category === category);
-        return `
-          <div class="category-block sm:col-span-2">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <span>${meta.icon}</span>
-                <h3 class="font-black text-sm">${meta.name}</h3>
-              </div>
-              <button type="button" class="text-xs text-lime-400 hover:underline" onclick="selectCategory('${category}')">
-                Selecionar estes
-              </button>
-            </div>
-            <div class="grid sm:grid-cols-2 gap-2">
-              ${items.map(r => `
-                <label class="rhythm-card" data-rhythm="${r.id}" data-category="${r.category}">
-                  <input type="checkbox" value="${r.id}" aria-label="Selecionar ${r.name}">
-                  <span class="min-w-0">
-                    <span class="block text-sm font-bold leading-tight">${r.name}</span>
-                    <span class="block text-[11px] text-slate-400 mt-1">${r.rateStr}</span>
-                  </span>
-                </label>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      library.querySelectorAll('input[type=checkbox]').forEach(input => {
-        input.addEventListener('change', () => {
-          input.closest('.rhythm-card').classList.toggle('selected', input.checked);
-          updateSelectedCount();
-        });
-      });
-      updateSelectedCount();
-    }
-
-    window.selectCategory = function(cat) {
-      document.querySelectorAll(`#rhythmLibrary label[data-category="${cat}"] input`).forEach(i => {
-        i.checked = true;
-        i.closest('.rhythm-card').classList.add('selected');
-      });
-      updateSelectedCount();
-    };
-
-    function updateSelectedCount() {
-      const count = document.querySelectorAll('#rhythmLibrary input:checked').length;
-      $('selectedCount').textContent = String(count);
-      if (count > 0) $('setupError').classList.add('hidden');
-    }
-
-    function getSelectedRhythms() {
-      return [...document.querySelectorAll('#rhythmLibrary input:checked')].map(el => el.value);
-    }
-
-    // AVATAR PICKER FOR STUDENT SIGNUP
-    function renderAvatarPicker() {
-      const picker = $('avatarPicker');
-      picker.innerHTML = AVATARS.map((a, i) => `
-        <button type="button" class="avatar-option ${i === 0 ? 'selected' : ''}" data-avatar="${a.id}" aria-label="${a.label}" title="${a.label}">
-          ${a.emoji}
-        </button>
-      `).join('');
-
-      picker.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          picker.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          state.studentAvatar = btn.dataset.avatar;
-          playBeep(440, 0.05);
-        });
-      });
-    }
-
-    // HOST ROOM INITIALIZATION
-    function initHostRoom() {
-      state.role = 'host';
-      state.participants.clear();
-      state.pin = String(Math.floor(100000 + Math.random() * 900000));
-      $('hostPinDisplay').textContent = state.pin.slice(0, 3) + ' ' + state.pin.slice(3);
-      
-      const joinUrl = location.origin + location.pathname + '?pin=' + state.pin;
-      $('hostDirectUrl').textContent = joinUrl;
-
-      const qr = $('qrCodeContainer');
-      qr.innerHTML = '';
-      if (window.QRCode) {
-        try {
-          new QRCode(qr, {
-            text: joinUrl,
-            width: 250,
-            height: 250,
-            colorDark: '#060a10',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-          });
-        } catch (e) {
-          qr.textContent = joinUrl;
-        }
-      } else {
-        qr.textContent = joinUrl;
-      }
-
-      updateParticipantsUI();
-      switchView('viewHost');
-      $('hostLobbySection').classList.remove('hidden');
-      $('hostGameSection').classList.add('hidden');
-      $('hostPodiumSection').classList.add('hidden');
-
-      // Local BroadcastChannel for same-device/browser testing
-      try {
-        state.channel?.close();
-        state.channel = new BroadcastChannel('ecg-rhythm-room-' + state.pin);
-        state.channel.onmessage = e => handleHostIncomingMessage(e.data, null);
-      } catch (e) {}
-
-      // Optional background sync with simulator homepage
-      try {
-        state.syncChannel?.close();
-        state.syncChannel = new BroadcastChannel('ecg-arena-sync');
-        state.syncChannel.onmessage = e => {
-          if (e.data?.type === 'SYNC_RHYTHM' && e.data.rhythmId) {
-            $('hostSyncBadge').classList.remove('hidden');
-            startRoundForRhythm(e.data.rhythmId);
-          }
-        };
-      } catch (e) {}
-
-      setupHostPeer(state.pin);
-    }
-
-    function setupHostPeer(pin) {
-      try {
-        state.peer?.destroy();
-        state.peer = new Peer('ecg-sim-room-' + pin, {
-          debug: 0,
-          config: {
-            iceServers: [
-              { urls: 'stun:stun.l.google.com:19302' },
-              { urls: 'stun:global.stun.twilio.com:3478' }
-            ]
-          }
-        });
-
-        state.peer.on('open', () => {
-          $('hostNetBadge').textContent = 'Sala ativa · PIN ' + pin.slice(0, 3) + ' ' + pin.slice(3);
-        });
-
-        state.peer.on('connection', conn => {
-          conn.on('data', data => handleHostIncomingMessage(data, conn));
-          conn.on('close', () => handleStudentDisconnected(conn.peer));
-        });
-
-        state.peer.on('error', err => {
-          console.warn('Host Peer warning:', err);
-          $('hostNetBadge').textContent = 'Sala pronta · Rede local ativa';
-        });
-      } catch (e) {
-        console.warn('Peer setup error:', e);
-      }
-    }
-
-    function handleHostIncomingMessage(msg, conn) {
-      if (!msg?.type) return;
-
-      if (msg.type === 'JOIN') {
-        const id = msg.studentId || (conn ? conn.peer : 'local-' + Date.now());
-        if (state.participants.has(id)) {
-          const existing = state.participants.get(id);
-          existing.conn = conn || existing.conn;
-          return;
-        }
-
-        const name = String(msg.name || 'Participante').trim().slice(0, 20);
-        const avatar = AVATARS.some(a => a.id === msg.avatar) ? msg.avatar : 'stetho';
-        const participant = { id, name, avatar, conn, score: 0, lastAnswer: null };
-        state.participants.set(id, participant);
-
-        const ack = { type: 'JOIN_ACK', pin: state.pin, studentId: id, studentName: name, avatar };
-        if (conn?.open) conn.send(ack);
-        if (state.channel) state.channel.postMessage(ack);
-
-        updateParticipantsUI();
-        playBeep(520, 0.08);
-        showToast(name + ' entrou na partida!');
-
-        if (state.currentRhythm && !state.isRevealed) {
-          sendToParticipant(participant, {
-            type: 'ROUND_QUESTION',
-            round: state.roundNumber,
-            choices: state.currentChoices,
-            seconds: state.timeLeft
-          });
-        }
-      } else if (msg.type === 'ANSWER' && msg.round === state.roundNumber && !state.answersReceived.has(msg.studentId)) {
-        state.answersReceived.set(msg.studentId, {
-          choiceId: msg.choiceId,
-          timeSpent: msg.timeSpent || 0
-        });
-
-        const p = state.participants.get(msg.studentId);
-        if (p) p.lastAnswer = msg.choiceId;
-
-        $('answerCount').textContent = String(state.answersReceived.size);
-        playBeep(700, 0.04);
-
-        // Auto reveal if everyone answered
-        if (state.participants.size > 0 && state.answersReceived.size >= state.participants.size) {
-          setTimeout(() => {
-            if (!state.isRevealed) revealRoundResult();
-          }, 600);
-        }
-      } else if (msg.type === 'LEAVE') {
-        handleStudentDisconnected(msg.studentId);
-      }
-    }
-
-    function sendToParticipant(p, msg) {
-      if (p?.conn?.open) {
-        try { p.conn.send(msg); } catch (e) {}
-      }
-    }
-
-    function handleStudentDisconnected(id) {
-      if (state.participants.delete(id)) {
-        updateParticipantsUI();
-      }
-    }
-
-    function updateParticipantsUI() {
-      const count = state.participants.size;
-      $('participantBadgeCount').textContent = count + ' ' + (count === 1 ? 'participante' : 'participantes');
-      $('readySummary').textContent = count + ' conectados';
-      $('totalStudentsCount').textContent = String(count);
-      $('participantsEmptyState').classList.toggle('hidden', count > 0);
-      $('participantsGrid').classList.toggle('hidden', count === 0);
-
-      $('participantsGrid').innerHTML = '';
-      state.participants.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'flex items-center gap-3 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800';
-
-        const avatar = document.createElement('span');
-        avatar.className = 'text-3xl flex-none';
-        avatar.textContent = getAvatar(p.avatar);
-
-        const name = document.createElement('span');
-        name.className = 'min-w-0 truncate font-bold text-slate-100 flex-1';
-        name.textContent = p.name;
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'text-slate-500 hover:text-rose-400 text-lg px-2';
-        removeBtn.type = 'button';
-        removeBtn.textContent = '×';
-        removeBtn.title = 'Remover participante';
-        removeBtn.onclick = () => kickParticipant(p.id);
-
-        card.append(avatar, name, removeBtn);
-        $('participantsGrid').append(card);
-      });
-    }
-
-    function kickParticipant(id) {
-      const p = state.participants.get(id);
-      if (!p) return;
-      sendToParticipant(p, { type: 'KICK', studentId: id });
-      if (state.channel) state.channel.postMessage({ type: 'KICK', studentId: id });
-      state.participants.delete(id);
-      updateParticipantsUI();
-    }
-
-    // GAMEPLAY & ROUND LOGIC
-    function createRoundQueue() {
-      let queue = state.selectedRhythmIds.slice();
-      if (state.gameMode === 'random') {
-        queue.sort(() => Math.random() - 0.5);
-      }
-      if (state.roundLimit && state.roundLimit < queue.length) {
-        queue = queue.slice(0, state.roundLimit);
-      }
-      state.roundQueue = queue;
-      state.queueIndex = 0;
-    }
-
-    function startRoundForRhythm(rhythmId) {
-      const target = ECG_RHYTHMS.find(r => r.id === rhythmId);
-      if (!target) return;
-
-      state.currentRhythm = target;
-      state.roundNumber++;
-      state.answersReceived.clear();
-      state.isRevealed = false;
-
-      $('hostLobbySection').classList.add('hidden');
-      $('hostGameSection').classList.remove('hidden');
-      $('roundRevealPanel').classList.add('hidden');
-      $('btnRevealNow').classList.remove('hidden');
-
-      $('roundNumber').textContent = String(state.roundNumber);
-      $('roundTotalLabel').textContent = state.roundLimit ? ' / ' + state.roundLimit : '';
-
-      // Generate 3 random wrong options
-      const wrong = ECG_RHYTHMS.filter(r => r.id !== target.id)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
-      const choices = [target, ...wrong].sort(() => Math.random() - 0.5);
-
-      state.currentChoices = choices.map((c, i) => ({
-        id: c.id,
-        label: c.name,
-        short: c.short,
-        color: ANSWER_COLORS[i],
-        hex: ANSWER_HEX[i],
-        shape: ANSWER_SHAPES[i]
-      }));
-
-      // Render 4 answer tiles for the projection
-      $('hostAnswerOptions').innerHTML = state.currentChoices.map(c => `
-        <div id="hostTile-${c.id}" class="answer-tile ${c.color} p-4 sm:p-6 flex items-center gap-4 sm:gap-6">
-          <span class="text-4xl sm:text-6xl font-black">${c.shape}</span>
-          <span class="text-base sm:text-2xl font-black leading-snug">${c.label}</span>
-        </div>
-      `).join('');
-
-      // Start ECG monitor animation and timer
-      startEcgAnimation(target.id);
-      broadcastToStudents({
-        type: 'ROUND_QUESTION',
-        round: state.roundNumber,
-        choices: state.currentChoices,
-        seconds: state.roundDuration
-      });
-
-      startRoundTimer();
-      $('answerCount').textContent = '0';
-      $('totalStudentsCount').textContent = String(state.participants.size);
-    }
-
-    function startNextRound() {
-      // Check if finished
-      if (state.roundLimit && state.roundNumber >= state.roundLimit) {
-        showFinalPodium();
-        return;
-      }
-
-      if (state.gameMode === 'random') {
-        let pool = state.selectedRhythmIds.filter(id => id !== state.lastRoundId);
-        if (!pool.length) pool = state.selectedRhythmIds.slice();
-        const nextId = pool[Math.floor(Math.random() * pool.length)];
-        state.lastRoundId = nextId;
-        startRoundForRhythm(nextId);
-        return;
-      }
-
-      if (state.queueIndex >= state.roundQueue.length) {
-        showFinalPodium();
-        return;
-      }
-
-      const nextId = state.roundQueue[state.queueIndex++];
-      startRoundForRhythm(nextId);
-    }
-
-    function startRoundTimer() {
-      if (state.timerHandle) clearInterval(state.timerHandle);
-      state.timeLeft = state.roundDuration;
-      $('roundTimer').textContent = String(state.timeLeft);
-
-      state.timerHandle = setInterval(() => {
-        if (state.isPaused) return;
-        state.timeLeft--;
-        $('roundTimer').textContent = String(Math.max(0, state.timeLeft));
-
-        if (state.timeLeft <= 5 && state.timeLeft > 0) {
-          playBeep(880, 0.05);
-          $('roundTimer').classList.add('text-rose-400');
-        } else {
-          $('roundTimer').classList.remove('text-rose-400');
-        }
-
-        if (state.timeLeft <= 0) {
-          clearInterval(state.timerHandle);
-          revealRoundResult();
-        }
-      }, 1000);
-    }
-
-    function revealRoundResult() {
-      if (state.isRevealed || !state.currentRhythm) return;
-      state.isRevealed = true;
-      if (state.timerHandle) clearInterval(state.timerHandle);
-
-      const rhythm = state.currentRhythm;
-      playFanfare();
-
-      // Highlight the correct option and fade others
-      state.currentChoices.forEach(c => {
-        const tile = $('hostTile-' + c.id);
-        if (tile) {
-          if (c.id === rhythm.id) {
-            tile.classList.add('ring-4', 'ring-white', 'shadow-2xl');
-          } else {
-            tile.classList.add('opacity-30', 'grayscale');
-          }
-        }
-      });
-
-      // Populate clinical reveal panel
-      $('roundRevealPanel').classList.remove('hidden');
-      $('revealRhythmName').textContent = rhythm.name;
-      $('revealRhythmFeature').textContent = rhythm.feature;
-      $('revealConduct').textContent = rhythm.conduct;
-      $('revealBpmBadge').textContent = 'FC: ' + rhythm.rateStr;
-      $('btnRevealNow').classList.add('hidden');
-
-      // Tally student votes
-      const votes = {};
-      state.currentChoices.forEach(c => votes[c.id] = 0);
-      state.answersReceived.forEach(ans => {
-        if (votes[ans.choiceId] !== undefined) votes[ans.choiceId]++;
-      });
-
-      const totalAnswers = state.answersReceived.size || 1;
-      $('voteDistributionBars').innerHTML = state.currentChoices.map(c => {
-        const count = votes[c.id] || 0;
-        const pct = Math.round((count / totalAnswers) * 100);
-        const isCorrect = c.id === rhythm.id;
-        return `
-          <div class="flex items-center gap-3 text-xs">
-            <span class="w-6 text-center font-black">${c.shape}</span>
-            <div class="flex-1">
-              <div class="flex justify-between mb-1 font-bold">
-                <span class="${isCorrect ? 'text-lime-300' : 'text-slate-300'}">${c.label} ${isCorrect ? '✔' : ''}</span>
-                <span class="font-mono text-slate-400">${count} (${pct}%)</span>
-              </div>
-              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                <div class="h-full rounded-full ${isCorrect ? 'bg-lime-400' : 'bg-slate-600'}" style="width: ${pct}%"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Score calculation (Kahoot-style: points for accuracy + speed)
-      state.answersReceived.forEach((ans, studentId) => {
-        const p = state.participants.get(studentId);
-        if (p && ans.choiceId === rhythm.id) {
-          const speedBonus = Math.round(500 * (Math.max(1, state.timeLeft) / state.roundDuration));
-          p.score += 500 + speedBonus;
-        }
-      });
-
-      // Update Top leaderboard
-      const ranked = [...state.participants.values()].sort((a, b) => b.score - a.score).slice(0, 5);
-      $('leaderboardList').innerHTML = ranked.length ? ranked.map((p, i) => `
-        <div class="flex items-center gap-3 rounded-xl bg-slate-950 p-2.5 border border-slate-800">
-          <span class="text-xl">${getAvatar(p.avatar)}</span>
-          <span class="text-xs font-black ${i === 0 ? 'text-amber-400' : 'text-slate-400'} font-mono">#${i + 1}</span>
-          <span class="font-bold text-sm flex-1 truncate text-white">${escapeHtml(p.name)}</span>
-          <span class="text-xs font-black font-mono text-lime-400">${p.score} pts</span>
-        </div>
-      `).join('') : '<p class="text-xs text-slate-500 py-3 text-center">Nenhum participante respondeu a tempo.</p>';
-
-      // Notify students
-      broadcastToStudents({
-        type: 'ROUND_REVEAL',
-        correctId: rhythm.id,
-        name: rhythm.name,
-        feature: rhythm.feature,
-        round: state.roundNumber
-      });
-    }
-
-    function showFinalPodium() {
-      if (ecgAnimId) cancelAnimationFrame(ecgAnimId);
-      $('hostGameSection').classList.add('hidden');
-      $('hostPodiumSection').classList.remove('hidden');
-
-      const ranked = [...state.participants.values()].sort((a, b) => b.score - a.score);
-      const first = ranked[0];
-      const second = ranked[1];
-      const third = ranked[2];
-
-      $('podiumDisplay').innerHTML = `
-        <!-- 2nd Place -->
-        <div class="order-2 sm:order-1 panel p-6 bg-slate-900/80 border-slate-700 flex flex-col items-center">
-          <div class="text-4xl mb-2">${second ? getAvatar(second.avatar) : '🥈'}</div>
-          <span class="text-2xl font-black text-slate-300">2º LUGAR</span>
-          <p class="font-bold text-lg mt-2 truncate max-w-full text-white">${second ? escapeHtml(second.name) : '---'}</p>
-          <p class="text-sm font-black font-mono text-lime-400 mt-1">${second ? second.score + ' pts' : '0'}</p>
-        </div>
-
-        <!-- 1st Place (Champion) -->
-        <div class="order-1 sm:order-2 panel p-8 bg-amber-950/40 border-amber-500/60 shadow-2xl flex flex-col items-center -translate-y-4">
-          <div class="text-6xl mb-2">${first ? getAvatar(first.avatar) : '🥇'}</div>
-          <span class="text-3xl font-black text-amber-400">CAMPEÃO 🏆</span>
-          <p class="font-black text-2xl mt-2 truncate max-w-full text-white">${first ? escapeHtml(first.name) : '---'}</p>
-          <p class="text-lg font-black font-mono text-lime-400 mt-1">${first ? first.score + ' pts' : '0'}</p>
-        </div>
-
-        <!-- 3rd Place -->
-        <div class="order-3 panel p-6 bg-slate-900/80 border-amber-800/40 flex flex-col items-center">
-          <div class="text-4xl mb-2">${third ? getAvatar(third.avatar) : '🥉'}</div>
-          <span class="text-2xl font-black text-amber-600">3º LUGAR</span>
-          <p class="font-bold text-lg mt-2 truncate max-w-full text-white">${third ? escapeHtml(third.name) : '---'}</p>
-          <p class="text-sm font-black font-mono text-lime-400 mt-1">${third ? third.score + ' pts' : '0'}</p>
-        </div>
-      `;
-
-      playFanfare();
-    }
-
-    function broadcastToStudents(msg) {
-      if (state.channel) state.channel.postMessage(msg);
-      state.participants.forEach(p => sendToParticipant(p, msg));
-    }
-
-    // HIGH FIDELITY MEDICAL ECG CANVAS RENDERER
-    function startEcgAnimation(rhythmId) {
-      const canvas = $('roundEcgCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const rhythm = ECG_RHYTHMS.find(r => r.id === rhythmId) || ECG_RHYTHMS[0];
-
-      if (ecgAnimId) cancelAnimationFrame(ecgAnimId);
-
-      function render() {
-        const rect = canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
-        const w = rect.width || 1000;
-        const h = rect.height || 450;
-
-        if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-          canvas.width = Math.round(w * dpr);
-          canvas.height = Math.round(h * dpr);
-        }
-
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        // Background
-        ctx.fillStyle = '#020705';
-        ctx.fillRect(0, 0, w, h);
-
-        // Grid (Small 1mm squares)
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
-        ctx.lineWidth = 1;
-        for (let x = 0; x < w; x += 10) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-        }
-        for (let y = 0; y < h; y += 10) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-        }
-
-        // Grid (Large 5mm squares)
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.22)';
-        for (let x = 0; x < w; x += 50) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-        }
-        for (let y = 0; y < h; y += 50) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-        }
-
-        // Lead trace (Phosphor Emerald glow)
-        ctx.strokeStyle = '#54e7a8';
-        ctx.lineWidth = 3.2;
-        ctx.shadowColor = '#54e7a8';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-
-        const base = h * 0.52;
-        let cycle = rhythm.id === 'sinus-brady' ? 245 :
-                    rhythm.id === 'sinus-tachy' ? 82 :
-                    rhythm.id === 'svt' ? 64 :
-                    rhythm.id === 'idioventricular' ? 250 : 140;
-
-        for (let x = 0; x <= w; x += 2) {
-          const pos = x + ecgOffset;
-          let y = base;
-
-          if (rhythm.id === 'asystole') {
-            y = base + Math.sin(pos * 0.02) * 1.2 + Math.cos(pos * 0.05) * 0.8;
-          } else if (rhythm.id === 'vf') {
-            y = base + Math.sin(pos * 0.22) * h * 0.10 + Math.sin(pos * 0.47) * h * 0.06 + Math.sin(pos * 0.11) * h * 0.08;
-          } else if (rhythm.id === 'vt-poly') {
-            y = base + Math.sin(pos * 0.006) * h * 0.18 * Math.sin(pos * 0.12);
-          } else if (rhythm.id === 'vt') {
-            y = base - h * 0.18 * Math.max(0, Math.sin(((pos % 74) / 74) * Math.PI));
-          } else if (rhythm.id === 'afib') {
-            y = base + Math.sin(pos * 0.28) * 4 + Math.sin(pos * 0.72) * 3;
-            const c = 100 + Math.sin(Math.floor(pos / 100)) * 35;
-            const t = (pos % c) / c;
-            if (t > 0.45 && t < 0.48) y = base - h * 0.15;
-            else if (t >= 0.48 && t < 0.52) y = base + h * 0.05;
-          } else if (rhythm.id === 'flutter') {
-            y = base + (((pos % 28) / 28) * 18 - 9);
-            const t = pos % 86;
-            if (t > 40 && t < 44) y = base - h * 0.15;
-          } else {
-            // Sinusoid morphology
-            const t = (pos % cycle) / cycle;
-            if (t > 0.12 && t < 0.24) {
-              y = base - 10 * Math.sin(((t - 0.12) / 0.12) * Math.PI); // P wave
-            } else if (t > 0.40 && t < 0.43) {
-              y = base + 7 * ((t - 0.40) / 0.03); // Q wave
-            } else if (t >= 0.43 && t < 0.47) {
-              y = base - h * 0.17 * Math.sin(((t - 0.43) / 0.04) * Math.PI); // R peak
-            } else if (t >= 0.47 && t < 0.51) {
-              y = base + h * 0.05 * Math.sin(((t - 0.47) / 0.04) * Math.PI); // S wave
-            } else if (t > 0.65 && t < 0.82) {
-              y = base - h * 0.04 * Math.sin(((t - 0.65) / 0.17) * Math.PI); // T wave
-            }
-          }
-
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        ecgOffset = (ecgOffset + 2) % 10000;
-        ecgAnimId = requestAnimationFrame(render);
-      }
-
-      render();
-    }
-
-    // STUDENT JOIN & PLAY FLOW
-    function initStudentJoinView(prefilledPin) {
-      state.role = 'student';
-      switchView('viewStudentJoin');
-      renderAvatarPicker();
-
-      const pin = String(prefilledPin || '').replace(/\D/g, '');
-      if (pin) {
-        $('inputPin').value = pin;
-        $('pinDisplayDetected').textContent = pin.slice(0, 3) + ' ' + pin.slice(3);
-        $('pinVerifiedBadge').classList.remove('hidden');
-        $('pinInputFieldContainer').classList.add('hidden');
-      } else {
-        $('pinVerifiedBadge').classList.add('hidden');
-        $('pinInputFieldContainer').classList.remove('hidden');
-      }
-
-      setTimeout(() => $('inputName').focus(), 150);
-    }
-
-    function setStudentButtonLoading(loading) {
-      $('btnSubmitJoin').disabled = loading;
-      $('btnSubmitJoinText').classList.toggle('hidden', loading);
-      $('btnSubmitJoinSpinner').classList.toggle('hidden', !loading);
-    }
-
-    function submitStudentJoin(e) {
-      e.preventDefault();
-      const pin = $('inputPin').value.replace(/\D/g, '');
-      const name = $('inputName').value.trim().replace(/\s+/g, ' ');
-      const err = $('joinErrorMessage');
-
-      if (pin.length !== 6) {
-        err.textContent = 'Informe o código da sala com 6 números.';
-        err.classList.remove('hidden');
-        return;
-      }
-
-      if (!name) {
-        err.textContent = 'Informe seu Nome de Usuário.';
-        err.classList.remove('hidden');
-        return;
-      }
-
-      if (!/^[\p{L}\p{N} _.-]{2,20}$/u.test(name)) {
-        err.textContent = 'Use de 2 a 20 letras ou números no Nome de Usuário.';
-        err.classList.remove('hidden');
-        return;
-      }
-
-      err.classList.add('hidden');
-      setStudentButtonLoading(true);
-
-      state.studentId = 'std-' + Math.random().toString(36).slice(2, 11);
-      state.studentName = name;
-      state.pin = pin;
-
-      let ackReceived = false;
-      const onAck = msg => {
-        if (msg?.type === 'JOIN_ACK' && msg.studentId === state.studentId && !ackReceived) {
-          ackReceived = true;
-          onJoinSuccess(msg);
-        }
+    // === MOTOR REAL DO SIMULADOR DE ECG (public/simulator.html) ===
+    const p = (key, label, def, min, max, unit, step=1, format) => ({ key, label, kind: 'slider', default: def, min, max, step, unit, format });
+    const m = (key, label, def, options) => ({ key, label, kind: 'segmented', default: def, options: options.map(([v, l]) => ({ value: v, label: l })) });
+    const h = (def, min, max, label = 'FC') => p('rate', label, def, min, max, 'bpm');
+    const g = (def, min, max) => p('atrialRate', 'FC atrial', def, min, max, 'bpm');
+    const _ = (def, min, max) => p('qrs', 'Largura do QRS', def, min, max, 'ms', 5);
+    const qrs = _;
+    const v = (key, label, def) => p(key, label, def, 0, 100, '%');
+    const y = (def, min, max) => [h(def, min, max), p('pr', 'Intervalo PR', 160, 120, 240, 'ms', 5), _(90, 60, 120), v('variability', 'Variabilidade', 15)];
+    const b = (confusable, rate) => ({ eligible: true, confusable, rate });
+    const d = (e, t) => false;
+
+    var ECG_CORE = (() => {
+x=[{id:`sinus`,name:`Ritmo sinusal`,shortName:`Sinusal`,category:`sinus`,defaultRate:75,rateRange:[50,100],rateKey:`rate`,rhythmType:`regular`,qrsWidth:90,regularity:98,atrialActivity:`p-wave`,conduction:`normal`,morphology:`narrow`,renderer:`atrial-driven`,controls:y(75,40,300),teaching:{keyFeature:`P antes de cada QRS, PR constante`,features:[`FC 60–100 bpm`,`QRS estreito`,`ritmo regular`,`P antes de cada QRS`]},challenge:b([`sinus-brady`,`sinus-tachy`,`junctional`],[62,98])},{id:`sinus-brady`,name:`Bradicardia sinusal`,shortName:`Brad. sinusal`,category:`sinus`,defaultRate:45,rateRange:[30,59],rateKey:`rate`,rhythmType:`regular`,qrsWidth:90,regularity:98,atrialActivity:`p-wave`,conduction:`normal`,morphology:`narrow`,renderer:`atrial-driven`,controls:y(45,30,80),teaching:{keyFeature:`Ritmo sinusal com FC abaixo de 60`,features:[`FC < 60 bpm`,`QRS estreito`,`ritmo regular`,`P antes de cada QRS`]},challenge:b([`sinus`,`junctional`,`avb3`],[38,56])},{id:`sinus-tachy`,name:`Taquicardia sinusal`,shortName:`Taq. sinusal`,category:`sinus`,defaultRate:120,rateRange:[101,180],rateKey:`rate`,rhythmType:`regular`,qrsWidth:90,regularity:98,atrialActivity:`p-wave`,conduction:`normal`,morphology:`narrow`,renderer:`atrial-driven`,controls:y(120,90,300).map(e=>e.key===`variability`?{...e,default:5}:e),teaching:{keyFeature:`Ritmo sinusal com FC acima de 100`,features:[`FC > 100 bpm`,`QRS estreito`,`ritmo regular`,`P antes de cada QRS`]},challenge:b([`svt`,`sinus`,`flutter`],[105,150])},{id:`afib`,name:`Fibrilação atrial`,shortName:`FA`,category:`supraventricular`,defaultRate:95,rateRange:[40,220],rateKey:`rate`,rhythmType:`irregularly-irregular`,qrsWidth:90,regularity:15,atrialActivity:`fibrillatory`,conduction:`normal`,morphology:`narrow`,renderer:`afib`,controls:[h(95,40,300,`FC ventricular`),v(`irregularity`,`Irregularidade RR`,60),v(`fib`,`Atividade fibrilatória`,50),_(90,60,140)],teaching:{keyFeature:`RR irregularmente irregular, sem onda P`,features:[`sem ondas P`,`RR irregularmente irregular`,`linha de base fibrilatória`,`QRS estreito`]},challenge:b([`flutter`,`sinus`,`svt`],[70,150])},{id:`flutter`,name:`Flutter atrial`,shortName:`Flutter`,category:`supraventricular`,defaultRate:300,rateRange:[240,350],rateKey:`atrialRate`,rhythmType:`regular`,qrsWidth:90,regularity:95,atrialActivity:`flutter`,conduction:`normal`,morphology:`narrow`,renderer:`flutter`,controls:[g(300,240,350),m(`ratio`,`Condução AV`,2,[[2,`2:1`],[3,`3:1`],[4,`4:1`]]),v(`variability`,`Variabilidade da condução`,0)],teaching:{keyFeature:`Ondas F em serrote, condução AV fixa`,features:[`ondas F em dente de serra`,`FC atrial ≈ 300 bpm`,`condução 2:1, 3:1 ou 4:1`,`QRS estreito`]},challenge:b([`afib`,`svt`,`sinus-tachy`],[270,320])},{id:`svt`,name:`Taquicardia supraventricular`,shortName:`TSV`,category:`supraventricular`,defaultRate:180,rateRange:[140,250],rateKey:`rate`,rhythmType:`regular`,qrsWidth:80,regularity:99,atrialActivity:`retrograde`,conduction:`normal`,morphology:`narrow`,renderer:`svt`,controls:[h(180,140,300),_(80,60,120),m(`retro`,`Onda P`,0,[[0,`Oculta`],[1,`Retrógrada`]])],teaching:{keyFeature:`Taquicardia regular de QRS estreito, P oculta`,features:[`FC elevada`,`ritmo muito regular`,`QRS estreito`,`P oculta ou retrógrada`]},challenge:b([`sinus-tachy`,`flutter`,`vt`],[160,220])},{id:`pvc`,name:`Extrassístole ventricular`,shortName:`ESV`,category:`ventricular`,defaultRate:75,rateRange:[50,120],rateKey:`rate`,rhythmType:`regularly-irregular`,qrsWidth:140,regularity:70,atrialActivity:`p-wave`,conduction:`normal`,morphology:`wide`,renderer:`pvc`,controls:[h(75,50,200,`FC basal`),m(`pattern`,`Padrão`,0,[[0,`Isoladas`],[1,`Bigeminismo`],[2,`Trigeminismo`]]),p(`coupling`,`Acoplamento`,60,40,90,`%`),p(`pvcQrs`,`Largura da ESV`,140,110,180,`ms`,5)],teaching:{keyFeature:`Batimento precoce, QRS largo, pausa compensatória`,features:[`batimento precoce`,`QRS largo sem P precedente`,`T discordante`,`pausa compensatória`]},challenge:b([`sinus`,`junctional`,`vt`],[60,90])},{id:`vt`,name:`Taquicardia ventricular monomórfica`,shortName:`TV`,category:`ventricular`,defaultRate:170,rateRange:[120,250],rateKey:`rate`,rhythmType:`regular`,qrsWidth:150,regularity:95,atrialActivity:`dissociated`,conduction:`none`,morphology:`wide`,renderer:`vt`,controls:[h(170,120,300),_(150,120,200),m(`morph`,`Morfologia`,0,[[0,`Positiva`],[1,`Negativa`],[2,`Bifásica`]]),v(`regularity`,`Regularidade`,95),m(`dissociation`,`Dissociação AV`,0,[[0,`Não`],[1,`Sim`]])],teaching:{keyFeature:`Taquicardia regular de QRS largo`,features:[`FC elevada`,`QRS largo`,`ritmo regular`,`morfologia monomórfica`]},challenge:b([`svt`,`vt-poly`,`sinus-tachy`],[140,220])},{id:`vt-poly`,name:`Taquicardia ventricular polimórfica`,shortName:`TV polimórfica`,category:`ventricular`,defaultRate:220,rateRange:[150,300],rateKey:`rate`,rhythmType:`regularly-irregular`,qrsWidth:140,regularity:70,atrialActivity:`none`,conduction:`none`,morphology:`variable`,renderer:`vt-poly`,controls:[h(220,150,300),p(`twist`,`Torção (batimentos/ciclo)`,10,6,20,void 0)],teaching:{keyFeature:`QRS largo com amplitude e polaridade variáveis`,features:[`FC muito elevada`,`QRS largo`,`amplitude variável (torção)`,`polaridade alternante`]},challenge:b([`vt`,`vf`,`afib`],[190,260])},{id:`vf`,name:`Fibrilação ventricular`,shortName:`FV`,category:`ventricular`,defaultRate:330,rateRange:[150,500],rateKey:`freq`,rhythmType:`chaotic`,qrsWidth:0,regularity:0,atrialActivity:`none`,conduction:`none`,morphology:`none`,renderer:`vf`,controls:[p(`freq`,`Frequência dominante`,330,150,500,`/min`),p(`coarse`,`Amplitude (fina ↔ grosseira)`,60,5,100,`%`)],teaching:{keyFeature:`Atividade caótica, sem QRS identificável`,features:[`sem complexos QRS`,`atividade caótica`,`amplitude variável`,`sem pulso`],pulseless:!0},challenge:b([`vt-poly`,`aesp`,`afib`])},{id:`idioventricular`,name:`Ritmo idioventricular`,shortName:`Idioventricular`,category:`ventricular`,defaultRate:35,rateRange:[20,50],rateKey:`rate`,rhythmType:`regular`,qrsWidth:160,regularity:90,atrialActivity:`none`,conduction:`none`,morphology:`wide`,renderer:`idioventricular`,controls:[h(35,20,50),_(160,120,220),v(`regularity`,`Regularidade`,90)],teaching:{keyFeature:`Escape ventricular lento, QRS largo, sem P`,features:[`FC < 50 bpm`,`QRS largo`,`sem ondas P`,`ritmo de escape`]},challenge:b([`avb3`,`aesp`,`sinus-brady`],[24,42])},{id:`avb1`,name:`BAV de 1º grau`,shortName:`BAV 1º grau`,category:`conduction`,defaultRate:70,rateRange:[40,110],rateKey:`rate`,rhythmType:`regular`,qrsWidth:90,regularity:98,atrialActivity:`p-wave`,conduction:`first-degree`,morphology:`narrow`,renderer:`atrial-driven`,controls:[h(70,40,150),p(`pr`,`Intervalo PR`,280,210,450,`ms`,5),_(90,60,120),v(`variability`,`Variabilidade`,10)],teaching:{keyFeature:`PR prolongado (> 200 ms) e constante`,features:[`PR > 200 ms`,`PR constante`,`todo P conduz`,`QRS estreito`]},challenge:b([`sinus`,`avb2-1`,`avb2-2`],[55,85])},{id:`avb2-1`,name:`BAV de 2º grau Mobitz I`,shortName:`Mobitz I`,category:`conduction`,defaultRate:80,rateRange:[50,120],rateKey:`atrialRate`,rhythmType:`regularly-irregular`,qrsWidth:90,regularity:70,atrialActivity:`p-wave`,conduction:`wenckebach`,morphology:`narrow`,renderer:`atrial-driven`,controls:[g(80,50,120),p(`cycle`,`Ciclo (P : QRS)`,4,3,8,void 0,1,e=>`${e}:${e-1}`),p(`pr0`,`PR inicial`,160,120,240,`ms`,5),p(`progression`,`Progressão do PR`,60,20,120,`ms`,5),_(90,60,120)],teaching:{keyFeature:`PR aumenta progressivamente até um P bloqueado`,features:[`PR progressivamente maior`,`P bloqueado (sem QRS)`,`RR encurta antes da pausa`,`agrupamento dos batimentos`]},challenge:b([`avb2-2`,`avb1`,`avb3`],[60,100])},{id:`avb2-2`,name:`BAV de 2º grau Mobitz II`,shortName:`Mobitz II`,category:`conduction`,defaultRate:80,rateRange:[50,120],rateKey:`atrialRate`,rhythmType:`regularly-irregular`,qrsWidth:100,regularity:70,atrialActivity:`p-wave`,conduction:`mobitz2`,morphology:`narrow`,renderer:`atrial-driven`,controls:[g(80,50,120),p(`cycle`,`Ciclo (P : QRS)`,3,2,6,void 0,1,e=>`${e}:${e-1}`),p(`pr`,`Intervalo PR`,180,120,280,`ms`,5),_(100,60,140)],teaching:{keyFeature:`PR constante com P bloqueado de forma súbita`,features:[`PR constante nos conduzidos`,`P bloqueado súbito`,`sem alargamento prévio do PR`,`risco de BAV total`]},challenge:b([`avb2-1`,`avb1`,`avb3`],[60,100])},{id:`avb3`,name:`BAV total`,shortName:`BAVT`,category:`conduction`,defaultRate:35,rateRange:[20,60],rateKey:`rate`,rhythmType:`regular`,qrsWidth:160,regularity:95,atrialActivity:`dissociated`,conduction:`none`,morphology:`wide`,renderer:`avb3`,controls:[h(35,20,60,`FC ventricular`),g(80,50,130),m(`escape`,`Escape`,1,[[0,`Juncional`],[1,`Ventricular`]]),v(`regularity`,`Regularidade ventricular`,95)],teaching:{keyFeature:`Dissociação AV: P e QRS independentes`,features:[`P regulares, QRS regulares`,`sem relação entre P e QRS`,`FC atrial > FC ventricular`,`escape lento`]},challenge:b([`avb2-2`,`idioventricular`,`sinus-brady`],[28,48])},{id:`junctional`,name:`Ritmo juncional`,shortName:`Juncional`,category:`other`,defaultRate:60,rateRange:[40,120],rateKey:`rate`,rhythmType:`regular`,qrsWidth:85,regularity:98,atrialActivity:`retrograde`,conduction:`none`,morphology:`narrow`,renderer:`junctional`,controls:[h(60,40,300),_(85,60,110),m(`retro`,`Onda P retrógrada`,1,[[0,`Antes`],[1,`Oculta`],[2,`Depois`]])],teaching:{keyFeature:`QRS estreito regular sem P sinusal`,features:[`QRS estreito`,`ritmo regular`,`P ausente, invertida ou após o QRS`,`FC 40–60 bpm`]},challenge:b([`sinus-brady`,`sinus`,`avb3`],[42,58])},{id:`aesp`,name:`AESP`,shortName:`AESP`,category:`other`,defaultRate:50,rateRange:[20,120],rateKey:`rate`,rhythmType:`regular`,qrsWidth:90,regularity:90,atrialActivity:`p-wave`,conduction:`normal`,morphology:`variable`,renderer:`aesp`,controls:[h(50,20,300),m(`origin`,`Complexo`,0,[[0,`Estreito`],[1,`Largo`]])],teaching:{keyFeature:`Atividade elétrica organizada sem pulso`,features:[`ritmo organizado no monitor`,`sem pulso palpável`,`QRS estreito ou largo`,`checar pulso`],pulseless:!0},challenge:b([`sinus-brady`,`idioventricular`,`junctional`],[36,70])}];for(let e of x)if((e.rateKey===`rate`||e.rateKey===`atrialRate`)&&e.id!==`flutter`&&e.id!==`avb3`)for(let t of e.controls)t.key===e.rateKey&&(t.min=0);var S={id:`asystole`,name:`Assistolia`,shortName:`Assistolia`,category:`other`,defaultRate:0,rateRange:[0,0],rateKey:`rate`,rhythmType:`none`,qrsWidth:0,regularity:0,atrialActivity:`none`,conduction:`none`,morphology:`none`,renderer:`aesp`,controls:[],teaching:{keyFeature:`Ausência de atividade elétrica: linha isoelétrica`,features:[`sem ondas P`,`sem complexos QRS`,`linha de base plana`,`confirmar derivações e ganho`],pulseless:!0},challenge:{eligible:!1,confusable:[`vf`,`aesp`,`idioventricular`]}},ee=new Map([...x,S].map(e=>[e.id,e]));function C(e){let t=ee.get(e);if(!t)throw Error(`Ritmo desconhecido: ${e}`);return t}function w(e,t){return d(e,t)?S:e}function te(e){return x.filter(t=>t.category===e)}
+M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step(e){return this.x+=-this.x*e/this.tau+Math.sqrt(2*e/this.tau)*this.rng.randn(),this.x}},N=class{envDepth;phase=[];f=[];a=[];nf=[];na=[];env;norm;constructor(e,t,n,r,i){this.envDepth=i;let a=0;for(let i=0;i<t;i++){this.phase.push(e.next()*2*Math.PI),this.f.push(n+(r-n)*(i+e.next())/t);let o=.6+.8*e.next();this.a.push(o),a+=o*o/2,this.nf.push(new M(e,.4+e.next()*.5)),this.na.push(new M(e,.5+e.next()*.8))}this.env=new M(e,1.6),this.norm=1/Math.sqrt(a)}next(e,t){let n=0;for(let r=0;r<this.phase.length;r++){let i=this.f[r]*t*(1+.16*this.nf[r].step(e));this.phase[r]+=2*Math.PI*i*e;let a=this.a[r]*Math.max(.25,.75+.3*this.na[r].step(e));n+=a*Math.sin(this.phase[r])}let r=Math.max(.35,1+this.envDepth*this.env.step(e));return n*this.norm*r}},Te=2*Math.PI;function Ee(e,t){if(e.g){let n=0,r=e.g;for(let e=0;e<r.length;e++){let i=r[e],a=(t-i.c)/(t<i.c?i.sl:i.sr);a>-5&&a<5&&(n+=i.a*Math.exp(-.5*a*a))}return n}if(e.saw){let n=(t-e.saw.start)/e.saw.period;if(n<0||n>=1)return 0;let r=0;for(let e=1;e<=4;e++)r+=Math.sin(Te*e*n)/e;return e.saw.amp*(2/Math.PI)*r}return 0}function De(e){let t=1/0,n=-1/0;for(let r of e)t=Math.min(t,r.c-5*r.sl),n=Math.max(n,r.c+5*r.sr);return{t0:t,t1:n,g:e}}function Oe(e,t,n){return{t0:e,t1:e+t,saw:{start:e,period:t,amp:n}}}var ke=(e,t,n)=>({c:e,sl:t,sr:t,a:n}),Ae=e=>Math.min(1.6,Math.max(.25,e));function je(e,t){return[ke(e,.022,.14*t)]}function Me(e,t){return[ke(e,.022,-.11*t)]}var Ne=e=>e/1e3*.42,Pe=e=>e/1e3*.58;function Fe(e,t){let n=t.qrs/1e3,r=t.amp,i=Ae(t.rr),a=Math.sqrt(i),o=[ke(e-.22*n,.09*n,-.1*r),ke(e,.105*n,1.15*r),ke(e+.24*n,.1*n,-.22*r)];t.stDepression&&o.push(ke(e+.55*n+.04,.05,-t.stDepression*Math.abs(r)));let s=t.tScale??1;if(s>0){let t=.04*a;o.push({c:e+.26*a,sl:1.2*t,sr:.85*t,a:.32*r*s})}return o}function Ie(e,t){let n=t.qrs/1e3,r=t.amp,i=Ae(t.rr),a=Math.sqrt(i),o=t.morph??0,s=[],c=-1;o===0?(s.push({c:e,sl:.2*n,sr:.22*n,a:1*r}),s.push(ke(e+.42*n,.17*n,-.4*r)),c=-1):o===1?(s.push({c:e,sl:.2*n,sr:.22*n,a:-1*r}),s.push(ke(e+.42*n,.17*n,.4*r)),c=1):(s.push(ke(e-.12*n,.17*n,.85*r)),s.push(ke(e+.2*n,.2*n,-.95*r)),c=1);let l=t.tScale??1;if(l>0){let t=.05*a;s.push({c:e+.55*n+.12*a,sl:1.1*t,sr:.9*t,a:c*(o===2?.3:.45)*Math.abs(r)*Math.sign(r||1)*l})}return s}var Le=class{last=0;first=null;z=0;init(e,t){this.first=e,this.z=t.randn()}run(e,t,n){for(let r=0;r<64;r++){let r=this.first===null?this.last+t(this.z,this.last):this.first;if(r<e.now+.02&&(r=e.now+.02),r>=e.horizon)break;this.first=null,n(r),this.last=r,this.z=e.rng.randn()}}},Re=.72;function ze(e,t,n){switch(e){case`normal`:case`first-degree`:return{ok:!0,pr:(n.pr??160)/1e3};case`wenckebach`:{let e=Math.max(2,Math.round(n.cycle??4)),r=t%e;if(r===e-1)return{ok:!1,pr:0};let i=n.progression??60,a=n.pr0??160,o=i*(1-Re**+r)/.28;return{ok:!0,pr:Math.min(.7,(a+o)/1e3)}}case`mobitz2`:{let e=Math.max(2,Math.round(n.cycle??3));return t%e===e-1?{ok:!1,pr:0}:{ok:!0,pr:(n.pr??180)/1e3}}case`none`:return{ok:!1,pr:0}}}var Be=2*Math.PI,Ve=.055;function He(e,t,n,r,i={}){e.emit.wave(Fe(t,{qrs:n,amp:i.amp??1,rr:r,tScale:i.tScale,stDepression:i.stDepression})),e.emit.beat(t)}function Ue(e,t,n,r,i,a=1,o=1){e.emit.wave(Ie(t,{qrs:n,amp:a,rr:r,morph:i,tScale:o})),e.emit.beat(t)}var We=(e,t,n)=>60/Math.max(1,e)*Math.max(.2,1+t*n),Ge=(e,t,n)=>(100-(e??96))/100*t+n,Ke=class{rateKey;rule;lookahead=.35;clock=new Le;idx=0;lastR=NaN;constructor(e,t){this.rateKey=e,this.rule=t}init(e,t){this.clock.init(e,t),this.idx=0,this.lastR=NaN}schedule(e){let t=e.p;this.clock.run(e,(e,n)=>{let r=(t.variability??0)/100,i=1+.12*r*Math.sin(Be*.25*n)+.01*r*e;return 60/t[this.rateKey]*i},n=>{e.emit.wave(je(n,1));let r=ze(this.rule,this.idx++,t);if(!r.ok)return;let i=t.qrs??90,a=n-Ve+r.pr+Ne(i);He(e,a,i,Number.isFinite(this.lastR)?a-this.lastR:60/t[this.rateKey]),this.lastR=a})}},qe=class{lookahead=1;clock=new Le;lastR=NaN;untilPvc=3;morph=0;init(e,t){this.clock.init(e,t),this.lastR=NaN,this.untilPvc=2,this.morph=t.next()<.5?0:1}gapFor(e,t){return e===1?1:e===2?2:t.int(3,8)}schedule(e){let t=e.p;this.clock.run(e,e=>60/t.rate*(1+.004*e),n=>{let r=60/t.rate;e.emit.wave(je(n,1));let i=n-Ve+.16+Ne(90);if(this.untilPvc<=0){let n=i-(1-t.coupling/100)*r;Ue(e,n,t.pvcQrs,r,this.morph,1.15),this.lastR=n,this.untilPvc=this.gapFor(t.pattern,e.rng)}else He(e,i,90,Number.isFinite(this.lastR)?i-this.lastR:r),this.lastR=i,this.untilPvc--})}},Je=class{lookahead=.35;clock=new Le;lastR=NaN;init(e,t){this.clock.init(e,t),this.lastR=NaN}schedule(e){let t=e.p;e.bg.af=.015+.1*(t.fib/100),this.clock.run(e,e=>{let n=60/t.rate,r=.015+.42*(t.irregularity/100);return Math.max(.16,n*Math.exp(r*e-.5*r*r))},n=>{let r=Number.isFinite(this.lastR)?n-this.lastR:60/t.rate;He(e,n,t.qrs,r,{amp:1+.06*e.rng.randn(),tScale:.7}),this.lastR=n})}},Ye=class{lookahead=.35;nextF=0;left=2;lastR=NaN;init(e){this.nextF=e,this.left=2,this.lastR=NaN}pickRatio(e){let t=Math.round(e.p.ratio);return e.rng.next()<e.p.variability/100?e.rng.int(2,4):t}schedule(e){let t=e.p;for(;this.nextF<e.horizon;){let n=60/t.atrialRate*(1+.004*e.rng.randn());if(e.emit.saw(this.nextF,n,.2),--this.left<=0){let t=this.nextF+.5*n;He(e,t,90,Number.isFinite(this.lastR)?t-this.lastR:n*2,{tScale:.5}),this.lastR=t,this.left=this.pickRatio(e)}this.nextF+=n}}},Xe=class{lookahead=.35;clock=new Le;lastR=NaN;init(e,t){this.clock.init(e,t),this.lastR=NaN}schedule(e){let t=e.p;this.clock.run(e,e=>We(t.rate,.004,e),n=>{let r=Number.isFinite(this.lastR)?n-this.lastR:60/t.rate;He(e,n,t.qrs,r,{tScale:.4,stDepression:.08}),t.retro===1&&e.emit.wave(Me(n+Pe(t.qrs)+.06,1)),this.lastR=n})}},Ze=class{lookahead=.4;clock=new Le;lastR=NaN;init(e,t){this.clock.init(e+.1,t),this.lastR=NaN}schedule(e){let t=e.p;this.clock.run(e,e=>We(t.rate,.01,e),n=>{let r=Number.isFinite(this.lastR)?n-this.lastR:60/t.rate;He(e,n,t.qrs,r),t.retro===0?e.emit.wave(Me(n-Ne(t.qrs)-.065,1)):t.retro===2&&e.emit.wave(Me(n+Pe(t.qrs)+.07,1)),this.lastR=n})}},Qe=class{lookahead=.35;clock=new Le;atrial=new Le;dissociated=!1;init(e,t){this.clock.init(e,t),this.dissociated=!1}schedule(e){let t=e.p,n=Ge(t.regularity,.15,.003);this.clock.run(e,e=>We(t.rate,n,e),n=>Ue(e,n,t.qrs,60/t.rate,t.morph,1.05)),t.dissociation===1?(this.dissociated||=(this.atrial.init(e.now+.1,e.rng),!0),this.atrial.run(e,e=>We(75,.005,e),t=>e.emit.wave(je(t,.85)))):this.dissociated=!1}},$e=class{lookahead=.35;clock=new Le;i=0;init(e,t){this.clock.init(e,t),this.i=0}schedule(e){let t=e.p;this.clock.run(e,e=>We(t.rate,.05,e),n=>{let r=Math.cos(Be*this.i++/Math.max(4,t.twist)),i=Math.max(Math.abs(r),.2)*(r<0?-1:1);Ue(e,n,125+35*e.rng.next(),60/t.rate,0,1.1*i)})}},et=class{lookahead=.35;init(){}schedule(e){e.bg.vf=.08+.55*(e.p.coarse/100),e.bg.vfHz=e.p.freq/60}},tt=class{lookahead=.4;atrial=new Le;vent=new Le;lastR=NaN;init(e,t){this.atrial.init(e,t),this.vent.init(e+.35,t),this.lastR=NaN}schedule(e){let t=e.p;this.atrial.run(e,e=>We(t.atrialRate,.01,e),t=>e.emit.wave(je(t,1)));let n=Ge(t.regularity,.2,.004);this.vent.run(e,e=>We(t.rate,n,e),n=>{let r=Number.isFinite(this.lastR)?n-this.lastR:60/t.rate;t.escape===0?He(e,n,100,r,{amp:.9}):Ue(e,n,160,r,0,1),this.lastR=n})}},nt=class{lookahead=.4;clock=new Le;lastR=NaN;init(e,t){this.clock.init(e,t),this.lastR=NaN}schedule(e){let t=e.p,n=Ge(t.regularity,.2,.004);this.clock.run(e,e=>We(t.rate,n,e),n=>{let r=Number.isFinite(this.lastR)?n-this.lastR:60/t.rate;Ue(e,n,t.qrs??160,r,0,1),this.lastR=n})}},rt=class{lookahead=.4;narrowProg=new Ke(`rate`,`normal`);wideProg=new nt;origin=-1;rng;init(e,t){this.rng=t,this.origin=-1,this.t0=e}t0=0;schedule(e){let t=e.p.origin;if(t!==this.origin){let n=this.origin===-1?this.t0:e.now+.1;t===0?this.narrowProg.init(n,this.rng):this.wideProg.init(n,this.rng),this.origin=t}t===0?this.narrowProg.schedule(e):this.wideProg.schedule(e)}};function it(e){switch(e.renderer){case`atrial-driven`:return new Ke(e.rateKey,e.conduction);case`pvc`:return new qe;case`afib`:return new Je;case`flutter`:return new Ye;case`svt`:return new Xe;case`junctional`:return new Ze;case`vt`:return new Qe;case`vt-poly`:return new $e;case`vf`:return new et;case`avb3`:return new tt;case`idioventricular`:return new nt;case`aesp`:return new rt}}var at=class{s;spare=null;constructor(e=1){this.s=e>>>0}reseed(e){this.s=e>>>0,this.spare=null}next(){this.s=this.s+1831565813>>>0;let e=this.s;return e=Math.imul(e^e>>>15,e|1),e^=e+Math.imul(e^e>>>7,e|61),((e^e>>>14)>>>0)/4294967296}randn(){if(this.spare!==null){let e=this.spare;return this.spare=null,e}let e=0;for(;e<1e-12;)e=this.next();let t=this.next(),n=Math.sqrt(-2*Math.log(e));return this.spare=n*Math.sin(2*Math.PI*t),n*Math.cos(2*Math.PI*t)}int(e,t){return e+Math.floor(this.next()*(t-e+1))}},ot=1/250;function st(e){let t={};for(let n of e.controls)t[n.key]=n.default;return t}var ct=class{t=0;acc=0;events=[];beats=[];beepedUntil=0;idle=!1;rng;program;def;params={};amplitude=1;realism=!0;afBank;vfBank;bg={af:0,vf:0,vfHz:5.5};bgNow={af:0,vf:0};wanderPhase=0;emitter={wave:e=>this.events.push(De(e)),saw:(e,t,n)=>this.events.push(Oe(e,t,n)),beat:e=>this.beats.push(e)};constructor(e,t,n=1234){this.rng=new at(n),this.setRhythm(e,t,n)}get time(){return this.t}get rhythm(){return this.def}setRhythm(e,t,n){n!==void 0&&this.rng.reseed(n),this.def=e,this.params={...st(e),...t??{}},this.events=this.events.filter(e=>e.t0<=this.t),this.beats=this.beats.filter(e=>e<=this.t),this.afBank=new N(this.rng,6,5,9.5,.12),this.vfBank=new N(this.rng,7,3.2,8.5,.35),this.program=it(e),this.program.init(this.t+.12,this.rng)}reset(e){this.t=0,this.acc=0,this.events=[],this.beats=[],this.beepedUntil=0,this.bgNow={af:0,vf:0},this.setRhythm(this.def,this.params,e??1234)}setParams(e){this.params=e}setSignal(e,t){this.amplitude=e,this.realism=t}advance(e){this.acc+=e*250;let t=Math.floor(this.acc);this.acc-=t;let n=new Float32Array(t);if(t===0)return n;let r=this.t+t*ot;this.runProgram(this.t);let i=1-Math.exp(-.004/.35);for(let e=0;e<t;e++){let t=this.t;this.bgNow.af+=(this.bg.af-this.bgNow.af)*i,this.bgNow.vf+=(this.bg.vf-this.bgNow.vf)*i;let r=0,a=this.events;for(let e=0;e<a.length;e++){let n=a[e];t>=n.t0&&t<=n.t1&&(r+=Ee(n,t))}this.bgNow.af>.002&&(r+=this.bgNow.af*this.afBank.next(ot,1)),this.bgNow.vf>.002&&(r+=this.bgNow.vf*this.vfBank.next(ot,this.bg.vfHz/5.5)),this.realism&&(this.wanderPhase+=ot,r+=.018*Math.sin(2*Math.PI*.21*this.wanderPhase)+.008*Math.sin(2*Math.PI*.07*this.wanderPhase+1.3)+.0035*this.rng.randn()),n[e]=r*this.amplitude,this.t+=ot}return this.t=r,this.events.length>64&&(this.events=this.events.filter(e=>e.t1>this.t-.2)),this.beats.length>40&&this.beats.splice(0,this.beats.length-24),n}runProgram(e){if(this.bg.af=0,this.bg.vf=0,d(this.def,this.params)){this.idle=!0;return}this.idle&&(this.idle=!1,this.program.init(e+.12,this.rng));let t={now:e,horizon:e+this.program.lookahead,p:this.params,rng:this.rng,emit:this.emitter,bg:this.bg};this.program.schedule(t)}measuredBpm(){let e=this.beats.filter(e=>e<=this.t&&e>this.t-70);if(e.length<2)return null;let t=e.slice(-6),n=t[t.length-1]-t[0];if(n<=0)return null;let r=n/(t.length-1);return this.t-t[t.length-1]>Math.max(3.5,2.5*r)?null:Math.round(60/r)}hasOrganizedQrs(){return this.measuredBpm()!==null}takeBeats(){let e=this.beats.filter(e=>e>this.beepedUntil&&e<=this.t);return this.beepedUntil=this.t,e}beatTimes(){return this.beats.filter(e=>e<=this.t)}}
+      return {
+        rhythmMap: ee,
+        RhythmSimulator: ct,
+        defaults: st,
+        getRhythm: C
       };
+    })();
+    window.ECG_CORE = ECG_CORE;
+    const ECG_RHYTHMS = Array.from(ECG_CORE.rhythmMap.values());
 
-      // 1. BroadcastChannel (Local immediate)
-      try {
-        state.channel?.close();
-        state.channel = new BroadcastChannel('ecg-rhythm-room-' + pin);
-        state.channel.onmessage = e => {
-          if (e.data?.type === 'JOIN_ACK') onAck(e.data);
-          else handleStudentIncomingMessage(e.data);
-        };
-        state.channel.postMessage({
-          type: 'JOIN',
-          studentId: state.studentId,
-          name,
-          avatar: state.studentAvatar
-        });
-      } catch (e) {}
+    const AVATARS = [{"id": "stetho", "emoji": "🩺", "label": "Estetoscópio"}, {"id": "heart", "emoji": "🫀", "label": "Coração"}, {"id": "defib", "emoji": "⚡", "label": "Desfibrilador"}, {"id": "ambu", "emoji": "🚑", "label": "Ambulância"}, {"id": "doc_m", "emoji": "👨‍⚕️", "label": "Médico"}, {"id": "doc_f", "emoji": "👩‍⚕️", "label": "Médica"}, {"id": "micro", "emoji": "🔬", "label": "Microscópio"}, {"id": "pill", "emoji": "💊", "label": "Medicamento"}, {"id": "target", "emoji": "🎯", "label": "Alvo"}, {"id": "rocket", "emoji": "🚀", "label": "Foguete"}, {"id": "trophy", "emoji": "🏆", "label": "Troféu"}, {"id": "lion", "emoji": "🦁", "label": "Leão"}, {"id": "tiger", "emoji": "🐯", "label": "Tigre"}, {"id": "eagle", "emoji": "🦅", "label": "Águia"}, {"id": "wolf", "emoji": "🐺", "label": "Lobo"}, {"id": "brain", "emoji": "🧠", "label": "Cérebro"}];
+    const CLINICAL = {"sinus": {"conduct": "Ritmo fisiológico normal. Manter vigilância clínica e suporte básico de rotina.", "points": "Onda P positiva em DII precedendo cada complexo QRS com intervalo PR fixo e normal (120-200 ms). FC entre 60 e 100 bpm."}, "sinus-brady": {"conduct": "Se assintomático em atletas: observar. Se sintomático (hipotensão, síncope): Atropina 1 mg IV a cada 3-5 min (máx 3 mg); considerar marca-passo transcutâneo.", "points": "Ritmo sinusal regular com FC < 60 bpm. Morfologia normal de P, PR e QRS."}, "sinus-tachy": {"conduct": "Tratar a causa de base: febre, dor, hipovolemia, anemia, ansiedade, sepse ou embolia pulmonar. Não usar antiarrítmicos para frear resposta compensatória.", "points": "Ritmo sinusal regular com FC > 100 bpm (geralmente 100-160 bpm). Ondas P precedendo cada QRS."}, "afib": {"conduct": "Instável: Cardioversão sincronizada imediata. Estável: Controle de frequência (Beta-bloqueador / Diltiazem) e anticoagulação conforme escore CHA2DS2-VASc.", "points": "Intervalos R-R irregularmente irregulares, ausência de ondas P discerníveis e linha de base com ondulações caóticas (ondas f)."}, "flutter": {"conduct": "Instável: Cardioversão elétrica sincronizada (50-100 J). Estável: Controle de FC, anticoagulação precoce e encaminhamento para ablação por cateter.", "points": "Ondas F contínuas em 'dente de serrote' a ~300 bpm, mais evidentes em DII, DIII e aVF, com condução AV fixa (ex.: 2:1 = 150 bpm)."}, "svt": {"conduct": "Estável: Manobra vagal modificada; se refratária: Adenosina 6 mg IV em bolus rápido + flush (se necessário, 12 mg). Instável: Cardioversão sincronizada 50-100 J.", "points": "Taquicardia regular de QRS estreito (< 120 ms), FC típica 150-250 bpm, ondas P ocultas no QRS ou retrógradas logo após."}, "pvc": {"conduct": "Isolada e assintomática: tranquilizar. Frequente ou sintomática: investigar isquemia miocárdica, eletrólitos (K+, Mg++) e fração de ejeção do VE.", "points": "Complexo prematuro bizarro e alargado (> 120 ms), sem onda P precedente, com onda T com polaridade oposta e pausa compensatória completa."}, "vt": {"conduct": "SEM PULSO: PCR! RCP imediata + Desfibrilação 200 J bifásico. COM PULSO INSTÁVEL: Cardioversão sincronizada 100 J. COM PULSO ESTÁVEL: Amiodarona 150 mg IV em 10 min.", "points": "Sequência regular de complexos QRS alargados (> 120 ms), FC elevada (120-250 bpm) e morfologia monomórfica uniforme."}, "vt-poly": {"conduct": "SEM PULSO: Desfibrilação imediata 200 J bifásico. COM PULSO (Torsades com QT longo): Sulfato de Magnésio 2 g IV em 1-2 min + suspensão de drogas que prolongam QT.", "points": "Taquicardia ventricular com amplitude e polaridade continuamente variáveis, aparentando torcer em torno da linha isoelétrica."}, "vf": {"conduct": "PCR - RITMO CHOCÁVEL! Desfibrilação imediata 200 J bifásico + RCP ininterrupta 30:2 por 2 min + Adrenalina 1 mg IV a cada 3-5 min + Amiodarona 300 mg após 3º choque.", "points": "Atividade elétrica ventricular totalmente desorganizada e caótica, sem complexos QRS, sem débito cardíaco e sem pulso."}, "idioventricular": {"conduct": "Ritmo de escape protetor: NÃO usar antiarrítmicos! Se RIVA pós-trombólise/angioplastia: benigno, apenas observar. Se bradicardia extrema sintomática: marca-passo.", "points": "Ritmo regular de escape ventricular com FC lenta (20-40 bpm) ou acelerado (60-110 bpm), QRS alargado e sem ondas P."}, "avb1": {"conduct": "Benigno na maioria dos casos. Revisar e ajustar medicações que retardam o nó AV (beta-bloqueadores, verapamil, diltiazem, digoxina).", "points": "Prolongamento fixo e constante do intervalo PR > 200 ms (mais de 1 quadrado grande). Toda onda P conduz a um QRS (condução 1:1)."}, "avb2-1": {"conduct": "Geralmente de origem no nó AV e benigno. Se sintomático ou no contexto de IAM inferior: Atropina 1 mg IV ou marca-passo temporário se instável.", "points": "Aumento progressivo do intervalo PR a cada ciclo até que uma onda P é bloqueada (sem QRS). O ciclo reinicia logo em seguida."}, "avb2-2": {"conduct": "Bloqueio infranodal de ALTO RISCO de parada por BAVT! Pronto uso de marca-passo transcutâneo e indicação formal de marca-passo definitivo.", "points": "Intervalo PR constante antes e depois dos batimentos bloqueados, com falha súbita de condução de uma ou mais ondas P."}, "avb3": {"conduct": "EMERGÊNCIA MÉDICA! Instalar marca-passo transcutâneo imediato, infusão de Adrenalina ou Dopamina para suporte e implante de marca-passo definitivo.", "points": "Dissociação atrioventricular completa: ondas P marcham regulares (60-90 bpm) e complexos QRS marcham lentos e independentes (20-40 bpm)."}, "junctional": {"conduct": "Investigar intoxicação digitálica, isquemia miocárdica de parede inferior ou disfunção do nó sinusal. Tratar etiologia.", "points": "Ritmo de escape regular com QRS estreito, FC de 40-60 bpm, com ondas P ausentes, invertidas antes ou retrógradas logo após o QRS."}, "aesp": {"conduct": "PCR - RITMO NÃO CHOCÁVEL! RCP de alta qualidade contínua + Adrenalina 1 mg IV a cada 3-5 min + Identificação e reversão imediata dos 5Hs e 5Ts.", "points": "Atividade elétrica organizada presente no monitor, mas SEM pulso carotídeo ou femoral palpável. Emergência clínica de ressuscitação."}, "asystole": {"conduct": "PCR - NÃO CHOCÁVEL (NÃO DESFIBRILAR!). Protocolo da Linha Reta (cabos, derivação, ganho) + RCP de alta qualidade + Adrenalina 1 mg a cada 3-5 min + 5Hs e 5Ts.", "points": "Linha isoelétrica plana contínua. Ausência completa de atividade elétrica e mecânica cardíaca."}};
+    const ANSWER_COLORS = ['answer-red','answer-blue','answer-yellow','answer-green'];
+    const ANSWER_SHAPES = ['▲','◆','●','■'];
+    const EASY_GROUPS = {
+      sinus: ['sinus-brady','sinus-tachy','junctional'],
+      'sinus-brady': ['sinus','sinus-tachy','avb1'],
+      'sinus-tachy': ['sinus','sinus-brady','svt'],
+      afib: ['flutter','svt','sinus-tachy'],
+      flutter: ['afib','sinus-tachy','sinus'],
+      svt: ['sinus-tachy','flutter','afib'],
+      pvc: ['sinus','afib','sinus-brady'],
+      vt: ['sinus-tachy','afib','pvc'],
+      'vt-poly': ['sinus','flutter','avb1'],
+      vf: ['sinus','avb1','flutter'],
+      idioventricular: ['sinus-tachy','afib','flutter'],
+      avb1: ['sinus','sinus-tachy','pvc'],
+      'avb2-1': ['sinus','sinus-brady','afib'],
+      'avb2-2': ['sinus','sinus-tachy','flutter'],
+      avb3: ['sinus-tachy','afib','pvc'],
+      junctional: ['sinus-tachy','afib','flutter'],
+      aesp: ['sinus','avb1','flutter'],
+      asystole: ['sinus','avb1','flutter']
+    };
+    const HARD_GROUPS = {
+      sinus: ['sinus-brady','sinus-tachy','junctional'],
+      'sinus-brady': ['sinus','junctional','avb1'],
+      'sinus-tachy': ['svt','flutter','sinus'],
+      afib: ['flutter','svt','sinus-tachy'],
+      flutter: ['afib','svt','sinus-tachy'],
+      svt: ['sinus-tachy','flutter','afib'],
+      pvc: ['vt','idioventricular','sinus'],
+      vt: ['vt-poly','pvc','idioventricular'],
+      'vt-poly': ['vt','vf','pvc'],
+      vf: ['vt-poly','vt','asystole'],
+      idioventricular: ['avb3','pvc','junctional'],
+      avb1: ['avb2-1','avb2-2','sinus'],
+      'avb2-1': ['avb1','avb2-2','avb3'],
+      'avb2-2': ['avb1','avb2-1','avb3'],
+      avb3: ['avb2-2','idioventricular','avb2-1'],
+      junctional: ['sinus-brady','idioventricular','avb3'],
+      aesp: ['sinus','idioventricular','avb3'],
+      asystole: ['vf','aesp','idioventricular']
+    };
+    const $ = id => document.getElementById(id);
+    var state = window.state = {
+      role:null,pin:null,peer:null,channel:null,syncChannel:null,studentConn:null,
+      participants:new Map(),studentId:null,studentName:null,studentAvatar:'stetho',
+      studentScore:0,studentLastChoice:null,studentStreak:0,studentPosition:0,
+      currentRhythm:null,currentChoices:[],roundNumber:0,roundDuration:25,
+      timerHandle:null,timeLeft:25,answersReceived:new Map(),isRevealed:false,
+      selectedRhythmIds:[],gameMode:'random',difficulty:'easy',roundLimit:null,
+      roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
+      pauseReasons:new Set(),showRanking:true,theme:'dark',answerOrder:[],
+      projection:false,currentSamples:new Float32Array(),sampleOffset:0,
+      zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
+    };
+    let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
+    const CHANNEL_PREFIX='ecg-rhythm-room-';
 
-      // 2. WebRTC PeerJS (Remote cross-device)
-      try {
-        state.peer?.destroy();
-        state.peer = new Peer(undefined, {
-          debug: 0,
-          config: {
-            iceServers: [
-              { urls: 'stun:stun.l.google.com:19302' },
-              { urls: 'stun:global.stun.twilio.com:3478' }
-            ]
-          }
-        });
+    function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
+    function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('globalHeader').classList.remove('hidden');const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
+    function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
+    function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
+    function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
+    function setTheme(theme){state.theme=theme;document.body.classList.toggle('theme-light',theme==='light');try{localStorage.setItem('arena-theme',theme)}catch(e){}$('btnThemeToggle').textContent=theme==='light'?'🌙 Escuro':'☀️ Claro';$('btnThemeProjection').textContent=theme==='light'?'🌙':'☀️';if(state.currentRhythm)drawEcgFrame(true)}
+    function setProjectionVisible(on){state.projection=on;$('globalHeader').classList.toggle('hidden',on);$('viewHost').classList.toggle('hidden',on);$('projection').classList.toggle('hidden',!on);if(on){$('projection').classList.remove('controls-visible');drawEcgFrame(true)}else $('viewHost').classList.remove('hidden')}
+    function randomPin(){return String(Math.floor(100000+Math.random()*900000))}
+    function rhythmById(id){return ECG_RHYTHMS.find(r=>r.id===id)}
+    function escapeHTML(value){const el=document.createElement('div');el.textContent=value;return el.innerHTML}
+    function updateSelectedCount(){const n=document.querySelectorAll('#rhythmLibrary input:checked').length;$('selectedCount').textContent=String(n);if(n)$('setupError').classList.add('hidden')}
+    function renderRhythmLibrary(){const categories={sinus:'Sinusais',supraventricular:'Atrial e supraventricular',ventricular:'Ventriculares e PCR',conduction:'Bloqueios AV',other:'Juncionais e outros'};$('rhythmLibrary').innerHTML=Object.entries(categories).map(([cat,label])=>`<div class="category-block sm:col-span-2" data-category-block="${cat}"><h3 class="text-xs font-black tracking-wide mb-2 text-slate-300">${label}</h3><div class="grid sm:grid-cols-2 gap-2">${ECG_RHYTHMS.filter(r=>r.category===cat).map(r=>`<label class="rhythm-card" data-id="${r.id}"><input type="checkbox" value="${r.id}"><span class="text-sm font-bold">${r.name}</span></label>`).join('')}</div></div>`).join('');$('rhythmLibrary').querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{i.closest('.rhythm-card').classList.toggle('selected',i.checked);updateSelectedCount();renderSequence()}));updateSelectedCount()}
+    function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence()}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence()})})}
+    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if(show)renderSequence()}
+    function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
+    function initHost(){state.role='host';state.pin=randomPin();state.participants.clear();state.roundNumber=0;state.lastRoundId=null;$('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);const url=location.origin+location.pathname+'?pin='+state.pin;$('hostDirectUrl').textContent=url;const qr=$('qrCodeContainer');qr.innerHTML='';if(window.QRCode)new QRCode(qr,{text:url,width:250,height:250,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});updateParticipants();switchView('viewHost');try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}setupPeer(state.pin)}
+    function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=state.participants.get(conn.peer);if(p)removeParticipant(p.id)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();beep(520,.07);if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)revealRound()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function sendParticipant(p,msg){if(p?.conn?.open)try{p.conn.send(msg)}catch(e){}}
+    function sendToAll(msg){state.channel?.postMessage(msg);state.participants.forEach(p=>sendParticipant(p,msg))}
+    function removeParticipant(id){if(state.participants.delete(id)){state.answersReceived.delete(id);updateParticipants();updateAnswerProgress();updateLeaderboard()}}
+    function updateParticipants(){const n=state.participants.size;$('participantCount').textContent=String(n);$('participantsEmpty').classList.toggle('hidden',n>0);$('participantsList').classList.toggle('hidden',n===0);$('participantsList').innerHTML='';state.participants.forEach(p=>{const item=document.createElement('div');item.className='panel p-3 flex items-center gap-3';item.innerHTML=`<span class="text-3xl">${avatarEmoji(p.avatar)}</span><span class="font-bold text-sm flex-1 truncate">${escapeHTML(p.name)}</span><span class="text-xs text-lime-300">${p.score}</span>`;$('participantsList').append(item)});$('totalStudents').textContent=String(n)}
+    function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
+    function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
+    function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
+    function startRoundForRhythm(id){const rhythm=rhythmById(id);if(!rhythm)return;state.roundNumber++;state.currentRhythm=rhythm;state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));state.answersReceived.clear();state.isRevealed=false;state.roundLocked=false;state.isPaused=false;state.pauseReasons.clear();state.studentLastChoice=null;state.studentRank=0;state.sampleOffset=0;state.roundStartTime=Date.now();$('revealPanel').classList.add('hidden');$('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';$('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile answer-enter ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');$('answerCount').textContent='0';$('roundTimer').textContent=String(state.roundDuration);$('timerDisc').classList.remove('urgent');document.querySelector('.projection-question').textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
+      updateAnswerProgress();initRealEcg(rhythm.id);setProjectionVisible(true);state.roundDeadline=Date.now()+state.roundDuration*1000;sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration});startTimer()}
+    function questionPayload(){return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused}}
+    function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
+    function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.isPaused||state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);revealRound()}},100)}
+    function updateTimerDisplay(){ $('roundTimer').textContent=String(state.timeLeft);$('timerDisc').classList.toggle('urgent',state.timeLeft<=5);$('studentTimer').textContent=String(state.timeLeft)}
+    function updateAnswerProgress(){$('answerCount').textContent=String(state.answersReceived.size);$('totalStudents').textContent=String(state.participants.size);$('answerProgress').style.width=state.participants.size?Math.min(100,state.answersReceived.size/state.participants.size*100)+'%':'0%'}
+    function revealRound(){if(state.isRevealed||!state.currentRhythm)return;state.roundLocked=true;state.isRevealed=true;state.isPaused=false;state.pauseReasons.clear();clearInterval(state.timerHandle);const correct=state.currentRhythm;const now=Date.now();const results=[];for(const [id,p] of state.participants){const answer=state.answersReceived.get(id);const isCorrect=!!answer&&answer.choiceId===correct.id;const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,answer.answeredAt-state.roundStartTime)):state.roundDuration*1000;const remaining=answer?Math.max(0,1-elapsed/(state.roundDuration*1000)):0;const points=isCorrect?500+Math.round(500*remaining):0;p.streak=isCorrect?p.streak+1:0;p.score+=points;results.push({p,points,isCorrect,elapsed})}results.sort((a,b)=>b.p.score-a.p.score);results.forEach((r,i)=>{const old=state.previousRank.get(r.p.id)||0;r.rank=i+1;r.rankDelta=old?old-(i+1):0;state.previousRank.set(r.p.id,i+1)});updateLeaderboard();const resultById=new Map(results.map(r=>[r.p.id,r]));$('revealName').textContent=correct.name;$('revealFeature').textContent=CLINICAL[correct.id]?.points||'';$('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'';$('revealRate').textContent='· '+(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`);$('revealPanel').classList.remove('hidden');$('projectionOptions').querySelectorAll('.answer-tile').forEach(tile=>{const c=state.currentChoices.find(x=>x.label===tile.lastElementChild?.textContent);if(c?.id===correct.id)tile.classList.add('ring-4','ring-white');else tile.classList.add('opacity-35','grayscale')});const votes={};state.currentChoices.forEach(c=>votes[c.id]=0);state.answersReceived.forEach(a=>{if(votes[a.choiceId]!==undefined)votes[a.choiceId]++});for(const [id,p] of state.participants){const r=resultById.get(id);const rank=r?.rank||0;const payload={type:'ROUND_REVEAL',correctId:correct.id,name:correct.name,feature:CLINICAL[correct.id]?.points||'',pointsEarned:r?.points||0,totalScore:p.score,rank,rankDelta:r?.rankDelta||0,streak:p.streak,timeExpired:!state.answersReceived.has(id),votes};sendParticipant(p,payload)}fanfare()}
+    function updateLeaderboard(){const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);if(!$('showRanking').checked){$('teacherLeaderboard').innerHTML='<p class="text-xs text-slate-500">Ranking ocultado pelo professor.</p>';return}$('teacherLeaderboard').innerHTML=list.slice(0,5).map((p,i)=>`<div class="flex items-center gap-2 rounded-lg bg-slate-950 px-2 py-1.5"><span>${avatarEmoji(p.avatar)}</span><span class="text-[10px] text-amber-300 font-black">#${i+1}</span><span class="truncate flex-1 text-xs font-bold">${escapeHTML(p.name)}</span><span class="text-xs font-black text-lime-300">${p.score}</span></div>`).join('')||'<p class="text-xs text-slate-500">Aguardando participantes.</p>'}
+    function showPodium(){clearInterval(state.timerHandle);cancelAnimationFrame(ecgFrame);setProjectionVisible(false);$('hostPodium').classList.remove('hidden');const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);$('podiumPlaces').innerHTML=[1,0,2].map((rank,index)=>{const p=list[rank];return `<div class="panel p-6 ${rank===0?'border-amber-400 -translate-y-3':''}"><div class="text-5xl">${p?avatarEmoji(p.avatar):['🥈','🥇','🥉'][index]}</div><div class="font-black text-2xl mt-2">${rank===0?'1º':rank===1?'2º':'3º'}</div><p class="font-bold mt-2">${p?escapeHTML(p.name):'—'}</p><p class="text-lime-300 font-black">${p?p.score:0} pts</p></div>`}).join('');fanfare()}
 
-        state.peer.on('open', () => {
-          const conn = state.peer.connect('ecg-sim-room-' + pin, { reliable: true });
-          conn.on('open', () => {
-            conn.send({
-              type: 'JOIN',
-              studentId: state.studentId,
-              name,
-              avatar: state.studentAvatar
-            });
-          });
-
-          conn.on('data', data => {
-            if (data?.type === 'JOIN_ACK') onAck(data);
-            else handleStudentIncomingMessage(data);
-          });
-
-          state.studentConn = conn;
-        });
-
-        state.peer.on('error', err => console.warn('Student connection notice:', err));
-      } catch (e) {}
-
-      setTimeout(() => {
-        if (!ackReceived) {
-          setStudentButtonLoading(false);
-          err.textContent = 'Ainda não conectou. Verifique se o código está certo e se o professor iniciou a sala.';
-          err.classList.remove('hidden');
+    // REAL ECG WAVEFORM RENDERER (Autêntico do simulador)
+    function initRealEcg(rhythmId){
+      const rhythm=ECG_CORE.rhythmMap.get(rhythmId);
+      if(!rhythm)return;
+      ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,ECG_CORE.defaults(rhythm),Math.random()*1e9|0);
+      ecgEngine.setSignal(1,true);
+      state.currentSamples=new Float32Array();
+      state.sampleOffset=0;
+      frameLast=0;
+      cancelAnimationFrame(ecgFrame);
+      ecgFrame=requestAnimationFrame(ecgLoop);
+    }
+    function ecgLoop(timestamp){
+      if(!ecgEngine)return;
+      if(!state.isPaused){
+        const dt=frameLast?Math.min(.08,(timestamp-frameLast)/1000):.016;
+        frameLast=timestamp;
+        const samples=ecgEngine.advance(dt);
+        if(samples.length){
+          const maxSamples=20000;
+          const combined=new Float32Array(Math.min(maxSamples,state.currentSamples.length+samples.length));
+          const keep=Math.min(state.currentSamples.length,combined.length-samples.length);
+          if(keep>0)combined.set(state.currentSamples.subarray(state.currentSamples.length-keep),0);
+          const newCount=combined.length-keep;
+          if(newCount>0)combined.set(samples.subarray(samples.length-newCount),keep);
+          state.currentSamples=combined;
+          state.sampleOffset+=samples.length;
         }
-      }, 9000);
+      }
+      drawEcgFrame();
+      ecgFrame=requestAnimationFrame(ecgLoop);
     }
-
-    function onJoinSuccess(msg) {
-      setStudentButtonLoading(false);
-      state.studentName = msg?.studentName || state.studentName;
-      $('studentNameDisplay').textContent = state.studentName;
-      $('studentAvatarDisplay').textContent = getAvatar(state.studentAvatar);
-      $('studentCurrentScore').textContent = String(state.studentScore);
-      switchView('viewStudentLobby');
-      playBeep(600, 0.1);
-      showToast('Conectado à sala com sucesso!');
+    function ecgPalette(){
+      return state.theme==='light'
+        ? { bg: '#fff3f1', small: '#f7c8c6', large: '#ec8c89', trace: '#111111' }
+        : { bg: '#020806', small: 'rgba(22,185,129,.08)', large: 'rgba(22,185,129,.23)', trace: '#54e7a8' };
     }
-
-    function handleStudentIncomingMessage(msg) {
-      if (!msg?.type) return;
-
-      if (msg.type === 'ROUND_QUESTION') {
-        renderStudentQuestion(msg);
-      } else if (msg.type === 'ROUND_REVEAL') {
-        renderStudentReveal(msg);
-      } else if (msg.type === 'KICK' && msg.studentId === state.studentId) {
-        showToast('Sua conexão com a sala foi encerrada.');
-        switchView('viewStudentJoin');
+    function drawEcgFrame(){
+      const canvas=$('roundEcgCanvas');
+      if(!canvas||!state.currentSamples.length)return;
+      const rect=canvas.getBoundingClientRect();
+      if(!rect.width||!rect.height)return;
+      const dpr=Math.min(2,devicePixelRatio||1),w=Math.floor(rect.width),h=Math.floor(rect.height);
+      if(canvas.width!==w*dpr||canvas.height!==h*dpr){canvas.width=w*dpr;canvas.height=h*dpr}
+      const ctx=canvas.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      const colors=ecgPalette();
+      ctx.fillStyle=colors.bg;
+      ctx.fillRect(0,0,w,h);
+      for(const [step,color,width] of [[10,colors.small,1],[50,colors.large,1.2]]){
+        ctx.strokeStyle=color;ctx.lineWidth=width;
+        for(let x=0;x<w;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+        for(let y=0;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+      }
+      const data=state.currentSamples;
+      const visible=Math.min(data.length,Math.max(1,Math.floor(w*3)));
+      const start=data.length-visible;
+      const scale=Math.min(h*.43,165);
+      ctx.beginPath();
+      ctx.strokeStyle=colors.trace;
+      ctx.lineWidth=state.theme==='light'?2.6:2.8;
+      ctx.shadowColor=state.theme==='light'?'transparent':'#54e7a8';
+      ctx.shadowBlur=state.theme==='light'?0:8;
+      for(let x=0;x<w;x++){
+        const index=Math.min(data.length-1,start+Math.floor(x/w*visible));
+        const y=h*.52-data[index]*scale;
+        if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+    function togglePause(reason='teacher'){if(state.isRevealed&&!state.currentRhythm)return;state.isPaused=!state.isPaused;if(state.isPaused){state.pauseReasons.add(reason);clearInterval(state.timerHandle);$('btnPause').textContent='▶ Retomar';sendToAll({type:'ROUND_PAUSE',paused:true});$('studentWaitMessage').classList.remove('hidden')}else{state.pauseReasons.clear();$('btnPause').textContent='⏸ Pausar';if(!state.isRevealed){state.roundDeadline=Date.now()+state.timeLeft*1000;startTimer()}sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});$('studentWaitMessage').classList.add('hidden')} }
+    function addTime(){if(state.isRevealed||state.roundLocked)return;state.timeLeft+=10;state.roundDeadline+=10000;updateTimerDisplay();sendToAll({type:'ROUND_TIME',seconds:state.timeLeft})}
+    function openZoom(rect){if(!state.currentSamples.length)return;$('explainOverlay').classList.remove('hidden');const canvas=$('zoomCanvas');const box=canvas.getBoundingClientRect();const dpr=Math.min(2,devicePixelRatio||1);canvas.width=box.width*dpr;canvas.height=box.height*dpr;const ctx=canvas.getContext('2d');const light=state.theme==='light';ctx.fillStyle=light?'#fff3f1':'#020806';ctx.fillRect(0,0,box.width,box.height);const minor=light?'#f7c8c6':'rgba(22,185,129,.08)',major=light?'#ec8c89':'rgba(22,185,129,.23)';for(let step of [10,50]){ctx.strokeStyle=step===10?minor:major;ctx.lineWidth=step===10?1:1.4;for(let x=0;x<box.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,box.height);ctx.stroke()}for(let y=0;y<box.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(box.width,y);ctx.stroke()}}ctx.beginPath();ctx.strokeStyle=light?'#111':'#54e7a8';ctx.lineWidth=3;ctx.shadowColor=light?'transparent':'#54e7a8';ctx.shadowBlur=light?0:8;const data=state.currentSamples;let begin=0,end=data.length;if(rect){begin=Math.floor(rect.x/Math.max(1,$('roundEcgCanvas').clientWidth)*data.length);end=Math.floor((rect.x+rect.w)/Math.max(1,$('roundEcgCanvas').clientWidth)*data.length);begin=Math.max(0,Math.min(data.length-1,begin));end=Math.max(begin+1,Math.min(data.length,end))}for(let x=0;x<box.width;x++){const index=begin+Math.floor(x/box.width*(end-begin));const y=box.height*.52-data[index]*Math.min(box.height*.35,120);if(!x)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();$('zoomRuler').classList.toggle('hidden',!state.rulerOn);
+      const cInfo = $('caliperInfo');
+      if (cInfo) {
+        cInfo.classList.toggle('hidden', !state.rulerOn);
+        if (state.rulerOn) {
+          // Standard ECG speed 25 mm/s, 1 mm = 40 ms, 5 mm = 200 ms
+          const dtMs = 280; // calibrated demo measurement
+          const smallBoxes = (dtMs / 40).toFixed(1);
+          const hr = Math.round(60000 / dtMs);
+          cInfo.innerHTML = `<b>COMPASSO ECG:</b> Δt ≈ ${dtMs} ms (${smallBoxes} quadradinhos) · FC estimada: ~${hr} bpm`;
+        }
       }
     }
-
-    function renderStudentQuestion(msg) {
-      switchView('viewStudentRound');
-      $('studentRoundNumber').textContent = String(msg.round);
-      $('studentRoundScoreDisplay').textContent = String(state.studentScore);
-      $('studentAnswerStatus').textContent = 'Toque na resposta correspondente ao telão';
-
-      const grid = $('studentAnswerGrid');
-      grid.innerHTML = msg.choices.map(c => `
-        <button type="button" class="answer-tile student-choice ${c.color} flex flex-col items-center justify-center gap-2 p-3 text-center" data-choice="${c.id}">
-          <span class="text-5xl sm:text-7xl font-black">${c.shape}</span>
-          <span class="text-sm sm:text-lg font-black leading-tight">${c.label}</span>
-        </button>
-      `).join('');
-
-      let answered = false;
-      const started = Date.now();
-
-      grid.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (answered) return;
-          answered = true;
-          state.studentLastChoice = btn.dataset.choice;
-
-          try { navigator.vibrate?.(40); } catch (e) {}
-          playBeep(750, 0.05);
-
-          grid.querySelectorAll('button').forEach(b => {
-            b.disabled = true;
-            b.classList.add('opacity-40');
-          });
-          btn.classList.remove('opacity-40');
-          btn.classList.add('ring-4', 'ring-white');
-
-          $('studentAnswerStatus').textContent = 'Resposta registrada! Aguarde a revelação.';
-
-          const answerPayload = {
-            type: 'ANSWER',
-            studentId: state.studentId,
-            choiceId: btn.dataset.choice,
-            round: msg.round,
-            timeSpent: Math.round((Date.now() - started) / 1000)
-          };
-
-          state.channel?.postMessage(answerPayload);
-          if (state.studentConn?.open) state.studentConn.send(answerPayload);
-        });
+    function setupZoomSelection(){
+      const stage = $('ecgStage');
+      let start = null, rectEl = null;
+      stage.addEventListener('pointerdown', e => {
+        if (!state.projection || e.button !== 0) return;
+        const b = stage.getBoundingClientRect();
+        start = { x: e.clientX - b.left, y: e.clientY - b.top };
+        rectEl = document.createElement('div');
+        rectEl.className = 'select-rect';
+        rectEl.style.left = start.x + 'px';
+        rectEl.style.top = start.y + 'px';
+        rectEl.style.width = '0px';
+        rectEl.style.height = '0px';
+        stage.appendChild(rectEl);
+        stage.setPointerCapture(e.pointerId);
       });
-
-      // Synchronized countdown on student device
-      let sec = Number(msg.seconds) || 25;
-      $('studentRoundTimer').textContent = String(sec);
-      clearInterval(window.studentTimerHandle);
-      window.studentTimerHandle = setInterval(() => {
-        sec = Math.max(0, sec - 1);
-        $('studentRoundTimer').textContent = String(sec);
-        if (sec === 0) clearInterval(window.studentTimerHandle);
-      }, 1000);
+      stage.addEventListener('pointermove', e => {
+        if (!start || !rectEl) return;
+        const b = stage.getBoundingClientRect();
+        const curX = Math.max(0, Math.min(b.width, e.clientX - b.left));
+        const curY = Math.max(0, Math.min(b.height, e.clientY - b.top));
+        rectEl.style.left = Math.min(start.x, curX) + 'px';
+        rectEl.style.top = Math.min(start.y, curY) + 'px';
+        rectEl.style.width = Math.abs(curX - start.x) + 'px';
+        rectEl.style.height = Math.abs(curY - start.y) + 'px';
+      });
+      stage.addEventListener('pointerup', e => {
+        if (!start || !rectEl) return;
+        const b = stage.getBoundingClientRect();
+        const endX = Math.max(0, Math.min(b.width, e.clientX - b.left));
+        const endY = Math.max(0, Math.min(b.height, e.clientY - b.top));
+        const box = {
+          x: Math.min(start.x, endX),
+          y: Math.min(start.y, endY),
+          w: Math.abs(endX - start.x),
+          h: Math.abs(endY - start.y)
+        };
+        rectEl.remove();
+        rectEl = null;
+        start = null;
+        if (box.w > 25) {
+          if (!state.isPaused) togglePause('zoom');
+          openZoom(box);
+        }
+      });
     }
 
-    function renderStudentReveal(msg) {
-      clearInterval(window.studentTimerHandle);
-      switchView('viewStudentResult');
+    // STUDENT FLOW
+    function renderAvatarPicker(){const picker=$('avatarPicker');picker.innerHTML=AVATARS.map((a,i)=>`<button type="button" class="avatar-option ${i===0?'selected':''}" data-avatar="${a.id}" title="${a.label}" aria-label="${a.label}">${a.emoji}</button>`).join('');picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{picker.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');state.studentAvatar=btn.dataset.avatar}))}
+    function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
+    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
+    function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
+    function handleStudentMessage(msg){if(!msg?.type)return;if(msg.type==='ROUND_QUESTION')showStudentQuestion(msg);else if(msg.type==='ROUND_PAUSE'){state.isPaused=msg.paused;$('studentWaitMessage').classList.toggle('hidden',!msg.paused)}else if(msg.type==='ROUND_TIME')$('studentTimer').textContent=String(msg.seconds);else if(msg.type==='ROUND_REVEAL')showStudentReveal(msg);else if(msg.type==='KICK'&&msg.studentId===state.studentId)switchView('viewStudentJoin')}
+    function showStudentQuestion(msg){switchView('studentGame');state.studentLastChoice=null;state.roundLocked=false;state.roundNumber=msg.round;state.timeLeft=msg.seconds;state.studentRank=state.studentPosition;$('studentRound').textContent=String(msg.round);$('studentScore').textContent=String(state.studentScore);$('studentRank').textContent=state.studentPosition?'#'+state.studentPosition:'#—';$('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
+    function showStudentReveal(msg){clearInterval(window.studentTimer);state.studentScore=msg.totalScore;state.studentPosition=msg.rank;state.studentStreak=msg.streak;$('studentReveal').classList.remove('hidden');const answered=state.studentLastChoice!==null;const correct=answered&&state.studentLastChoice===msg.correctId;const timedOut=!!msg.timeExpired;const bg=timedOut?'#963b20':correct?'#087646':'#a32d3a';$('studentReveal').style.background=bg;$('studentRevealIcon').textContent=timedOut?'⏱️':correct?'🎉':'💡';$('studentRevealTitle').textContent=timedOut?'TEMPO ESGOTADO':correct?'VOCÊ ACERTOU!':'QUASE!';animatePoints(msg.pointsEarned||0);$('studentRevealName').textContent=msg.name;$('studentRevealFeature').textContent=msg.feature;$('studentStreak').textContent=msg.streak>1?'🔥 '+msg.streak+' acertos seguidos':'';$('studentRevealRank').textContent=`#${msg.rank||'—'} na classificação ${msg.rankDelta>0?'⬆️ subiu '+msg.rankDelta:msg.rankDelta<0?'⬇️ desceu '+Math.abs(msg.rankDelta):''}`;$('studentScore').textContent=String(state.studentScore);$('studentRank').textContent=msg.rank?'#'+msg.rank:'#—';$('studentScoreLobby').textContent=String(state.studentScore);$('studentRankLobby').textContent='Posição: '+(msg.rank?'#'+msg.rank:'—');if(correct)fanfare();else beep(220,.12,'sawtooth')}
+    function animatePoints(points){const el=$('pointsAnimation');el.textContent='+0';const start=performance.now(),duration=600;function frame(now){const p=Math.min(1,(now-start)/duration);el.textContent='+'+Math.round(points*p);if(p<1)requestAnimationFrame(frame)}requestAnimationFrame(frame)}
 
-      const isCorrect = state.studentLastChoice === msg.correctId;
-      $('studentResultIcon').textContent = isCorrect ? '🎉' : '💡';
-      $('studentResultTitle').textContent = isCorrect ? 'VOCÊ ACERTOU!' : 'RESPOSTA REVELADA';
-      $('studentResultPointsBadge').textContent = isCorrect ? '+500 PONTOS' : 'PREPARE-SE PARA A PRÓXIMA';
-      $('studentResultPointsBadge').className = isCorrect ?
-        'inline-block mt-3 rounded-full bg-emerald-400 text-slate-950 font-black text-sm px-6 py-2 shadow-lg' :
-        'inline-block mt-3 rounded-full bg-slate-700 text-slate-300 font-bold text-sm px-6 py-2';
-
-      $('studentResultRhythmName').textContent = msg.name;
-      $('studentResultFeature').textContent = msg.feature;
-
-      if (isCorrect) {
-        state.studentScore += 500;
-        playFanfare();
-      } else {
-        playBeep(240, 0.15, 'sawtooth');
-      }
-
-      $('studentCurrentScore').textContent = String(state.studentScore);
-      $('studentResultCard').style.borderColor = isCorrect ? '#54e7a8' : '#2d4359';
-    }
-
-    // EVENT LISTENERS & SHORTCUTS
-    $('btnStartHost').addEventListener('click', () => {
-      renderRhythmLibrary();
-      switchView('viewHostSetup');
-    });
-
-    $('btnSetupBack').addEventListener('click', () => switchView('viewHome'));
-
-    $('btnFilterAll').addEventListener('click', () => {
-      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
-        i.checked = true;
-        i.closest('.rhythm-card').classList.add('selected');
-      });
-      updateSelectedCount();
-    });
-
-    $('btnFilterBlocks').addEventListener('click', () => {
-      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
-        const isBlock = i.closest('.rhythm-card').dataset.category === 'bloqueio';
-        i.checked = isBlock;
-        i.closest('.rhythm-card').classList.toggle('selected', isBlock);
-      });
-      updateSelectedCount();
-    });
-
-    $('btnFilterPcr').addEventListener('click', () => {
-      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
-        const isPcrOrVent = ['ventricular', 'pcr'].includes(i.closest('.rhythm-card').dataset.category);
-        i.checked = isPcrOrVent;
-        i.closest('.rhythm-card').classList.toggle('selected', isPcrOrVent);
-      });
-      updateSelectedCount();
-    });
-
-    $('btnClearSelection').addEventListener('click', () => {
-      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
-        i.checked = false;
-        i.closest('.rhythm-card').classList.remove('selected');
-      });
-      updateSelectedCount();
-    });
-
-    $('btnCreateConfiguredRoom').addEventListener('click', () => {
-      state.selectedRhythmIds = getSelectedRhythms();
-      if (!state.selectedRhythmIds.length) {
-        $('setupError').classList.remove('hidden');
-        return;
-      }
-      state.gameMode = $('gameMode').value;
-      state.roundDuration = Number($('roundDurationSelect').value) || 25;
-      const count = $('roundCountSelect').value;
-      state.roundLimit = count === 'all' ? null : Number(count);
-
-      $('selectedRhythmsSummary').textContent = state.selectedRhythmIds.length + ' ritmos selecionados · ' +
-        (state.gameMode === 'random' ? 'Ordem aleatória' : 'Ordem da lista');
-
-      initHostRoom();
-    });
-
-    $('btnGoToJoin').addEventListener('click', () => initStudentJoinView(''));
-    $('formStudentJoin').addEventListener('submit', submitStudentJoin);
-    $('btnCancelJoin').addEventListener('click', () => switchView('viewHome'));
-
-    $('btnStartGame').addEventListener('click', () => {
-      createRoundQueue();
-      startNextRound();
-    });
-
-    $('btnRestartTimer').addEventListener('click', startRoundTimer);
-    $('btnRevealNow').addEventListener('click', revealRoundResult);
-    $('btnNextQuestion').addEventListener('click', startNextRound);
-
-    $('btnPodiumRestart').addEventListener('click', () => {
-      switchView('viewHostSetup');
-    });
-
-    $('btnPodiumLeave').addEventListener('click', () => {
-      switchView('viewHome');
-    });
-
-    $('btnToggleSound').addEventListener('click', () => {
-      soundEnabled = !soundEnabled;
-      $('soundIcon').textContent = soundEnabled ? '🔔' : '🔕';
-      $('soundLabel').textContent = soundEnabled ? 'Som ligado' : 'Som desligado';
-      showToast(soundEnabled ? 'Som habilitado' : 'Som desabilitado');
-    });
-
-    $('btnFullscreen').addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen?.();
-      } else {
-        document.exitFullscreen?.();
-      }
-    });
-
-    $('btnLeaveHost').addEventListener('click', () => {
-      if (confirm('Tem certeza de que deseja encerrar a sala da Arena?')) {
-        state.peer?.destroy();
-        state.channel?.close();
-        state.syncChannel?.close();
-        if (state.timerHandle) clearInterval(state.timerHandle);
-        if (ecgAnimId) cancelAnimationFrame(ecgAnimId);
-        switchView('viewHome');
-      }
-    });
-
-    $('btnCopyPin').addEventListener('click', () => {
-      navigator.clipboard?.writeText(state.pin).then(() => showToast('Código copiado!')).catch(() => showToast('Erro ao copiar'));
-    });
-
-    $('btnCopyLink').addEventListener('click', () => {
-      navigator.clipboard?.writeText(location.origin + location.pathname + '?pin=' + state.pin)
-        .then(() => showToast('Link copiado!'))
-        .catch(() => showToast('Erro ao copiar'));
-    });
-
-    // Keyboard shortcuts for the teacher
-    window.addEventListener('keydown', e => {
-      if (state.role !== 'host') return;
-      if (e.code === 'Space' && !$('hostGameSection').classList.contains('hidden')) {
-        e.preventDefault();
-        if (!state.isRevealed) revealRoundResult();
-        else startNextRound();
-      } else if ((e.key === 'n' || e.key === 'N') && state.isRevealed) {
-        startNextRound();
-      } else if (e.key === 'f' || e.key === 'F') {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-        else document.exitFullscreen?.();
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      if (state.currentRhythm && !$('hostGameSection').classList.contains('hidden')) {
-        startEcgAnimation(state.currentRhythm.id);
-      }
-    });
-
-    window.addEventListener('beforeunload', () => {
-      if (state.studentId) {
-        state.channel?.postMessage({ type: 'LEAVE', studentId: state.studentId });
-        if (state.studentConn?.open) state.studentConn.send({ type: 'LEAVE', studentId: state.studentId });
-      }
-    });
-
-    // URL Parsing: ?pin=123456 or ?host=1
-    const params = new URLSearchParams(location.search);
-    const urlPin = params.get('pin');
-    const urlHost = params.get('host');
-
-    if (urlPin) {
-      initStudentJoinView(urlPin);
-    } else if (urlHost === '1' || urlHost === 'true') {
-      renderRhythmLibrary();
-      switchView('viewHostSetup');
-    } else {
-      switchView('viewHome');
-    }
+    // EVENT WIRING
+    $('btnStartHost').onclick=()=>{renderRhythmLibrary();switchView('viewHostSetup')};$('btnSetupBack').onclick=()=>switchView('viewHome');$('btnSelectAll').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=true;i.closest('.rhythm-card').classList.add('selected')});updateSelectedCount();renderSequence()};$('btnSelectBlocks').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock==='conduction';i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnSelectPcr').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=['ventricular'].includes(i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock);i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnClearSelection').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=false;i.closest('.rhythm-card').classList.remove('selected')});updateSelectedCount();renderSequence()};$('gameMode').onchange=toggleSequenceEditor;$('difficultySelect').onchange=()=>state.difficulty=$('difficultySelect').value;$('btnCreateRoom').onclick=()=>{state.selectedRhythmIds=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);if(!state.selectedRhythmIds.length){$('setupError').classList.remove('hidden');return}state.gameMode=$('gameMode').value;state.difficulty=$('difficultySelect').value;state.roundDuration=Number($('roundDurationSelect').value)||25;const n=$('roundCountSelect').value;state.roundLimit=n==='all'?null:Number(n);if(state.gameMode==='sequence')state.answerOrder=state.answerOrder.filter(id=>state.selectedRhythmIds.includes(id));$('hostGameSummary').textContent=state.selectedRhythmIds.length+' ritmos · '+(state.gameMode==='sequence'?'sequência personalizada':'sorteio aleatório');initHost()};$('btnGoToJoin').onclick=()=>showJoin('');$('joinForm').onsubmit=submitJoin;$('joinBack').onclick=()=>switchView('viewHome');$('btnStartGame').onclick=()=>{buildRoundQueue();startNextRound()};$('btnPause').onclick=()=>togglePause();$('btnReveal').onclick=revealRound;$('btnNext').onclick=()=>{if(!state.isRevealed)revealRound();else startNextRound()};$('btnAddTime').onclick=addTime; $('btnOpenZoom').onclick=()=>{ if(!state.isPaused) togglePause('zoom'); openZoom(null); };$('btnThemeToggle').onclick=()=>setTheme(state.theme==='dark'?'light':'dark');$('btnThemeProjection').onclick=()=>setTheme(state.theme==='dark'?'light':'dark');$('btnFullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};$('btnLeaveHost').onclick=()=>{if(confirm('Encerrar esta sala?')){state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')}};$('btnCopyPin').onclick=()=>navigator.clipboard?.writeText(state.pin).then(()=>showToast('PIN copiado'));$('btnCopyLink').onclick=()=>navigator.clipboard?.writeText(location.origin+location.pathname+'?pin='+state.pin).then(()=>showToast('Link copiado'));$('showRanking').onchange=e=>{state.showRanking=e.target.checked;updateLeaderboard()};$('btnCloseZoom').onclick=()=>$('explainOverlay').classList.add('hidden');$('btnRuler').onclick=()=>{state.rulerOn=!state.rulerOn;openZoom(state.zoomRect)};$('btnPodiumRestart').onclick=()=>switchView('viewHostSetup');$('podiumBack').onclick=()=>switchView('viewHome');$('studentRevealContinue').onclick=()=>$('studentReveal').classList.add('hidden');$('btnToggleSound')?.addEventListener('click',()=>soundOn=!soundOn);setupZoomSelection();document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explainOverlay').classList.add('hidden');if(e.code==='Space'&&state.role==='host'&&state.projection){e.preventDefault();togglePause()}if((e.key==='n'||e.key==='N')&&state.role==='host'&&state.isRevealed)startNextRound()});document.addEventListener('mousemove',()=>{if(state.projection){$('projection').classList.add('controls-visible');clearTimeout(window.hideControls);window.hideControls=setTimeout(()=>$('projection').classList.remove('controls-visible'),2400)}});$('projection').addEventListener('dblclick',()=>togglePause());$('showRanking').checked=true;
+    window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)studentSend({type:'LEAVE',studentId:state.studentId})});
+    try{setTheme(localStorage.getItem('arena-theme')||'dark')}catch(e){setTheme('dark')}
+    const params=new URLSearchParams(location.search);if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();switchView('viewHostSetup')}else switchView('viewHome');
   </script>
 </body>
 </html>
