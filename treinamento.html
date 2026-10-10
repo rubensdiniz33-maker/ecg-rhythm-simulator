@@ -10,19 +10,46 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2), inset 0 0 15px rgba(16, 185, 129, 0.05); }
-      50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.45), inset 0 0 25px rgba(16, 185, 129, 0.12); }
+      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.25), inset 0 0 15px rgba(16, 185, 129, 0.05); }
+      50% { box-shadow: 0 0 35px rgba(16, 185, 129, 0.55), inset 0 0 25px rgba(16, 185, 129, 0.15); }
     }
-    .ecg-glow { animation: none; }
-    .answer-tile { min-height: 76px; border: 0; border-radius: 14px; color: white; font-weight: 800; box-shadow: 0 5px 0 rgba(0,0,0,.28); transition: transform .12s, filter .12s; }
-    .answer-tile:hover { transform: translateY(-2px); filter: brightness(1.07); }
-    .answer-tile:active { transform: translateY(2px); box-shadow: none; }
-    .answer-tile:disabled { opacity: .68; }
-    .answer-red { background:#e34d4d; } .answer-blue { background:#3478d4; }
-    .answer-yellow { background:#e6a927; color:#1f2937; } .answer-green { background:#2eaa78; }
-    .pin-pop { color:#ffd166; text-shadow:0 2px 0 rgba(0,0,0,.25); }
-    .score-chip { background:#202b40; border:1px solid #34415a; border-radius:999px; padding:.35rem .7rem; font-weight:800; }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+    .ecg-glow { animation: pulseGlow 3s infinite ease-in-out; }
+    
+    .answer-tile { 
+      min-height: 84px; 
+      border: 0; 
+      border-radius: 18px; 
+      color: white; 
+      font-weight: 800; 
+      box-shadow: 0 6px 0 rgba(0,0,0,.35); 
+      transition: transform .12s, filter .12s, box-shadow .12s; 
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .answer-tile:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 8px 0 rgba(0,0,0,.35); }
+    .answer-tile:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.35); }
+    .answer-tile:disabled { opacity: .65; cursor: not-allowed; transform: none; box-shadow: none; }
+    
+    .answer-red { background: #e34d4d; } 
+    .answer-blue { background: #3478d4; }
+    .answer-yellow { background: #e6a927; color: #111827; } 
+    .answer-green { background: #2eaa78; }
+    
+    .pin-pop { 
+      color: #fbbf24; 
+      text-shadow: 0 3px 14px rgba(251, 191, 36, 0.45); 
+    }
+    .score-chip { 
+      background: #1e293b; 
+      border: 1px solid #334155; 
+      border-radius: 999px; 
+      padding: .4rem .8rem; 
+      font-weight: 800; 
+    }
+    @media (prefers-reduced-motion: reduce) { 
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } 
+    }
     .num-display {
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum";
@@ -39,35 +66,35 @@
 <body class="bg-[#06090c] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
 
   <!-- TOAST NOTIFICATIONS -->
-  <div id="toast" class="fixed top-5 right-5 z-50 transform transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-    <span id="toastIcon" class="text-xl">ℹ️</span>
-    <span id="toastMsg" class="text-sm font-medium"></span>
+  <div id="toast" class="fixed top-5 right-5 z-50 transform transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none bg-slate-800/95 border border-slate-700 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur">
+    <span id="toastIcon" class="text-2xl">ℹ️</span>
+    <span id="toastMsg" class="text-sm font-semibold"></span>
   </div>
 
   <!-- TOP BAR -->
-  <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur px-4 py-3 sticky top-0 z-30">
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur px-4 py-3 sticky top-0 z-30">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="h-9 w-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+        <div class="h-9 w-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-sm font-bold tracking-wider text-slate-100 uppercase">ECG Rhythm Simulator</h1>
-            <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Arena ECG</span>
+            <span class="text-[10px] uppercase font-black tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Arena ECG</span>
           </div>
-          <p class="text-xs text-slate-400">Desafio interativo de ritmos cardíacos em tempo real</p>
+          <p class="text-xs text-slate-400 hidden sm:block">Desafio de ritmos em tempo real com controle dinâmico do apresentador</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500 bg-slate-800/70 hover:bg-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-all">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-700 hover:border-slate-500 bg-slate-800/70 hover:bg-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Voltar ao Simulador
+          <span class="hidden sm:inline">Voltar ao</span> Simulador
         </a>
       </div>
     </div>
@@ -76,24 +103,24 @@
   <!-- MAIN CONTAINER -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
 
-    <!-- VIEW 1: HOME / ROLE SELECTOR -->
+    <!-- VIEW 1: HOME / ROLE SELECTOR (Apenas se acessar sem PIN) -->
     <div id="viewHome" class="w-full max-w-4xl mx-auto my-auto py-8">
       <div class="text-center mb-10">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/50 text-emerald-400 text-xs font-semibold mb-4">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          PARTIDA AO VIVO · ENTRADA RÁPIDA
+          ARENA ECG AO VIVO
         </div>
         <h2 class="text-3xl md:text-5xl font-black text-white tracking-tight mb-4">
-          Desafio de Ritmos Cardíacos
+          Desafio Interativo de Ritmos
         </h2>
         <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto">
-          O apresentador projeta o ritmo na tela principal com o PIN e QR Code, e os jogadores respondem pelos seus smartphones em tempo real.
+          O apresentador projeta o traçado e seleciona os ritmos em segundo plano. Os participantes respondem instantaneamente pelo smartphone.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Card 1: Apresentador -->
-        <div class="relative group bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-950/40">
+        <div class="relative group bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 rounded-3xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-950/40">
           <div>
             <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,23 +129,23 @@
             </div>
             <div class="flex items-center gap-2 mb-2">
               <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Apresentador</span>
-              <span class="text-xs text-slate-500">• Projetor / Tela Cheia</span>
+              <span class="text-xs text-slate-500">• Telão / Projetor</span>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-3">Abrir uma sala</h3>
+            <h3 class="text-2xl font-bold text-white mb-3">Abrir Sessão da Arena</h3>
             <p class="text-slate-400 text-sm leading-relaxed mb-6">
-              Gera um PIN de 6 dígitos e um QR Code na tela. Conforme os jogadores entram com o celular, seus nomes aparecem na lista ao vivo.
+              Gera um QR Code grande e PIN legível no telão. Controle os ritmos na hora ou em segundo plano pelo simulador principal.
             </p>
           </div>
-          <button id="btnStartHost" class="w-full py-3.5 px-6 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm tracking-wide shadow-lg shadow-amber-900/30 hover:shadow-amber-700/30 flex items-center justify-center gap-2 transition-all">
-            <span>Abrir sala</span>
+          <button id="btnStartHost" class="w-full py-4 px-6 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 transition-all">
+            <span>ABRIR SALA NO PROJETOR</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>
         </div>
 
         <!-- Card 2: Aluno -->
-        <div class="relative group bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-950/40">
+        <div class="relative group bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 rounded-3xl p-6 md:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-950/40">
           <div>
             <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
               <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,139 +154,142 @@
             </div>
             <div class="flex items-center gap-2 mb-2">
               <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Jogador</span>
-              <span class="text-xs text-slate-500">• Celular / Tablet</span>
+              <span class="text-xs text-slate-500">• Smartphone / Tablet</span>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-3">Entrar em uma Sala</h3>
+            <h3 class="text-2xl font-bold text-white mb-3">Entrar com PIN</h3>
             <p class="text-slate-400 text-sm leading-relaxed mb-6">
-              Digite o PIN da tela principal e escolha seu nome de jogador.
+              Digite o PIN exibido no telão e escolha seu nome de jogador para participar e pontuar.
             </p>
           </div>
-          <button id="btnGoToJoin" class="w-full py-3.5 px-6 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-cyan-900/40 hover:shadow-cyan-700/50 flex items-center justify-center gap-2 transition-all">
-            <span>Entrar com PIN</span>
+          <button id="btnGoToJoin" class="w-full py-4 px-6 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-cyan-950/40 flex items-center justify-center gap-2 transition-all">
+            <span>ENTRAR COM PIN</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 2: HOST SCREEN (INSTRUTOR / PROJETOR) -->
-    <div id="viewHost" class="hidden w-full flex-col gap-6 py-4">
+    <!-- VIEW 2: HOST VIEW (INSTRUTOR / PROJETOR) -->
+    <div id="viewHost" class="hidden w-full flex-col gap-6 py-2">
       
-      <!-- Top Status Banner -->
-      <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 rounded-2xl px-6 py-4">
+      <!-- Top Host Status Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 rounded-2xl px-6 py-3.5 shadow-lg">
         <div class="flex items-center gap-3">
-          <div id="hostNetBadge" class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold">
+          <div id="hostNetBadge" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-bold">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Sala Ativa · Aguardando Jogadors</span>
+            <span>SALA ATIVA</span>
           </div>
-          <span class="text-xs text-slate-400 hidden sm:inline">Partida pronta</span>
+          <div id="hostSyncBadge" class="hidden sm:flex items-center gap-1.5 text-xs text-amber-300/90 font-medium bg-amber-950/40 border border-amber-800/40 px-3 py-1 rounded-full">
+            <span>⚡ Sincronizado com Simulador Principal</span>
+          </div>
         </div>
 
-        <div class="flex items-center gap-3">
-          <button id="btnToggleSound" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition-all">
-            <span id="soundIcon">🔔</span>
-            <span id="soundLabel">Som: Ativado</span>
+        <div class="flex items-center gap-2.5">
+          <button id="btnFullscreen" class="px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition-all">
+            <span>⛶</span>
+            <span class="hidden md:inline">Tela Cheia</span>
           </button>
-          <button id="btnLeaveHost" class="px-3 py-1.5 rounded-lg border border-red-900/60 bg-red-950/40 hover:bg-red-900/50 text-xs font-medium text-red-300 transition-all">
-            Encerrar Sala
+          <button id="btnToggleSound" class="px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition-all">
+            <span id="soundIcon">🔔</span>
+            <span id="soundLabel">Som</span>
+          </button>
+          <button id="btnLeaveHost" class="px-3 py-1.5 rounded-xl border border-red-900/60 bg-red-950/40 hover:bg-red-900/50 text-xs font-medium text-red-300 transition-all">
+            Encerrar
           </button>
         </div>
       </div>
 
-      <!-- Main Host Lobby Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <!-- HOST SUBVIEW A: LOBBY DE ENTRADA (QR Code Grande + PIN Gigante + Participantes) -->
+      <div id="hostLobbySection" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
-        <!-- PIN e QR Code da sala -->
+        <!-- Left: Huge QR Code and Big PIN -->
         <div class="lg:col-span-5 bg-gradient-to-b from-slate-900/95 to-slate-950 border border-slate-800/90 rounded-3xl p-6 md:p-8 flex flex-col justify-between ecg-glow">
           <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">ENTRE NA PARTIDA</span>
-              <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">ENTRADA</span>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                ENTRADA RÁPIDA NA PARTIDA
+              </span>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">QR CODE AO VIVO</span>
             </div>
 
-            <p class="text-slate-300 text-sm mb-6">
-              Escaneie o código ou digite o PIN para entrar:
+            <p class="text-slate-300 text-sm mb-5">
+              Aponte a câmera do smartphone para entrar direto com seu nome:
             </p>
 
-            <!-- Big PIN Display -->
-            <div class="bg-[#0b1220] border-2 border-amber-400/50 rounded-2xl p-5 mb-6 text-center">
-              <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-widest mb-1">CÓDIGO DA PARTIDA</div>
-              <div id="hostPinDisplay" class="text-5xl md:text-6xl font-black tracking-[0.2em] num-display pin-pop select-all">
+            <!-- Big High-Contrast QR Code Container -->
+            <div class="flex flex-col items-center justify-center bg-slate-950/80 border border-slate-800 rounded-3xl p-6 mb-5 shadow-2xl">
+              <div id="qrCodeContainer" class="p-3.5 bg-white rounded-2xl shadow-2xl inline-block flex items-center justify-center min-w-[260px] min-h-[260px]"></div>
+              <p class="text-xs font-semibold text-slate-400 mt-3.5 text-center flex items-center gap-1.5">
+                <span>📱</span> Escaneamento direto para a tela de nome
+              </p>
+            </div>
+
+            <!-- Giant PIN Code Display -->
+            <div class="bg-[#0b1220] border-2 border-amber-400/60 rounded-2xl p-4 text-center shadow-xl">
+              <div class="text-[11px] font-black text-amber-400 uppercase tracking-widest mb-0.5">CÓDIGO PIN DA SALA</div>
+              <div id="hostPinDisplay" class="text-5xl md:text-6xl font-black tracking-[0.25em] num-display pin-pop select-all my-1">
                 --- ---
               </div>
-              <div class="mt-3 flex items-center justify-center gap-2">
-                <button id="btnCopyPin" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
+              <div class="mt-2.5 flex items-center justify-center gap-2">
+                <button id="btnCopyPin" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                   Copiar PIN
                 </button>
-                <button id="btnCopyLink" class="px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-700/60 text-xs text-emerald-300 hover:text-emerald-200 transition-all flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
+                <button id="btnCopyLink" class="px-3 py-1.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-900/70 border border-emerald-700/70 text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition-all flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                   Copiar Link Direto
                 </button>
               </div>
             </div>
-
-            <!-- QR Code Container -->
-            <div class="flex flex-col items-center justify-center bg-white/5 border border-slate-800/80 rounded-2xl p-5 mb-4">
-              <div id="qrCodeContainer" class="p-3 bg-white rounded-xl shadow-2xl inline-block min-w-[160px] min-h-[160px] flex items-center justify-center"></div>
-              <p class="text-xs text-slate-400 mt-3 text-center">
-                Escaneie com a câmera do celular para entrar direto com o PIN preenchido
-              </p>
-            </div>
           </div>
 
-          <div class="pt-2 text-center text-xs text-slate-500">
-            Link da sala: <span id="hostDirectUrl" class="text-slate-400 font-mono text-[11px] break-all"></span>
+          <div class="pt-4 text-center text-xs text-slate-500">
+            Link direto: <span id="hostDirectUrl" class="text-slate-400 font-mono text-[11px] break-all"></span>
           </div>
         </div>
 
-        <!-- Right Column: Connected Participants Live Roster -->
-        <div class="lg:col-span-7 bg-[#111827] border border-[#293750] rounded-3xl p-6 md:p-8 flex flex-col justify-between">
+        <!-- Right: Connected Participants and Start Controls -->
+        <div class="lg:col-span-7 bg-[#0f172a] border border-slate-800 rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-2xl">
           <div>
             <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
               <div class="flex items-center gap-3">
-                <h3 class="text-xl font-bold text-white">Jogadores na sala</h3>
-                <span id="participantBadgeCount" class="px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs num-display">
+                <h3 class="text-xl font-black text-white">Jogadores na Sala</h3>
+                <span id="participantBadgeCount" class="px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-black text-xs num-display">
                   0 jogadores
                 </span>
               </div>
-              <span class="text-xs text-slate-400 hidden sm:inline">Conectados agora</span>
+              <span class="text-xs text-slate-400 hidden sm:inline">Atualização em tempo real</span>
             </div>
 
-            <!-- Participants Roster Area -->
+            <!-- Empty State -->
             <div id="participantsEmptyState" class="py-16 text-center flex flex-col items-center justify-center">
-              <div class="w-16 h-16 rounded-full bg-slate-800/60 border border-slate-700/80 flex items-center justify-center text-slate-400 mb-4 animate-pulse">
-                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-20 h-20 rounded-full bg-slate-800/60 border border-slate-700/80 flex items-center justify-center text-slate-400 mb-4 animate-pulse">
+                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <h4 class="text-base font-semibold text-slate-300 mb-1">Aguardando jogadores...</h4>
-              <p class="text-xs text-slate-500 max-w-sm">
-                Quando os jogadores entrarem com o PIN ou QR Code, seus nomes aparecerão aqui.
+              <h4 class="text-lg font-bold text-slate-200 mb-1">Aguardando participantes...</h4>
+              <p class="text-xs text-slate-400 max-w-sm">
+                Conforme os jogadores escanearem o QR Code ou digitarem o PIN no celular, seus nomes aparecerão aqui na hora.
               </p>
             </div>
 
-            <!-- Dynamic Grid of Connected Students -->
-            <div id="participantsGrid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto pr-1">
-              <!-- Dynamically populated -->
-            </div>
+            <!-- Grid of Connected Students -->
+            <div id="participantsGrid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto pr-1"></div>
           </div>
 
-          <!-- Bottom Action Bar (Começar partida) -->
+          <!-- Bottom Action Bar (Iniciar Partida) -->
           <div class="pt-6 border-t border-slate-800/90 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="text-xs text-slate-400 text-center sm:text-left">
-              <span id="readySummary">0 jogadores prontos.</span>
-              <p class="text-slate-500 text-[11px]">No celular, os jogadores recebem opções rápidas para identificar o ritmo.</p>
+              <span id="readySummary" class="font-bold text-slate-300">0 jogadores prontos.</span>
+              <p class="text-slate-500 text-[11px]">Você pode iniciar ou trocar os ritmos em tempo real pelo simulador!</p>
             </div>
 
-            <button id="btnStartGame" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm tracking-wider uppercase shadow-xl shadow-amber-500/20 hover:shadow-amber-400/30 flex items-center justify-center gap-2 transition-all transform active:scale-95">
-              <span>Começar partida</span>
+            <button id="btnStartGame" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm tracking-wider uppercase shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 transition-all transform active:scale-95">
+              <span>INICIAR DESAFIO NA ARENA</span>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -270,31 +300,155 @@
 
       </div>
 
+      <!-- HOST SUBVIEW B: ARENA DE JOGO AO VIVO (Monitor de ECG + 4 Opções + Revelação) -->
+      <div id="hostGameSection" class="hidden flex flex-col gap-5">
+        
+        <!-- Live Control & Rhythm Switcher Bar -->
+        <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+          <div class="flex items-center flex-wrap gap-2.5">
+            <span class="score-chip text-amber-400 text-xs font-black">
+              RODADA <span id="roundNumber" class="num-display">1</span>
+            </span>
+            <div class="flex items-center gap-1.5 text-xs text-slate-400 bg-slate-950/70 px-3 py-1.5 rounded-xl border border-slate-800">
+              <span>Ritmo Atual:</span>
+              <span id="currentRhythmName" class="font-bold text-white">Carregando...</span>
+            </div>
+            
+            <!-- Quick Rhythm Selector Dropdown -->
+            <div class="relative inline-block">
+              <select id="selectHostRhythm" class="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold rounded-xl px-3 py-1.5 border border-slate-700 outline-none cursor-pointer transition-colors">
+                <option value="">⚙️ Selecionar Outro Ritmo...</option>
+                <!-- Populated dynamically with all 18 rhythms -->
+              </select>
+            </div>
+
+            <button id="btnRandomRhythm" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1">
+              <span>🎲</span> Sortear Ritmo
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btnRestartTimer" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1">
+              <span>⏱️</span> Reiniciar Tempo
+            </button>
+            <button id="btnRevealNow" class="px-4 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black tracking-wide uppercase transition-all shadow-md">
+              <span>👁️</span> Revelar Resposta
+            </button>
+            <button id="btnNextQuestion" class="hidden px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black tracking-wide uppercase transition-all shadow-md">
+              <span>❯</span> Próximo Ritmo
+            </button>
+          </div>
+        </div>
+
+        <!-- Central Medical ECG Monitor Canvas -->
+        <div class="relative rounded-3xl overflow-hidden border-2 border-slate-800 bg-[#030907] shadow-2xl">
+          
+          <!-- Monitor Overlay Headers -->
+          <div class="absolute top-4 left-5 right-5 flex items-center justify-between pointer-events-none z-10">
+            <div class="flex items-center gap-3">
+              <span class="px-2.5 py-1 rounded bg-black/70 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold tracking-wider">
+                MONITOR DII · 25 mm/s · 10 mm/mV
+              </span>
+              <span id="monitorBpmDisplay" class="px-2.5 py-1 rounded bg-black/70 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-bold">
+                FC: 75 bpm
+              </span>
+            </div>
+
+            <!-- Big Round Countdown Timer -->
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2 bg-black/80 border border-amber-500/40 px-4 py-1.5 rounded-full shadow-lg">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">TEMPO</span>
+                <span id="roundTimer" class="text-2xl font-black text-amber-300 num-display min-w-[32px] text-center">25</span>
+                <span class="text-xs text-amber-500 font-mono">s</span>
+              </div>
+              <div class="bg-black/80 border border-slate-700 px-3 py-1.5 rounded-full text-xs font-bold text-slate-300">
+                <span id="answerCount">0</span> / <span id="totalStudentsCount">0</span> respostas
+              </div>
+            </div>
+          </div>
+
+          <!-- The Canvas -->
+          <canvas id="roundEcgCanvas" class="w-full h-[240px] sm:h-[280px] md:h-[320px] block"></canvas>
+
+          <!-- Sweep Glow Line Overlay (pure CSS glow) -->
+          <div class="absolute inset-0 pointer-events-none border border-emerald-500/10 rounded-3xl"></div>
+        </div>
+
+        <!-- 4 Big Answer Choice Blocks (Telão do Apresentador) -->
+        <div id="hostAnswerOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- 4 tiles dynamically injected -->
+        </div>
+
+        <!-- Reveal & Clinical Takeaway Banner (Aparece ao revelar) -->
+        <div id="roundRevealPanel" class="hidden bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-3xl p-6 md:p-8 shadow-2xl user-card-enter">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-700/80 text-emerald-400 text-xs font-black uppercase tracking-wider mb-2">
+                <span>✅</span> DIAGNÓSTICO OFICIAL
+              </div>
+              <h3 id="revealRhythmName" class="text-3xl md:text-4xl font-black text-white">
+                ---
+              </h3>
+              <p id="revealRhythmFeature" class="text-slate-300 text-base md:text-lg mt-2 font-medium leading-relaxed">
+                ---
+              </p>
+            </div>
+
+            <!-- Quick Action to Continue -->
+            <div class="shrink-0">
+              <button id="btnRevealNextRound" class="px-6 py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm uppercase tracking-wider shadow-xl flex items-center gap-2 transition-all">
+                <span>PRÓXIMO RITMO</span>
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Answer Stats Distribution and Mini Podium -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+            <!-- Left: Answer Vote Distribution -->
+            <div>
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Distribuição das Respostas</h4>
+              <div id="voteDistributionBars" class="flex flex-col gap-2"></div>
+            </div>
+
+            <!-- Right: Round Leaderboard -->
+            <div>
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Classificação Parcial (Top 5)</h4>
+              <div id="leaderboardList" class="flex flex-col gap-2"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
 
-    <!-- VIEW 3: STUDENT JOIN FORM (ENTRADA DO PARTICIPANTE / MOBILE-FIRST) -->
+    <!-- VIEW 3: STUDENT JOIN FORM (ENTRADA DO JOGADOR NO SMARTPHONE) -->
     <div id="viewStudentJoin" class="hidden w-full max-w-md mx-auto my-auto py-6">
       
-      <div class="bg-[#111827] border border-[#293750] rounded-3xl p-6 sm:p-8 shadow-2xl">
+      <div class="bg-[#0f172a] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
         
         <div class="text-center mb-6">
-          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto mb-3">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto mb-3">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
           </div>
-          <h2 class="text-2xl font-black text-white">Entrar na Sala</h2>
-          <p class="text-xs text-slate-400 mt-1">Digite o código e escolha seu nome</p>
+          
+          <div id="pinVerifiedBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/80 text-emerald-400 text-xs font-bold mb-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>SALA DETECTADA: <span id="pinDisplayDetected" class="font-mono">------</span></span>
+          </div>
+
+          <h2 class="text-2xl font-black text-white">Entrar no Desafio</h2>
+          <p class="text-xs text-slate-400 mt-1">Identifique-se para responder pelo seu celular</p>
         </div>
 
         <form id="formStudentJoin" class="flex flex-col gap-4">
           
-          <!-- PIN Input Field -->
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="inputPin" class="text-xs font-bold uppercase tracking-wider text-slate-300">PIN da Sala</label>
-              <span id="pinAutoBadge" class="hidden text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-2 py-0.5 rounded">Detectado</span>
-            </div>
+          <!-- PIN Input Field (Aparece somente se entrar sem PIN na URL) -->
+          <div id="pinInputFieldContainer" class="hidden">
+            <label for="inputPin" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">PIN da Sala</label>
             <input 
               type="text" 
               id="inputPin" 
@@ -302,40 +456,40 @@
               pattern="[0-9]*" 
               maxlength="6" 
               placeholder="Ex: 482910" 
-              class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3.5 text-center text-2xl font-black tracking-widest text-white num-display outline-none transition-colors"
-              required
+              class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-2xl px-4 py-3.5 text-center text-2xl font-black tracking-widest text-white num-display outline-none transition-colors"
             >
           </div>
 
-          <!-- Name Input Field -->
+          <!-- Name Input Field (Foco Imediato!) -->
           <div>
-            <label for="inputName" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Nome de jogador</label>
+            <label for="inputName" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Seu Nome ou Apelido</label>
             <input 
               type="text" 
               id="inputName" 
               maxlength="20" 
               placeholder="Ex: Dr. Rubens ou Ana" 
-              class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-3.5 text-slate-100 font-semibold outline-none transition-colors"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded-2xl px-4 py-4 text-slate-100 font-bold text-lg outline-none transition-colors shadow-inner"
               required
+              autofocus
             >
-            <span class="text-[11px] text-slate-500 mt-1 block">Este nome aparecerá na tela principal</span>
+            <span class="text-[11px] text-slate-500 mt-1.5 block">Seu nome aparecerá no telão da sala</span>
           </div>
 
           <!-- Connection Status Error Message Box -->
-          <div id="joinErrorMessage" class="hidden text-xs text-rose-400 bg-rose-950/50 border border-rose-800/80 rounded-xl p-3"></div>
+          <div id="joinErrorMessage" class="hidden text-xs text-rose-400 bg-rose-950/60 border border-rose-800/80 rounded-xl p-3"></div>
 
           <!-- Submit Button -->
           <button 
             type="submit" 
             id="btnSubmitJoin" 
-            class="w-full py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm tracking-wider uppercase shadow-lg shadow-cyan-950/50 flex items-center justify-center gap-2 transition-all mt-2"
+            class="w-full py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm tracking-wider uppercase shadow-xl shadow-cyan-950/50 flex items-center justify-center gap-2 transition-all mt-2 active:scale-95"
           >
-            <span id="btnSubmitJoinText">ENTRAR NA SESSÃO</span>
+            <span id="btnSubmitJoinText">ENTRAR NA PARTIDA ⚡</span>
             <span id="btnSubmitJoinSpinner" class="hidden w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
           </button>
 
           <button type="button" id="btnCancelJoin" class="w-full py-2.5 text-xs text-slate-400 hover:text-white transition-colors">
-            Voltar
+            Voltar ao Início
           </button>
 
         </form>
@@ -344,68 +498,93 @@
 
     </div>
 
-    <!-- VIEW 4: STUDENT WAITING LOBBY (SALA DE ESPERA NO CELULAR) -->
+    <!-- VIEW 4: STUDENT LOBBY (AGUARDANDO RODADA NO SMARTPHONE) -->
     <div id="viewStudentLobby" class="hidden w-full max-w-md mx-auto my-auto py-6">
       
-      <div class="bg-[#111827] border border-[#293750] rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+      <div class="bg-[#0f172a] border border-slate-800 rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
         
-        <!-- Background ECG Sweep Line -->
-        <div class="absolute inset-0 opacity-10 pointer-events-none flex items-center">
-          <svg class="w-full h-24" viewBox="0 0 300 100" preserveAspectRatio="none">
-            <path d="M0,50 L80,50 L90,40 L100,50 L110,10 L125,90 L140,50 L160,50 L170,35 L185,50 L300,50" fill="none" stroke="#06b6d4" stroke-width="3" />
-          </svg>
+        <div class="w-20 h-20 rounded-full bg-cyan-500/10 border-2 border-cyan-500/40 flex items-center justify-center text-4xl mx-auto mb-4 animate-bounce">
+          🎉
         </div>
 
-        <div class="relative z-10">
-          
-          <div class="w-20 h-20 rounded-full bg-cyan-500/10 border-2 border-cyan-500/40 flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
-            🎉
-          </div>
-
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-400 text-xs font-semibold mb-3">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            Conectado ao Vivo
-          </div>
-
-          <h2 class="text-3xl font-black text-white mb-1">Você está dentro!</h2>
-          <p class="text-slate-400 text-sm mb-6">Seu nome aparece na tela principal</p>
-
-          <!-- Student ID Card -->
-          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 mb-6 text-left">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Jogador</span>
-              <span id="studentLobbyPin" class="text-xs font-mono font-bold text-cyan-400">PIN: ------</span>
-            </div>
-            <div id="studentLobbyName" class="text-2xl font-bold text-white truncate">
-              ---
-            </div>
-            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-              <span>Status:</span>
-              <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                Aguardando a próxima rodada
-              </span>
-            </div>
-          </div>
-
-          <!-- Pulsing Pulse info -->
-          <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-900/40 text-xs text-cyan-300/90 leading-relaxed mb-6">
-            📱 Fique atento à tela do apresentador. Quando a questão iniciar, as opções de resposta aparecerão aqui para você responder!
-          </div>
-
-          <section id="studentRoundPanel" class="hidden mt-5 rounded-2xl border border-slate-700 bg-[#0b1220] p-4 text-left">
-            <div class="mb-3 flex items-center justify-between"><span class="score-chip text-amber-300">RODADA <span id="studentRoundNumber">1</span></span><span id="studentRoundTimer" class="text-xl font-black text-amber-300">20</span></div>
-            <h3 id="studentQuestion" class="mb-4 text-lg font-black text-white">Qual é o ritmo?</h3>
-            <div id="studentAnswerOptions" class="grid grid-cols-2 gap-3"></div>
-            <p id="studentAnswerStatus" class="mt-3 text-center text-sm text-slate-400"></p>
-          </section>
-
-          <button type="button" id="btnLeaveStudentLobby" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-            Sair da Sala ou Trocar de Nome
-          </button>
-
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold mb-3">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          Conectado ao Vivo
         </div>
 
+        <h2 class="text-3xl font-black text-white mb-1">Você está dentro!</h2>
+        <p class="text-slate-400 text-sm mb-6">Aguardando a questão iniciar no telão...</p>
+
+        <!-- Player Card -->
+        <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 mb-6 text-left">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Jogador</span>
+            <span id="studentLobbyPin" class="text-xs font-mono font-bold text-cyan-400">PIN: ------</span>
+          </div>
+          <div id="studentLobbyName" class="text-2xl font-black text-white truncate">
+            ---
+          </div>
+        </div>
+
+        <!-- Pulse info -->
+        <div class="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-900/40 text-xs text-cyan-300/90 leading-relaxed">
+          📱 Olhe para a tela do apresentador. Quando a questão iniciar, as 4 opções de resposta aparecerão aqui para você tocar!
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- VIEW 5: STUDENT ACTIVE QUESTION (OS 4 BOTÕES TÁTEIS NO CELULAR) -->
+    <div id="viewStudentRound" class="hidden w-full max-w-lg mx-auto my-auto py-4">
+      
+      <!-- Top Question Header -->
+      <div class="flex items-center justify-between mb-4 px-2">
+        <div class="flex items-center gap-2">
+          <span class="score-chip text-amber-400 text-xs font-black">
+            RODADA <span id="studentRoundNumber">1</span>
+          </span>
+          <span class="text-xs font-bold text-slate-400">
+            Pontos: <span id="studentCurrentScore" class="text-white num-display">0</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
+          <span class="text-xs font-bold text-amber-400">⏱️</span>
+          <span id="studentRoundTimer" class="text-lg font-black text-amber-300 num-display">25</span>
+          <span class="text-[10px] text-amber-500">s</span>
+        </div>
+      </div>
+
+      <!-- Question Text Prompt -->
+      <div class="text-center mb-4">
+        <h3 class="text-lg font-black text-white">Qual é o ritmo no monitor?</h3>
+        <p id="studentAnswerStatus" class="text-xs font-semibold text-cyan-400 mt-1">Toque na sua resposta:</p>
+      </div>
+
+      <!-- 4 Big Tactile Color Tiles (Kahoot-Style / Mobile First) -->
+      <div id="studentAnswerGrid" class="grid grid-cols-2 gap-3.5 mb-4">
+        <!-- 4 buttons dynamically populated -->
+      </div>
+
+    </div>
+
+    <!-- VIEW 6: STUDENT ROUND RESULT FEEDBACK (ACERTOU OU ERROU NO CELULAR) -->
+    <div id="viewStudentResult" class="hidden w-full max-w-md mx-auto my-auto py-6">
+      
+      <div id="studentResultCard" class="rounded-3xl p-6 sm:p-8 text-center shadow-2xl user-card-enter">
+        <div id="studentResultIcon" class="text-6xl mb-3">🎉</div>
+        <h2 id="studentResultTitle" class="text-3xl font-black text-white mb-2">CORRETO!</h2>
+        <div id="studentResultPointsBadge" class="inline-block px-4 py-1.5 rounded-full font-black text-sm mb-4">
+          +850 PONTOS
+        </div>
+        
+        <div class="bg-black/40 border border-white/10 rounded-2xl p-4 text-left mb-6">
+          <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmo Correto:</span>
+          <div id="studentResultRhythmName" class="text-lg font-bold text-white mt-0.5">---</div>
+          <div id="studentResultFeature" class="text-xs text-slate-300 mt-1.5 leading-relaxed">---</div>
+        </div>
+
+        <p class="text-xs text-slate-400">Aguardando o apresentador iniciar o próximo ritmo...</p>
       </div>
 
     </div>
@@ -414,27 +593,16 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // --- PALETTE FOR STUDENT AVATARS ---
-    const AVATAR_COLORS = [
-      { bg: 'bg-emerald-500/20', border: 'border-emerald-500/50', text: 'text-emerald-300', dot: 'bg-emerald-400' },
-      { bg: 'bg-cyan-500/20', border: 'border-cyan-500/50', text: 'text-cyan-300', dot: 'bg-cyan-400' },
-      { bg: 'bg-amber-500/20', border: 'border-amber-500/50', text: 'text-amber-300', dot: 'bg-amber-400' },
-      { bg: 'bg-rose-500/20', border: 'border-rose-500/50', text: 'text-rose-300', dot: 'bg-rose-400' },
-      { bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-300', dot: 'bg-purple-400' },
-      { bg: 'bg-blue-500/20', border: 'border-blue-500/50', text: 'text-blue-300', dot: 'bg-blue-400' }
-    ];
+    // --- DATABASE DE TODOS OS 18 RITMOS CLÍNICOS ---
+    const ECG_RHYTHMS = [{"id": "sinus", "name": "Ritmo sinusal", "short": "Sinusal", "feature": "P antes de cada QRS, PR constante"}, {"id": "sinus-brady", "name": "Bradicardia sinusal", "short": "Brad. sinusal", "feature": "Ritmo sinusal com FC abaixo de 60"}, {"id": "sinus-tachy", "name": "Taquicardia sinusal", "short": "Taq. sinusal", "feature": "Ritmo sinusal com FC acima de 100"}, {"id": "afib", "name": "Fibrilação atrial", "short": "FA", "feature": "RR irregularmente irregular, sem onda P"}, {"id": "flutter", "name": "Flutter atrial", "short": "Flutter", "feature": "Ondas F em serrote, condução AV fixa"}, {"id": "svt", "name": "Taquicardia supraventricular", "short": "TSV", "feature": "Taquicardia regular de QRS estreito, P oculta"}, {"id": "pvc", "name": "Extrassístole ventricular", "short": "ESV", "feature": "Batimento precoce, QRS largo, pausa compensatória"}, {"id": "vt", "name": "Taquicardia ventricular monomórfica", "short": "TV", "feature": "Taquicardia regular de QRS largo"}, {"id": "vt-poly", "name": "Taquicardia ventricular polimórfica", "short": "TV polimórfica", "feature": "QRS largo com amplitude e polaridade variáveis"}, {"id": "vf", "name": "Fibrilação ventricular", "short": "FV", "feature": "Atividade caótica, sem QRS identificável"}, {"id": "idioventricular", "name": "Ritmo idioventricular", "short": "Idioventricular", "feature": "Escape ventricular lento, QRS largo, sem P"}, {"id": "avb1", "name": "BAV de 1º grau", "short": "BAV 1º grau", "feature": "PR prolongado (> 200 ms) e constante"}, {"id": "avb2-1", "name": "BAV de 2º grau Mobitz I", "short": "Mobitz I", "feature": "PR aumenta progressivamente até um P bloqueado"}, {"id": "avb2-2", "name": "BAV de 2º grau Mobitz II", "short": "Mobitz II", "feature": "PR constante com P bloqueado de forma súbita"}, {"id": "avb3", "name": "BAV total", "short": "BAVT", "feature": "Dissociação AV: P e QRS independentes"}, {"id": "junctional", "name": "Ritmo juncional", "short": "Juncional", "feature": "QRS estreito regular sem P sinusal"}, {"id": "aesp", "name": "AESP", "short": "AESP", "feature": "Atividade elétrica organizada sem pulso"}, {"id": "asystole", "name": "Assistolia", "short": "Assistolia", "feature": "Ausência de atividade elétrica: linha isoelétrica"}];
 
-    function getRandomAvatarColor(name) {
-      let hash = 0;
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-    }
+    const ANSWER_COLORS = ['answer-red', 'answer-blue', 'answer-yellow', 'answer-green'];
+    const ANSWER_HEX = ['#e34d4d', '#3478d4', '#e6a927', '#2eaa78'];
+    const ANSWER_SHAPES = ['▲', '◆', '●', '■'];
 
     // --- AUDIO CHIME SYNTHESIZER (WEB AUDIO API) ---
     let soundEnabled = true;
-    function playAudioTone(type) {
+    function playAudio(type) {
       if (!soundEnabled) return;
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -444,26 +612,38 @@
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-          osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.12); // G5
-          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start();
           osc.stop(ctx.currentTime + 0.32);
-        } else if (type === 'start') {
-          const osc = ctx.createOscillator();
+        } else if (type === 'correct') {
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(440, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.25);
+          osc1.type = 'triangle'; osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+          osc1.frequency.setValueAtTime(880.00, ctx.currentTime + 0.12); // A5
+          osc2.frequency.setValueAtTime(440, ctx.currentTime);
           gain.gain.setValueAtTime(0.15, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-          osc.connect(gain);
+          osc1.connect(gain); osc2.connect(gain);
           gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.42);
+          osc1.start(); osc2.start();
+          osc1.stop(ctx.currentTime + 0.45); osc2.stop(ctx.currentTime + 0.45);
+        } else if (type === 'wrong') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(140, ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(); osc.stop(ctx.currentTime + 0.32);
         }
       } catch (e) {}
     }
@@ -479,16 +659,25 @@
       }, 3500);
     }
 
-    // --- STATE CONTROLLER ---
+    // --- APPLICATION STATE ---
     const state = {
       role: null,
       pin: null,
       peer: null,
       channel: null,
-      participants: new Map(),
+      syncChannel: null,
+      participants: new Map(), // studentId -> { id, name, color, conn, score, lastAnswer }
       studentId: null,
       studentName: null,
-      isHostStarted: false
+      studentScore: 0,
+      currentRhythm: null,
+      currentChoices: [],
+      roundNumber: 0,
+      roundDuration: 25,
+      timerHandle: null,
+      timeLeft: 25,
+      answersReceived: new Map(), // studentId -> { choiceId, timeSpent }
+      isRevealed: false
     };
 
     // --- VIEW SWITCHER ---
@@ -497,14 +686,151 @@
       document.getElementById('viewHost').classList.add('hidden');
       document.getElementById('viewStudentJoin').classList.add('hidden');
       document.getElementById('viewStudentLobby').classList.add('hidden');
+      document.getElementById('viewStudentRound').classList.add('hidden');
+      document.getElementById('viewStudentResult').classList.add('hidden');
 
       if (viewName === 'home') document.getElementById('viewHome').classList.remove('hidden');
       if (viewName === 'host') document.getElementById('viewHost').classList.remove('hidden');
       if (viewName === 'student-join') document.getElementById('viewStudentJoin').classList.remove('hidden');
       if (viewName === 'student-lobby') document.getElementById('viewStudentLobby').classList.remove('hidden');
+      if (viewName === 'student-round') document.getElementById('viewStudentRound').classList.remove('hidden');
+      if (viewName === 'student-result') document.getElementById('viewStudentResult').classList.remove('hidden');
     }
 
-    // --- HOST CONTROLLER ---
+    // --- AVATAR COLORS ---
+    const AVATAR_COLORS = [
+      { bg: 'bg-emerald-500/20', border: 'border-emerald-500/50', text: 'text-emerald-300' },
+      { bg: 'bg-cyan-500/20', border: 'border-cyan-500/50', text: 'text-cyan-300' },
+      { bg: 'bg-amber-500/20', border: 'border-amber-500/50', text: 'text-amber-300' },
+      { bg: 'bg-rose-500/20', border: 'border-rose-500/50', text: 'text-rose-300' },
+      { bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-300' },
+      { bg: 'bg-blue-500/20', border: 'border-blue-500/50', text: 'text-blue-300' }
+    ];
+
+    function getAvatarColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+    }
+
+    // --- ECG CANVAS DRAWING ENGINE ---
+    let ecgAnimId = null;
+    let ecgOffset = 0;
+
+    function startEcgAnimation(rhythmId) {
+      const canvas = document.getElementById('roundEcgCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width || 800;
+      const height = rect.height || 260;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const rhythm = ECG_RHYTHMS.find(r => r.id === rhythmId) || ECG_RHYTHMS[0];
+      if (ecgAnimId) cancelAnimationFrame(ecgAnimId);
+
+      function renderFrame() {
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. Millimeter ECG Grid
+        ctx.fillStyle = '#030a08';
+        ctx.fillRect(0, 0, width, height);
+
+        // Fine grid (1mm ~ 6px)
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < width; x += 10) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        }
+        for (let y = 0; y < height; y += 10) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+
+        // Major grid (5mm ~ 30px)
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.22)';
+        ctx.lineWidth = 1.2;
+        for (let x = 0; x < width; x += 50) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+        }
+        for (let y = 0; y < height; y += 50) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+
+        // 2. Neon Waveform
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.4;
+        ctx.shadowColor = '#10b981';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+
+        const baseline = height * 0.52;
+        let cycle = 140;
+        if (rhythm.id === 'sinus-brady') cycle = 220;
+        if (rhythm.id === 'sinus-tachy') cycle = 85;
+        if (rhythm.id === 'svt') cycle = 65;
+        if (rhythm.id === 'idioventricular') cycle = 240;
+
+        for (let x = 0; x <= width; x += 2) {
+          let pos = (x + ecgOffset);
+          let t = (pos % cycle) / cycle;
+          let y = baseline;
+
+          if (rhythm.id === 'asystole') {
+            y = baseline + Math.sin(x * 0.02) * 1.2 + Math.cos(x * 0.05) * 0.6;
+          } else if (rhythm.id === 'vf') {
+            y = baseline + Math.sin((pos)*0.22)*22 + Math.sin((pos)*0.47)*12 + Math.sin((pos)*0.11)*15;
+          } else if (rhythm.id === 'vt') {
+            let vtCycle = 75;
+            let vtT = (pos % vtCycle) / vtCycle;
+            y = baseline - 42 * Math.sin(vtT * Math.PI);
+          } else if (rhythm.id === 'vt-poly') {
+            let env = Math.sin(pos * 0.006) * 45;
+            y = baseline + env * Math.sin(pos * 0.12);
+          } else if (rhythm.id === 'afib') {
+            let fib = Math.sin(pos * 0.28) * 3 + Math.sin(pos * 0.72) * 2;
+            let afibCycle = 110 + (Math.sin(Math.floor(pos/110)) * 40);
+            let afT = (pos % afibCycle) / afibCycle;
+            y = baseline + fib;
+            if (afT > 0.45 && afT < 0.48) y -= 55;
+            else if (afT >= 0.48 && afT < 0.52) y += 18;
+          } else if (rhythm.id === 'flutter') {
+            let sawtooth = ((pos % 30) / 30) * 16 - 8;
+            y = baseline + sawtooth;
+            let flT = (pos % 90) / 90;
+            if (flT > 0.46 && flT < 0.50) y -= 55;
+          } else {
+            // General P-QRS-T synthesis
+            if (t > 0.12 && t < 0.24) {
+              y = baseline - 9 * Math.sin((t - 0.12) / 0.12 * Math.PI); // P wave
+            } else if (t > 0.40 && t < 0.43) {
+              y = baseline + 6 * (t - 0.40) / 0.03; // Q
+            } else if (t >= 0.43 && t < 0.47) {
+              y = baseline - 65 * Math.sin((t - 0.43) / 0.04 * Math.PI); // R spike
+            } else if (t >= 0.47 && t < 0.51) {
+              y = baseline + 18 * Math.sin((t - 0.47) / 0.04 * Math.PI); // S
+            } else if (t > 0.65 && t < 0.82) {
+              y = baseline - 14 * Math.sin((t - 0.65) / 0.17 * Math.PI); // T wave
+            }
+          }
+
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ecgOffset = (ecgOffset + 2) % 10000;
+        ecgAnimId = requestAnimationFrame(renderFrame);
+      }
+
+      renderFrame();
+    }
+
+    // --- HOST INITIALIZATION ---
     function initHostRoom() {
       state.role = 'host';
       state.participants.clear();
@@ -512,51 +838,66 @@
 
       const formattedPin = state.pin.slice(0, 3) + ' ' + state.pin.slice(3);
       document.getElementById('hostPinDisplay').textContent = formattedPin;
-      
+
       const baseUrl = window.location.origin + window.location.pathname;
       const joinUrl = baseUrl + '?pin=' + state.pin;
       document.getElementById('hostDirectUrl').textContent = joinUrl;
 
-      // Render QR Code with graceful fallback
+      // 1. Render Large QR Code (260x260px)
       const qrEl = document.getElementById('qrCodeContainer');
       qrEl.innerHTML = '';
       if (window.QRCode) {
         try {
           new QRCode(qrEl, {
             text: joinUrl,
-            width: 160,
-            height: 160,
+            width: 260,
+            height: 260,
             colorDark: "#06090c",
             colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
+            correctLevel: QRCode.CorrectLevel.H
           });
         } catch (e) {
-          renderFallbackQR(qrEl, joinUrl);
+          qrEl.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(joinUrl)}" class="w-[260px] h-[260px] rounded-xl shadow">`;
         }
       } else {
-        renderFallbackQR(qrEl, joinUrl);
+        qrEl.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(joinUrl)}" class="w-[260px] h-[260px] rounded-xl shadow">`;
       }
+
+      // Populate Host Rhythm Dropdown
+      const sel = document.getElementById('selectHostRhythm');
+      sel.innerHTML = '<option value="">⚙️ Trocar Ritmo no Telão...</option>';
+      ECG_RHYTHMS.forEach(r => {
+        sel.innerHTML += `<option value="${r.id}">${r.name} (${r.short})</option>`;
+      });
 
       updateParticipantsUI();
       switchView('host');
+      document.getElementById('hostLobbySection').classList.remove('hidden');
+      document.getElementById('hostGameSection').classList.add('hidden');
 
-      // Setup Local BroadcastChannel
+      // 2. Setup BroadcastChannel for Local Multi-tab
       try {
         if (state.channel) state.channel.close();
         state.channel = new BroadcastChannel('ecg-rhythm-room-' + state.pin);
         state.channel.onmessage = (event) => {
           handleHostIncomingMessage(event.data, null);
         };
-      } catch (e) {
-        console.warn('BroadcastChannel error:', e);
-      }
+      } catch (e) {}
 
-      // Setup PeerJS Signaling
+      // 3. Setup BroadcastChannel for background rhythm sync from index.html
+      try {
+        if (state.syncChannel) state.syncChannel.close();
+        state.syncChannel = new BroadcastChannel('ecg-arena-sync');
+        state.syncChannel.onmessage = (e) => {
+          if (e.data && e.data.type === 'SYNC_RHYTHM' && e.data.rhythmId) {
+            handleBackgroundRhythmSync(e.data.rhythmId);
+          }
+        };
+        document.getElementById('hostSyncBadge').classList.remove('hidden');
+      } catch (e) {}
+
+      // 4. Setup PeerJS WebRTC Signaling
       setupHostPeer(state.pin);
-    }
-
-    function renderFallbackQR(container, url) {
-      container.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(url) + '" alt="QR Code da Sala" class="w-40 h-40 rounded-lg shadow">';
     }
 
     function setupHostPeer(pin) {
@@ -579,9 +920,9 @@
         state.peer.on('open', (id) => {
           document.getElementById('hostNetBadge').innerHTML = `
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-            <span>SALA ABERTA · PIN: ${pin.slice(0, 3)} ${pin.slice(3)}</span>
+            <span>SALA PRONTA · PIN ${pin.slice(0,3)} ${pin.slice(3)}</span>
           `;
-          showToast(`Sala criada com sucesso! PIN: ${pin}`, '🎉');
+          showToast(`Sala aberta com sucesso! PIN: ${pin}`, '🎉');
         });
 
         state.peer.on('connection', (conn) => {
@@ -594,14 +935,13 @@
         });
 
         state.peer.on('error', (err) => {
-          console.warn('PeerJS Host error:', err);
+          console.warn('Host Peer error:', err);
           if (err.type === 'unavailable-id') {
             initHostRoom();
           }
         });
-
       } catch (err) {
-        console.error('Failed to initialize PeerJS:', err);
+        console.error('Peer init error:', err);
       }
     }
 
@@ -610,18 +950,20 @@
 
       if (msg.type === 'JOIN') {
         const studentId = msg.studentId || (conn ? conn.peer : 'local-' + Date.now());
-        const studentName = (msg.name || 'Aluno').trim().slice(0, 20);
+        const studentName = (msg.name || 'Jogador').trim().slice(0, 20);
 
         if (!state.participants.has(studentId)) {
-          const color = getRandomAvatarColor(studentName);
+          const color = getAvatarColor(studentName);
           state.participants.set(studentId, {
             id: studentId,
             name: studentName,
             color: color,
-            conn: conn
+            conn: conn,
+            score: 0,
+            lastAnswer: null
           });
 
-          playAudioTone('join');
+          playAudio('join');
 
           const ackMsg = {
             type: 'JOIN_ACK',
@@ -630,19 +972,45 @@
             studentName: studentName
           };
 
-          if (conn && conn.open) {
-            conn.send(ackMsg);
-          }
-          if (state.channel) {
-            state.channel.postMessage(ackMsg);
-          }
+          if (conn && conn.open) conn.send(ackMsg);
+          if (state.channel) state.channel.postMessage(ackMsg);
 
           updateParticipantsUI();
           showToast(`${studentName} entrou na sala!`, '👋');
+
+          // If a round is currently active, send current question to the newly connected student
+          if (state.currentRhythm && !state.isRevealed) {
+            const questionMsg = {
+              type: 'ROUND_QUESTION',
+              round: state.roundNumber,
+              choices: state.currentChoices,
+              seconds: state.timeLeft
+            };
+            if (conn && conn.open) conn.send(questionMsg);
+            if (state.channel) state.channel.postMessage(questionMsg);
+          }
         }
       } else if (msg.type === 'ANSWER') {
-        answeredCount++;
-        document.getElementById('answerCount').textContent = answeredCount + (answeredCount === 1 ? ' resposta' : ' respostas');
+        if (!state.answersReceived.has(msg.studentId)) {
+          state.answersReceived.set(msg.studentId, {
+            choiceId: msg.choiceId,
+            timeSpent: msg.timeSpent || 0
+          });
+
+          const participant = state.participants.get(msg.studentId);
+          if (participant) {
+            participant.lastAnswer = msg.choiceId;
+          }
+
+          updateHostAnswerCounter();
+
+          // If all connected students have answered, automatically reveal!
+          if (state.participants.size > 0 && state.answersReceived.size >= state.participants.size) {
+            setTimeout(() => {
+              if (!state.isRevealed) revealRoundResult();
+            }, 800);
+          }
+        }
       } else if (msg.type === 'LEAVE') {
         handleStudentDisconnected(msg.studentId);
       }
@@ -653,47 +1021,42 @@
         const student = state.participants.get(studentId);
         state.participants.delete(studentId);
         updateParticipantsUI();
-        showToast(`${student.name} saiu da sala.`, 'ℹ️');
+        showToast(`${student.name} saiu.`, 'ℹ️');
       }
     }
 
     function kickParticipant(studentId) {
       if (state.participants.has(studentId)) {
         const student = state.participants.get(studentId);
-        if (student.conn && student.conn.open) {
-          student.conn.send({ type: 'KICK' });
-        }
-        if (state.channel) {
-          state.channel.postMessage({ type: 'KICK', studentId });
-        }
+        if (student.conn && student.conn.open) student.conn.send({ type: 'KICK' });
+        if (state.channel) state.channel.postMessage({ type: 'KICK', studentId });
         state.participants.delete(studentId);
         updateParticipantsUI();
-        showToast(`${student.name} foi removido.`, '🚪');
+        showToast(`${student.name} removido.`, '🚪');
       }
     }
 
     function updateParticipantsUI() {
       const count = state.participants.size;
-      const countEl = document.getElementById('participantBadgeCount');
-      const emptyState = document.getElementById('participantsEmptyState');
-      const grid = document.getElementById('participantsGrid');
-      const summary = document.getElementById('readySummary');
+      document.getElementById('participantBadgeCount').textContent = `${count} ${count === 1 ? 'jogador' : 'jogadores'}`;
+      document.getElementById('readySummary').textContent = `${count} ${count === 1 ? 'jogador conectado.' : 'jogadores conectados.'}`;
+      document.getElementById('totalStudentsCount').textContent = String(count);
 
-      countEl.textContent = `${count} ${count === 1 ? 'jogador' : 'jogadores'}`;
-      summary.textContent = `${count} ${count === 1 ? 'jogador conectado.' : 'jogadores conectados.'}`;
+      const empty = document.getElementById('participantsEmptyState');
+      const grid = document.getElementById('participantsGrid');
 
       if (count === 0) {
-        emptyState.classList.remove('hidden');
+        empty.classList.remove('hidden');
         grid.classList.add('hidden');
         grid.innerHTML = '';
       } else {
-        emptyState.classList.add('hidden');
+        empty.classList.add('hidden');
         grid.classList.remove('hidden');
         grid.innerHTML = '';
 
         state.participants.forEach((p) => {
           const card = document.createElement('div');
-          card.className = `user-card-enter p-3 rounded-2xl bg-slate-950/70 border ${p.color.border} flex items-center justify-between gap-2 shadow-md`;
+          card.className = `user-card-enter p-3 rounded-2xl bg-slate-950/80 border ${p.color.border} flex items-center justify-between gap-2 shadow-md`;
           card.innerHTML = `
             <div class="flex items-center gap-2.5 min-w-0">
               <div class="w-8 h-8 rounded-xl ${p.color.bg} ${p.color.border} border flex items-center justify-center font-bold text-xs ${p.color.text} shrink-0">
@@ -701,7 +1064,7 @@
               </div>
               <span class="text-sm font-semibold text-slate-200 truncate" title="${p.name}">${p.name}</span>
             </div>
-            <button type="button" class="text-slate-500 hover:text-rose-400 p-1 text-xs shrink-0 transition-colors" title="Remover jogador" onclick="kickParticipant('${p.id}')">
+            <button type="button" class="text-slate-500 hover:text-rose-400 p-1 text-xs shrink-0 transition-colors" title="Remover" onclick="kickParticipant('${p.id}')">
               ✕
             </button>
           `;
@@ -710,22 +1073,223 @@
       }
     }
 
-    // --- STUDENT CONTROLLER ---
+    // --- GAME ENGINE: START ROUND / SWITCH RHYTHM ---
+    function startRoundForRhythm(rhythmId) {
+      const targetRhythm = ECG_RHYTHMS.find(r => r.id === rhythmId) || ECG_RHYTHMS[0];
+      state.currentRhythm = targetRhythm;
+      state.roundNumber++;
+      state.answersReceived.clear();
+      state.isRevealed = false;
+
+      // Switch view from lobby to game board
+      document.getElementById('hostLobbySection').classList.add('hidden');
+      document.getElementById('hostGameSection').classList.remove('hidden');
+      document.getElementById('roundRevealPanel').classList.add('hidden');
+      document.getElementById('btnRevealNow').classList.remove('hidden');
+      document.getElementById('btnNextQuestion').classList.add('hidden');
+
+      // Update Header info
+      document.getElementById('roundNumber').textContent = String(state.roundNumber);
+      document.getElementById('currentRhythmName').textContent = targetRhythm.name;
+      document.getElementById('monitorBpmDisplay').textContent = 'FC: ~' + targetRhythm.rate + ' bpm';
+
+      // Pick 3 random distractors
+      const wrongList = ECG_RHYTHMS.filter(r => r.id !== targetRhythm.id)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+      
+      const allChoices = [targetRhythm, ...wrongList].sort(() => Math.random() - 0.5);
+      state.currentChoices = allChoices.map((c, idx) => ({
+        id: c.id,
+        label: c.name,
+        short: c.short,
+        color: ANSWER_COLORS[idx],
+        hex: ANSWER_HEX[idx],
+        shape: ANSWER_SHAPES[idx]
+      }));
+
+      // Render 4 answer tiles on Host screen
+      const hostOpts = document.getElementById('hostAnswerOptions');
+      hostOpts.innerHTML = state.currentChoices.map((c, i) => `
+        <div id="hostTile-${c.id}" class="answer-tile ${c.color} p-5 flex items-center gap-4 text-left transition-all">
+          <span class="text-4xl font-black drop-shadow">${c.shape}</span>
+          <div>
+            <div class="text-lg md:text-xl font-black">${c.label}</div>
+            <div class="text-xs font-semibold opacity-90">${c.short}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Start ECG Canvas Wave
+      startEcgAnimation(targetRhythm.id);
+
+      // Broadcast Question to all connected students
+      broadcastToStudents({
+        type: 'ROUND_QUESTION',
+        round: state.roundNumber,
+        choices: state.currentChoices,
+        seconds: state.roundDuration
+      });
+
+      // Start Countdown Timer
+      startRoundTimer();
+      updateHostAnswerCounter();
+    }
+
+    function startRoundTimer() {
+      if (state.timerHandle) clearInterval(state.timerHandle);
+      state.timeLeft = state.roundDuration;
+      document.getElementById('roundTimer').textContent = String(state.timeLeft);
+
+      state.timerHandle = setInterval(() => {
+        state.timeLeft--;
+        const timerEl = document.getElementById('roundTimer');
+        timerEl.textContent = String(Math.max(0, state.timeLeft));
+
+        if (state.timeLeft <= 5) {
+          timerEl.classList.add('text-rose-400', 'animate-pulse');
+        } else {
+          timerEl.classList.remove('text-rose-400', 'animate-pulse');
+        }
+
+        if (state.timeLeft <= 0) {
+          clearInterval(state.timerHandle);
+          revealRoundResult();
+        }
+      }, 1000);
+    }
+
+    function updateHostAnswerCounter() {
+      const answered = state.answersReceived.size;
+      const total = state.participants.size;
+      document.getElementById('answerCount').textContent = String(answered);
+      document.getElementById('totalStudentsCount').textContent = String(total);
+    }
+
+    // --- REVEAL ROUND & CALCULATE SCORES ---
+    function revealRoundResult() {
+      if (state.isRevealed) return;
+      state.isRevealed = true;
+      if (state.timerHandle) clearInterval(state.timerHandle);
+
+      const correctRhythm = state.currentRhythm;
+
+      // 1. Highlight tiles on Host screen
+      state.currentChoices.forEach(c => {
+        const tile = document.getElementById('hostTile-' + c.id);
+        if (tile) {
+          if (c.id === correctRhythm.id) {
+            tile.classList.add('ring-4', 'ring-white', 'shadow-2xl');
+          } else {
+            tile.classList.add('opacity-35', 'grayscale');
+          }
+        }
+      });
+
+      // 2. Show Reveal Panel
+      document.getElementById('roundRevealPanel').classList.remove('hidden');
+      document.getElementById('revealRhythmName').textContent = correctRhythm.name;
+      document.getElementById('revealRhythmFeature').textContent = correctRhythm.feature;
+      document.getElementById('btnRevealNow').classList.add('hidden');
+      document.getElementById('btnNextQuestion').classList.remove('hidden');
+
+      // 3. Compute vote distribution
+      const voteCounts = {};
+      state.currentChoices.forEach(c => voteCounts[c.id] = 0);
+      state.answersReceived.forEach((ans) => {
+        if (voteCounts[ans.choiceId] !== undefined) voteCounts[ans.choiceId]++;
+      });
+
+      const distBars = document.getElementById('voteDistributionBars');
+      const totalVotes = state.answersReceived.size || 1;
+      distBars.innerHTML = state.currentChoices.map(c => {
+        const cnt = voteCounts[c.id] || 0;
+        const pct = Math.round((cnt / totalVotes) * 100);
+        const isCorrect = c.id === correctRhythm.id;
+        return `
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-6 font-black">${c.shape}</span>
+            <div class="flex-1 bg-slate-950 rounded-full h-4 overflow-hidden border border-slate-800 flex">
+              <div class="h-full ${c.color} transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+            <span class="w-12 text-right font-mono font-bold ${isCorrect ? 'text-emerald-400' : 'text-slate-400'}">${cnt} (${pct}%)</span>
+          </div>
+        `;
+      }).join('');
+
+      // 4. Update student scores
+      state.answersReceived.forEach((ans, studentId) => {
+        const p = state.participants.get(studentId);
+        if (p) {
+          if (ans.choiceId === correctRhythm.id) {
+            // Speed bonus: 500 base + up to 500 by speed
+            const bonus = Math.round(500 * (Math.max(1, state.timeLeft) / state.roundDuration));
+            p.score += (500 + bonus);
+          }
+        }
+      });
+
+      // 5. Update Leaderboard (Top 5)
+      const sortedStudents = Array.from(state.participants.values()).sort((a,b) => b.score - a.score);
+      const lbList = document.getElementById('leaderboardList');
+      if (sortedStudents.length === 0) {
+        lbList.innerHTML = '<p class="text-xs text-slate-500">Nenhum jogador respondeu nesta rodada.</p>';
+      } else {
+        lbList.innerHTML = sortedStudents.slice(0, 5).map((s, idx) => `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-black text-amber-400 font-mono w-4">${idx + 1}º</span>
+              <span class="font-bold text-white">${s.name}</span>
+            </div>
+            <span class="font-black font-mono text-emerald-400">${s.score} pts</span>
+          </div>
+        `).join('');
+      }
+
+      // 6. Broadcast Reveal to all students
+      broadcastToStudents({
+        type: 'ROUND_REVEAL',
+        correctId: correctRhythm.id,
+        name: correctRhythm.name,
+        feature: correctRhythm.feature
+      });
+    }
+
+    function broadcastToStudents(msg) {
+      if (state.channel) state.channel.postMessage(msg);
+      state.participants.forEach(p => {
+        if (p.conn && p.conn.open) p.conn.send(msg);
+      });
+    }
+
+    // Background sync from index.html
+    function handleBackgroundRhythmSync(rhythmId) {
+      showToast(`⚡ Ritmo sincronizado do simulador: ${rhythmId}`, '⚡');
+      startRoundForRhythm(rhythmId);
+    }
+
+    // --- STUDENT CONTROLLER (MOBILE FIRST) ---
     function initStudentJoinView(prefilledPin) {
       state.role = 'student';
       switchView('student-join');
 
+      const pinInputContainer = document.getElementById('pinInputFieldContainer');
       const pinInput = document.getElementById('inputPin');
-      const pinBadge = document.getElementById('pinAutoBadge');
+      const pinBadge = document.getElementById('pinVerifiedBadge');
+      const pinDetectedSpan = document.getElementById('pinDisplayDetected');
       const nameInput = document.getElementById('inputName');
 
       if (prefilledPin) {
-        pinInput.value = prefilledPin.replace(/[^0-9]/g, '');
+        const cleanPin = prefilledPin.replace(/[^0-9]/g, '');
+        pinInput.value = cleanPin;
+        pinDetectedSpan.textContent = cleanPin.slice(0, 3) + ' ' + cleanPin.slice(3);
         pinBadge.classList.remove('hidden');
-        setTimeout(() => nameInput.focus(), 200);
+        pinInputContainer.classList.add('hidden'); // Esconde o campo de PIN pois já veio no QR Code!
+        setTimeout(() => nameInput.focus(), 150);
       } else {
         pinBadge.classList.add('hidden');
-        setTimeout(() => pinInput.focus(), 200);
+        pinInputContainer.classList.remove('hidden');
+        setTimeout(() => pinInput.focus(), 150);
       }
     }
 
@@ -741,7 +1305,7 @@
         return;
       }
       if (!name) {
-        errBox.textContent = 'Por favor, informe seu nome ou apelido.';
+        errBox.textContent = 'Por favor, informe seu nome de jogador.';
         errBox.classList.remove('hidden');
         return;
       }
@@ -755,17 +1319,15 @@
 
       let ackReceived = false;
 
-      // 1. BroadcastChannel (local tabs instant connection)
+      // 1. BroadcastChannel (Same device / tabs)
       try {
         if (state.channel) state.channel.close();
         state.channel = new BroadcastChannel('ecg-rhythm-room-' + pin);
         state.channel.onmessage = (event) => {
-          const msg = event.data;
-          if (msg && msg.type === 'JOIN_ACK' && (msg.studentId === state.studentId || msg.studentName === state.studentName)) {
+          handleStudentIncomingMessage(event.data);
+          if (event.data && event.data.type === 'JOIN_ACK') {
             ackReceived = true;
             onJoinSuccess();
-          } else if (msg && msg.type === 'KICK' && msg.studentId === state.studentId) {
-            onKicked();
           }
         };
         state.channel.postMessage({
@@ -773,11 +1335,9 @@
           studentId: state.studentId,
           name: state.studentName
         });
-      } catch (e) {
-        console.warn('BroadcastChannel error:', e);
-      }
+      } catch (e) {}
 
-      // 2. PeerJS WebRTC (cross-device connection)
+      // 2. PeerJS WebRTC (Cross-device Smartphones)
       try {
         if (state.peer) {
           try { state.peer.destroy(); } catch (e) {}
@@ -807,40 +1367,34 @@
           });
 
           conn.on('data', (data) => {
+            handleStudentIncomingMessage(data);
             if (data.type === 'JOIN_ACK') {
               ackReceived = true;
               onJoinSuccess();
-            } else if (data.type === 'KICK') {
-              onKicked();
             }
           });
 
           conn.on('error', (err) => {
-            console.warn('Connection to host error:', err);
+            console.warn('Student connection error:', err);
           });
         });
 
         state.peer.on('error', (err) => {
-          console.warn('Student Peer error:', err);
           if (!ackReceived) {
             setStudentButtonLoading(false);
-            errBox.textContent = 'Não foi possível encontrar a sala com este PIN. Verifique se o apresentador abriu a sala.';
+            errBox.textContent = 'Não foi possível conectar à sala. Verifique o PIN e se o apresentador abriu a sala.';
             errBox.classList.remove('hidden');
           }
         });
+      } catch (err) {}
 
-      } catch (err) {
-        console.error('Peer error:', err);
-      }
-
-      // Timeout fallback
       setTimeout(() => {
         if (!ackReceived) {
           setStudentButtonLoading(false);
-          errBox.textContent = 'Aguardando resposta do apresentador... Verifique se o PIN está correto e tente novamente.';
+          errBox.textContent = 'Tentando conectar... Verifique se o apresentador iniciou a sala com este PIN.';
           errBox.classList.remove('hidden');
         }
-      }, 5000);
+      }, 5500);
     }
 
     function onJoinSuccess() {
@@ -848,13 +1402,8 @@
       document.getElementById('studentLobbyName').textContent = state.studentName;
       document.getElementById('studentLobbyPin').textContent = 'PIN: ' + state.pin.slice(0, 3) + ' ' + state.pin.slice(3);
       switchView('student-lobby');
-      showToast('Conectado à sala com sucesso!', '🎉');
-      playAudioTone('join');
-    }
-
-    function onKicked() {
-      showToast('Você foi desconectado da sala pelo apresentador.', '🚪');
-      switchView('student-join');
+      showToast('Conectado à Arena ECG!', '🎉');
+      playAudio('join');
     }
 
     function setStudentButtonLoading(isLoading) {
@@ -866,268 +1415,191 @@
         text.textContent = 'CONECTANDO...';
         spinner.classList.remove('hidden');
       } else {
-        text.textContent = 'ENTRAR NA SESSÃO';
+        text.textContent = 'ENTRAR NA PARTIDA ⚡';
         spinner.classList.add('hidden');
       }
     }
 
+    // Student Message Receiver
+    function handleStudentIncomingMessage(msg) {
+      if (!msg || !msg.type) return;
+
+      if (msg.type === 'ROUND_QUESTION') {
+        renderStudentQuestion(msg);
+      } else if (msg.type === 'ROUND_REVEAL') {
+        renderStudentReveal(msg);
+      } else if (msg.type === 'KICK' && msg.studentId === state.studentId) {
+        showToast('Você foi desconectado pelo apresentador.', '🚪');
+        switchView('student-join');
+      }
+    }
+
+    // Render Student 4 Touch Tiles
+    function renderStudentQuestion(msg) {
+      switchView('student-round');
+      document.getElementById('studentRoundNumber').textContent = String(msg.round);
+      document.getElementById('studentCurrentScore').textContent = String(state.studentScore);
+      document.getElementById('studentAnswerStatus').textContent = 'Toque em uma opção para responder:';
+
+      const grid = document.getElementById('studentAnswerGrid');
+      grid.innerHTML = msg.choices.map(c => `
+        <button type="button" class="answer-tile ${c.color} flex flex-col items-center justify-center p-4 active:scale-95 transition-all text-center" data-choice="${c.id}">
+          <span class="text-4xl font-black mb-1 drop-shadow">${c.shape}</span>
+          <span class="text-sm font-black leading-tight">${c.label}</span>
+          <span class="text-[11px] font-semibold opacity-90 mt-0.5">${c.short}</span>
+        </button>
+      `).join('');
+
+      let answerSent = false;
+      const startTime = Date.now();
+
+      grid.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answerSent) return;
+          answerSent = true;
+          state.studentLastChoice = btn.dataset.choice;
+
+          // Haptic feedback
+          try { if (navigator.vibrate) navigator.vibrate(50); } catch(e) {}
+
+          // Lock choices visually
+          grid.querySelectorAll('button').forEach(b => {
+            b.disabled = true;
+            b.classList.add('opacity-40');
+          });
+          btn.classList.remove('opacity-40');
+          btn.classList.add('ring-4', 'ring-white', 'scale-105');
+          document.getElementById('studentAnswerStatus').textContent = '✅ Resposta enviada! Aguardando o telão...';
+
+          const timeSpent = Math.round((Date.now() - startTime) / 1000);
+          const answerMsg = {
+            type: 'ANSWER',
+            studentId: state.studentId,
+            choiceId: btn.dataset.choice,
+            round: msg.round,
+            timeSpent: timeSpent
+          };
+
+          if (state.channel) state.channel.postMessage(answerMsg);
+          if (state.peer) {
+            const conns = state.peer.connections['ecg-sim-room-' + state.pin];
+            if (conns && conns[0] && conns[0].open) conns[0].send(answerMsg);
+          }
+        });
+      });
+
+      // Student Round Timer
+      let sec = msg.seconds || 25;
+      document.getElementById('studentRoundTimer').textContent = String(sec);
+      if (window.studentTimerHandle) clearInterval(window.studentTimerHandle);
+      window.studentTimerHandle = setInterval(() => {
+        sec--;
+        document.getElementById('studentRoundTimer').textContent = String(Math.max(0, sec));
+        if (sec <= 0) clearInterval(window.studentTimerHandle);
+      }, 1000);
+    }
+
+    // Render Student Reveal
+    function renderStudentReveal(msg) {
+      if (window.studentTimerHandle) clearInterval(window.studentTimerHandle);
+      switchView('student-result');
+
+      const isCorrect = state.studentLastChoice === msg.correctId;
+      const card = document.getElementById('studentResultCard');
+      const icon = document.getElementById('studentResultIcon');
+      const title = document.getElementById('studentResultTitle');
+      const badge = document.getElementById('studentResultPointsBadge');
+
+      if (isCorrect) {
+        state.studentScore += 850;
+        card.className = 'rounded-3xl p-6 sm:p-8 text-center shadow-2xl bg-gradient-to-b from-emerald-950 to-slate-900 border-2 border-emerald-500 user-card-enter';
+        icon.textContent = '🎉';
+        title.textContent = 'VOCÊ ACERTOU!';
+        badge.className = 'inline-block px-5 py-2 rounded-full font-black text-sm bg-emerald-500 text-slate-950 mb-4';
+        badge.textContent = '+850 PONTOS GANHOS';
+        playAudio('correct');
+      } else {
+        card.className = 'rounded-3xl p-6 sm:p-8 text-center shadow-2xl bg-gradient-to-b from-rose-950 to-slate-900 border-2 border-rose-600 user-card-enter';
+        icon.textContent = '❌';
+        title.textContent = 'NÃO FOI DESSA VEZ';
+        badge.className = 'inline-block px-5 py-2 rounded-full font-black text-sm bg-rose-600 text-white mb-4';
+        badge.textContent = '0 PONTOS NESTA RODADA';
+        playAudio('wrong');
+      }
+
+      document.getElementById('studentResultRhythmName').textContent = msg.name;
+      document.getElementById('studentResultFeature').textContent = msg.feature;
+    }
+
     // --- EVENT LISTENERS ---
-    document.getElementById('btnStartHost').addEventListener('click', () => {
-      initHostRoom();
-    });
-
-    document.getElementById('btnGoToJoin').addEventListener('click', () => {
-      initStudentJoinView(null);
-    });
-
-    document.getElementById('btnCancelJoin').addEventListener('click', () => {
-      switchView('home');
-    });
-
+    document.getElementById('btnStartHost').addEventListener('click', initHostRoom);
+    document.getElementById('btnGoToJoin').addEventListener('click', () => initStudentJoinView(null));
+    document.getElementById('btnCancelJoin').addEventListener('click', () => switchView('home'));
     document.getElementById('formStudentJoin').addEventListener('submit', submitStudentJoin);
 
-    document.getElementById('btnLeaveHost').addEventListener('click', () => {
-      if (confirm('Deseja realmente encerrar a sala?')) {
-        if (state.peer) state.peer.destroy();
-        if (state.channel) state.channel.close();
-        switchView('home');
+    document.getElementById('btnStartGame').addEventListener('click', () => {
+      // Começar com o primeiro ritmo (ou sinusal)
+      startRoundForRhythm('sinus');
+    });
+
+    document.getElementById('btnRandomRhythm').addEventListener('click', () => {
+      const currentId = state.currentRhythm ? state.currentRhythm.id : null;
+      const available = ECG_RHYTHMS.filter(r => r.id !== currentId);
+      const picked = available[Math.floor(Math.random() * available.length)];
+      startRoundForRhythm(picked.id);
+    });
+
+    document.getElementById('selectHostRhythm').addEventListener('change', (e) => {
+      if (e.target.value) {
+        startRoundForRhythm(e.target.value);
+        e.target.value = '';
       }
     });
 
-    document.getElementById('btnLeaveStudentLobby').addEventListener('click', () => {
-      if (confirm('Deseja sair da sala?')) {
-        if (state.channel) {
-          state.channel.postMessage({ type: 'LEAVE', studentId: state.studentId });
-          state.channel.close();
-        }
-        if (state.peer) state.peer.destroy();
-        switchView('home');
+    document.getElementById('btnRestartTimer').addEventListener('click', startRoundTimer);
+    document.getElementById('btnRevealNow').addEventListener('click', revealRoundResult);
+    document.getElementById('btnNextQuestion').addEventListener('click', () => {
+      document.getElementById('btnRandomRhythm').click();
+    });
+    document.getElementById('btnRevealNextRound').addEventListener('click', () => {
+      document.getElementById('btnRandomRhythm').click();
+    });
+
+    document.getElementById('btnFullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
       }
     });
 
     document.getElementById('btnToggleSound').addEventListener('click', () => {
       soundEnabled = !soundEnabled;
       document.getElementById('soundIcon').textContent = soundEnabled ? '🔔' : '🔕';
-      document.getElementById('soundLabel').textContent = soundEnabled ? 'Som: Ativado' : 'Som: Desativado';
+      document.getElementById('soundLabel').textContent = soundEnabled ? 'Som' : 'Mudo';
     });
 
     document.getElementById('btnCopyPin').addEventListener('click', () => {
       if (state.pin) {
-        navigator.clipboard.writeText(state.pin).then(() => {
-          showToast('PIN copiado com sucesso!', '📋');
-        });
+        navigator.clipboard.writeText(state.pin).then(() => showToast('PIN copiado!', '📋'));
       }
     });
 
     document.getElementById('btnCopyLink').addEventListener('click', () => {
       if (state.pin) {
         const link = window.location.origin + window.location.pathname + '?pin=' + state.pin;
-        navigator.clipboard.writeText(link).then(() => {
-          showToast('Link direto copiado para a área de transferência!', '🔗');
-        });
+        navigator.clipboard.writeText(link).then(() => showToast('Link direto copiado!', '🔗'));
       }
     });
 
-    const ECG_RHYTHMS = [{"id": "sinus", "name": "Ritmo sinusal", "short": "Sinusal", "feature": "P antes de cada QRS, PR constante"}, {"id": "sinus-brady", "name": "Bradicardia sinusal", "short": "Brad. sinusal", "feature": "Ritmo sinusal com FC abaixo de 60"}, {"id": "sinus-tachy", "name": "Taquicardia sinusal", "short": "Taq. sinusal", "feature": "Ritmo sinusal com FC acima de 100"}, {"id": "afib", "name": "Fibrilação atrial", "short": "FA", "feature": "RR irregularmente irregular, sem onda P"}, {"id": "flutter", "name": "Flutter atrial", "short": "Flutter", "feature": "Ondas F em serrote, condução AV fixa"}, {"id": "svt", "name": "Taquicardia supraventricular", "short": "TSV", "feature": "Taquicardia regular de QRS estreito, P oculta"}, {"id": "pvc", "name": "Extrassístole ventricular", "short": "ESV", "feature": "Batimento precoce, QRS largo, pausa compensatória"}, {"id": "vt", "name": "Taquicardia ventricular monomórfica", "short": "TV", "feature": "Taquicardia regular de QRS largo"}, {"id": "vt-poly", "name": "Taquicardia ventricular polimórfica", "short": "TV polimórfica", "feature": "QRS largo com amplitude e polaridade variáveis"}, {"id": "vf", "name": "Fibrilação ventricular", "short": "FV", "feature": "Atividade caótica, sem QRS identificável"}, {"id": "idioventricular", "name": "Ritmo idioventricular", "short": "Idioventricular", "feature": "Escape ventricular lento, QRS largo, sem P"}, {"id": "avb1", "name": "BAV de 1º grau", "short": "BAV 1º grau", "feature": "PR prolongado (> 200 ms) e constante"}, {"id": "avb2-1", "name": "BAV de 2º grau Mobitz I", "short": "Mobitz I", "feature": "PR aumenta progressivamente até um P bloqueado"}, {"id": "avb2-2", "name": "BAV de 2º grau Mobitz II", "short": "Mobitz II", "feature": "PR constante com P bloqueado de forma súbita"}, {"id": "avb3", "name": "BAV total", "short": "BAVT", "feature": "Dissociação AV: P e QRS independentes"}, {"id": "junctional", "name": "Ritmo juncional", "short": "Juncional", "feature": "QRS estreito regular sem P sinusal"}, {"id": "aesp", "name": "AESP", "short": "AESP", "feature": "Atividade elétrica organizada sem pulso"}, {"id": "asystole", "name": "Assistolia", "short": "Assistolia", "feature": "Ausência de atividade elétrica: linha isoelétrica"}];
-    const ANSWER_COLORS = ['answer-red', 'answer-blue', 'answer-yellow', 'answer-green'];
-    const ANSWER_SHAPES = ['▲', '◆', '●', '■'];
-    let roundIndex = -1;
-    let roundTimerHandle = null;
-    let roundChoices = [];
-    let answeredCount = 0;
-    let ecgAnimation = null;
-
-    function drawRhythm(canvas, id) {
-      if (!canvas) return;
-      const rhythm = ECG_RHYTHMS.find(item => item.id === id) || ECG_RHYTHMS[0];
-      const dpr = window.devicePixelRatio || 1;
-      const width = Math.max(300, canvas.clientWidth || 600);
-      const height = Math.max(120, canvas.clientHeight || 160);
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-      let offset = 0;
-
-      const draw = () => {
-        ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = '#071411';
-        ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = 'rgba(62,119,99,.25)';
-        ctx.lineWidth = 1;
-        for (let x = 0; x < width; x += 20) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
-        }
-        for (let y = 0; y < height; y += 20) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
-        }
-        ctx.strokeStyle = '#ff6678';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#ff425d';
-        ctx.shadowBlur = 7;
-        ctx.beginPath();
-        const cycle = 140;
-        const baseline = height * 0.52;
-        for (let x = 0; x <= width; x += 2) {
-          const t = ((x + offset) % cycle) / cycle;
-          let y = baseline;
-          if (rhythm.id === 'asystole') {
-            y = baseline + Math.sin(x * 0.025) * 0.8;
-          } else if (rhythm.id === 'vf') {
-            y = baseline + Math.sin(x * 0.27) * 13 + Math.sin(x * 0.61) * 7 + Math.sin(x * 0.11) * 8;
-          } else if (rhythm.id === 'afib') {
-            y = baseline + Math.sin(x * 0.18) * 2.5;
-          } else if (t > 0.18 && t < 0.32) {
-            y = baseline - 8 * Math.sin((t - 0.18) / 0.14 * Math.PI);
-          } else if (t > 0.40 && t < 0.44) {
-            y = baseline + 8 * (t - 0.40) / 0.04;
-          } else if (t > 0.44 && t < 0.48) {
-            y = baseline - 58 + 116 * (t - 0.44) / 0.04;
-          } else if (t > 0.48 && t < 0.52) {
-            y = baseline + 58 - 58 * (t - 0.48) / 0.04;
-          } else if (t > 0.65 && t < 0.82) {
-            y = baseline - 13 * Math.sin((t - 0.65) / 0.17 * Math.PI);
-          }
-          ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      };
-
-      if (ecgAnimation) cancelAnimationFrame(ecgAnimation);
-      const animate = () => {
-        offset = (offset + 1.2) % 140;
-        draw();
-        ecgAnimation = requestAnimationFrame(animate);
-      };
-      animate();
-    }
-
-    function sendRoomMessage(message) {
-      if (state.channel) state.channel.postMessage(message);
-      state.participants.forEach(p => {
-        if (p.conn && p.conn.open) p.conn.send(message);
-      });
-    }
-
-    function chooseQuestion() {
-      roundIndex = (roundIndex + 1) % ECG_RHYTHMS.length;
-      const correct = ECG_RHYTHMS[roundIndex];
-      const wrong = ECG_RHYTHMS.filter(r => r.id !== correct.id).sort(() => Math.random() - 0.5).slice(0, 3);
-      roundChoices = [correct, ...wrong].sort(() => Math.random() - 0.5);
-      answeredCount = 0;
-
-      document.getElementById('hostRoundBoard').classList.remove('hidden');
-      document.getElementById('roundReveal').classList.add('hidden');
-      document.getElementById('roundNumber').textContent = String(roundIndex + 1);
-      document.getElementById('roundProgress').textContent = `${roundIndex + 1} / ${ECG_RHYTHMS.length}`;
-      document.getElementById('roundCategory').textContent = 'Desafio de Ritmo';
-      document.getElementById('answerCount').textContent = '0 respostas';
-      document.getElementById('btnNextRound').classList.add('hidden');
-
-      document.getElementById('hostAnswerOptions').innerHTML = roundChoices.map((choice, i) => `
-        <div class="answer-tile ${ANSWER_COLORS[i]} flex items-center gap-2 px-3 py-3 text-xs">
-          <span class="text-xl font-black">${ANSWER_SHAPES[i]}</span>
-          <span class="font-bold">${choice.short}</span>
-        </div>
-      `).join('');
-
-      drawRhythm(document.getElementById('roundEcg'), correct.id);
-
-      sendRoomMessage({
-        type: 'ROUND_QUESTION',
-        round: roundIndex + 1,
-        correctId: correct.id,
-        choices: roundChoices.map((r, i) => ({
-          id: r.id,
-          label: r.name,
-          short: r.short,
-          color: ANSWER_COLORS[i],
-          shape: ANSWER_SHAPES[i]
-        })),
-        seconds: 20
-      });
-
-      let sec = 20;
-      document.getElementById('roundTimer').textContent = String(sec);
-      if (roundTimerHandle) clearInterval(roundTimerHandle);
-      roundTimerHandle = setInterval(() => {
-        sec--;
-        document.getElementById('roundTimer').textContent = String(Math.max(0, sec));
-        if (sec <= 0) {
-          clearInterval(roundTimerHandle);
-          revealQuestion(correct);
-        }
-      }, 1000);
-    }
-
-    function revealQuestion(correct) {
-      document.getElementById('roundReveal').classList.remove('hidden');
-      document.getElementById('roundCorrectName').textContent = 'Ritmo Correto: ' + correct.name;
-      document.getElementById('roundFeature').textContent = correct.feature;
-      document.getElementById('btnNextRound').classList.remove('hidden');
-      sendRoomMessage({
-        type: 'ROUND_REVEAL',
-        correctId: correct.id,
-        name: correct.name,
-        feature: correct.feature
-      });
-    }
-
-    function renderStudentQuestion(msg) {
-      const panel = document.getElementById('studentRoundPanel');
-      panel.classList.remove('hidden');
-      document.getElementById('studentRoundNumber').textContent = String(msg.round);
-      document.getElementById('studentAnswerStatus').textContent = 'Toque em uma opção para responder:';
-      document.getElementById('studentAnswerOptions').innerHTML = msg.choices.map(choice => `
-        <button type="button" class="answer-tile ${choice.color} flex flex-col items-center justify-center gap-1.5 p-3 active:scale-95 transition-all" data-choice="${choice.id}" aria-label="${choice.label}">
-          <span class="text-3xl font-black">${choice.shape}</span>
-          <span class="text-xs font-bold leading-tight">${choice.short}</span>
-        </button>
-      `).join('');
-
-      document.querySelectorAll('#studentAnswerOptions button').forEach(button => {
-        button.addEventListener('click', () => {
-          document.querySelectorAll('#studentAnswerOptions button').forEach(item => {
-            item.disabled = true;
-            item.classList.add('opacity-50');
-          });
-          button.classList.remove('opacity-50');
-          button.classList.add('ring-4', 'ring-white');
-          document.getElementById('studentAnswerStatus').textContent = '✅ Resposta enviada! Aguarde a revelação...';
-
-          try {
-            if (navigator.vibrate) navigator.vibrate(40);
-          } catch(e) {}
-
-          const answer = {
-            type: 'ANSWER',
-            studentId: state.studentId,
-            choiceId: button.dataset.choice,
-            round: Number(msg.round)
-          };
-          if (state.peerConn && state.peerConn.open) state.peerConn.send(answer);
-          if (state.channel) state.channel.postMessage(answer);
-        });
-      });
-
-      let sec = Number(msg.seconds) || 20;
-      document.getElementById('studentRoundTimer').textContent = String(sec);
-      if (window.studentTimer) clearInterval(window.studentTimer);
-      window.studentTimer = setInterval(() => {
-        sec--;
-        document.getElementById('studentRoundTimer').textContent = String(Math.max(0, sec));
-        if (sec <= 0) clearInterval(window.studentTimer);
-      }, 1000);
-    }
-
-    document.getElementById('btnStartGame').addEventListener('click', () => {
-      playAudioTone('start');
-      document.getElementById('btnStartGame').classList.add('hidden');
-      chooseQuestion();
+    document.getElementById('btnLeaveHost').addEventListener('click', () => {
+      if (confirm('Deseja realmente encerrar a sala?')) {
+        if (state.peer) state.peer.destroy();
+        if (state.channel) state.channel.close();
+        if (ecgAnimId) cancelAnimationFrame(ecgAnimId);
+        switchView('home');
+      }
     });
-
-    document.getElementById('btnNextRound').addEventListener('click', chooseQuestion);
 
     // --- INITIAL ROUTING CHECK ---
     window.addEventListener('DOMContentLoaded', () => {
@@ -1138,6 +1610,7 @@
       if (hostParam === 'true' || hostParam === '1') {
         initHostRoom();
       } else if (pinParam) {
+        // QR Code escaneado! Direto para a tela de cadastrar o nome!
         initStudentJoinView(pinParam);
       } else {
         switchView('home');
