@@ -74,11 +74,7 @@
     .timer-disc { width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--amber); display: grid; place-items: center; font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 12px #f0b64b17; }
     .timer-disc.urgent { color: #ff7272; border-color: #ff5454; animation: pulse 700ms infinite; }
     @keyframes pulse { 50% { transform: scale(1.07); box-shadow: 0 0 18px #ff545466; } }
-    .answer-enter { animation: tileIn .3s backwards; }
-    .answer-enter:nth-child(2) { animation-delay: 50ms; }
-    .answer-enter:nth-child(3) { animation-delay: 100ms; }
-    .answer-enter:nth-child(4) { animation-delay: 150ms; }
-    @keyframes tileIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+    .answer-enter { animation: none !important; }
     .avatar-option { width: 50px; height: 50px; border: 1px solid #2a3b4e; border-radius: 15px; background: #09111b; font-size: 24px; transition: .15s; }
     .avatar-option:hover { transform: scale(1.08); border-color: #7d91a8; }
     .avatar-option.selected { border: 2px solid var(--lime); background: #192619; box-shadow: 0 0 15px #c5f36633; }
@@ -281,7 +277,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
     function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
     function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
-    function startRoundForRhythm(id){const rhythm=rhythmById(id);if(!rhythm)return;state.roundNumber++;state.currentRhythm=rhythm;state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));state.answersReceived.clear();state.isRevealed=false;state.roundLocked=false;state.isPaused=false;state.pauseReasons.clear();state.studentLastChoice=null;state.studentRank=0;state.sampleOffset=0;state.roundStartTime=Date.now();$('revealPanel').classList.add('hidden');$('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';$('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile answer-enter ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');$('answerCount').textContent='0';$('roundTimer').textContent=String(state.roundDuration);$('timerDisc').classList.remove('urgent');document.querySelector('.projection-question').textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
+    function startRoundForRhythm(id){const rhythm=rhythmById(id);if(!rhythm)return;state.roundNumber++;state.currentRhythm=rhythm;state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));state.answersReceived.clear();state.isRevealed=false;state.roundLocked=false;state.isPaused=false;state.pauseReasons.clear();state.studentLastChoice=null;state.studentRank=0;state.sampleOffset=0;state.roundStartTime=Date.now();$('revealPanel').classList.add('hidden');$('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';$('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');$('answerCount').textContent='0';$('roundTimer').textContent=String(state.roundDuration);$('timerDisc').classList.remove('urgent');document.querySelector('.projection-question').textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
       updateAnswerProgress();initRealEcg(rhythm.id);setProjectionVisible(true);state.roundDeadline=Date.now()+state.roundDuration*1000;sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration});startTimer()}
     function questionPayload(){return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
@@ -298,8 +294,24 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(!rhythm)return;
       ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,ECG_CORE.defaults(rhythm),Math.random()*1e9|0);
       ecgEngine.setSignal(1,true);
-      state.currentSamples=new Float32Array();
-      state.sampleOffset=0;
+      
+      // Pré-processar ~10 s de sinal (motor a 250 Hz = 2500 amostras) antes de exibir a pergunta
+      const targetSeconds=Math.max(10,Math.ceil((window.innerWidth||1920)/250)+1);
+      const preSteps=Math.round(targetSeconds/0.04);
+      const chunks=[];
+      let totalSamples=0;
+      for(let i=0;i<preSteps;i++){
+        const s=ecgEngine.advance(0.04);
+        if(s.length>0){chunks.push(s);totalSamples+=s.length}
+      }
+      const initialSamples=new Float32Array(totalSamples);
+      let offset=0;
+      for(const chunk of chunks){
+        initialSamples.set(chunk,offset);
+        offset+=chunk.length;
+      }
+      state.currentSamples=initialSamples;
+      state.sampleOffset=totalSamples;
       frameLast=0;
       cancelAnimationFrame(ecgFrame);
       ecgFrame=requestAnimationFrame(ecgLoop);
@@ -331,7 +343,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function drawEcgFrame(){
       const canvas=$('roundEcgCanvas');
-      if(!canvas||!state.currentSamples.length)return;
+      if(!canvas||!state.currentSamples||!state.currentSamples.length)return;
       const rect=canvas.getBoundingClientRect();
       if(!rect.width||!rect.height)return;
       const dpr=Math.min(2,devicePixelRatio||1),w=Math.floor(rect.width),h=Math.floor(rect.height);
@@ -347,25 +359,29 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         for(let y=0;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
       }
       const data=state.currentSamples;
-      const visible=Math.min(data.length,Math.max(1,Math.floor(w*3)));
-      const start=data.length-visible;
-      const scale=Math.min(h*.43,165);
+      // Janela de tempo fixa: 25 mm/s com grade de 10 px/mm = 250 px/s
+      // Como o motor roda a 250 Hz, 1 amostra = 1 pixel (sem esticar)
+      const start=data.length-w;
+      const scale=Math.min(h*.42,100);
+      const baseline=h*.52;
       ctx.beginPath();
       ctx.strokeStyle=colors.trace;
       ctx.lineWidth=state.theme==='light'?2.6:2.8;
       ctx.shadowColor=state.theme==='light'?'transparent':'#54e7a8';
       ctx.shadowBlur=state.theme==='light'?0:8;
+      let started=false;
       for(let x=0;x<w;x++){
-        const index=Math.min(data.length-1,start+Math.floor(x/w*visible));
-        const y=h*.52-data[index]*scale;
-        if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+        const idx=start+x;
+        if(idx<0)continue;
+        const y=baseline-data[idx]*scale;
+        if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y);
       }
       ctx.stroke();
       ctx.shadowBlur=0;
     }
     function togglePause(reason='teacher'){if(state.isRevealed&&!state.currentRhythm)return;state.isPaused=!state.isPaused;if(state.isPaused){state.pauseReasons.add(reason);clearInterval(state.timerHandle);$('btnPause').textContent='▶ Retomar';sendToAll({type:'ROUND_PAUSE',paused:true});$('studentWaitMessage').classList.remove('hidden')}else{state.pauseReasons.clear();$('btnPause').textContent='⏸ Pausar';if(!state.isRevealed){state.roundDeadline=Date.now()+state.timeLeft*1000;startTimer()}sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});$('studentWaitMessage').classList.add('hidden')} }
     function addTime(){if(state.isRevealed||state.roundLocked)return;state.timeLeft+=10;state.roundDeadline+=10000;updateTimerDisplay();sendToAll({type:'ROUND_TIME',seconds:state.timeLeft})}
-    function openZoom(rect){if(!state.currentSamples.length)return;$('explainOverlay').classList.remove('hidden');const canvas=$('zoomCanvas');const box=canvas.getBoundingClientRect();const dpr=Math.min(2,devicePixelRatio||1);canvas.width=box.width*dpr;canvas.height=box.height*dpr;const ctx=canvas.getContext('2d');const light=state.theme==='light';ctx.fillStyle=light?'#fff3f1':'#020806';ctx.fillRect(0,0,box.width,box.height);const minor=light?'#f7c8c6':'rgba(22,185,129,.08)',major=light?'#ec8c89':'rgba(22,185,129,.23)';for(let step of [10,50]){ctx.strokeStyle=step===10?minor:major;ctx.lineWidth=step===10?1:1.4;for(let x=0;x<box.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,box.height);ctx.stroke()}for(let y=0;y<box.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(box.width,y);ctx.stroke()}}ctx.beginPath();ctx.strokeStyle=light?'#111':'#54e7a8';ctx.lineWidth=3;ctx.shadowColor=light?'transparent':'#54e7a8';ctx.shadowBlur=light?0:8;const data=state.currentSamples;let begin=0,end=data.length;if(rect){begin=Math.floor(rect.x/Math.max(1,$('roundEcgCanvas').clientWidth)*data.length);end=Math.floor((rect.x+rect.w)/Math.max(1,$('roundEcgCanvas').clientWidth)*data.length);begin=Math.max(0,Math.min(data.length-1,begin));end=Math.max(begin+1,Math.min(data.length,end))}for(let x=0;x<box.width;x++){const index=begin+Math.floor(x/box.width*(end-begin));const y=box.height*.52-data[index]*Math.min(box.height*.35,120);if(!x)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();$('zoomRuler').classList.toggle('hidden',!state.rulerOn);
+    function openZoom(rect){if(!state.currentSamples.length)return;$('explainOverlay').classList.remove('hidden');const canvas=$('zoomCanvas');const box=canvas.getBoundingClientRect();const dpr=Math.min(2,devicePixelRatio||1);canvas.width=box.width*dpr;canvas.height=box.height*dpr;const ctx=canvas.getContext('2d');const light=state.theme==='light';ctx.fillStyle=light?'#fff3f1':'#020806';ctx.fillRect(0,0,box.width,box.height);const minor=light?'#f7c8c6':'rgba(22,185,129,.08)',major=light?'#ec8c89':'rgba(22,185,129,.23)';for(let step of [10,50]){ctx.strokeStyle=step===10?minor:major;ctx.lineWidth=step===10?1:1.4;for(let x=0;x<box.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,box.height);ctx.stroke()}for(let y=0;y<box.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(box.width,y);ctx.stroke()}}ctx.beginPath();ctx.strokeStyle=light?'#111':'#54e7a8';ctx.lineWidth=3;ctx.shadowColor=light?'transparent':'#54e7a8';ctx.shadowBlur=light?0:8;const data=state.currentSamples;const canW=Math.max(1,$('roundEcgCanvas')?.clientWidth||1000);const startIdx=data.length-canW;let begin=Math.max(0,startIdx),end=data.length;if(rect){begin=Math.max(0,Math.min(data.length-1,startIdx+Math.floor(rect.x)));end=Math.max(begin+1,Math.min(data.length,startIdx+Math.floor(rect.x+rect.w)));}for(let x=0;x<box.width;x++){const index=begin+Math.floor(x/box.width*(end-begin));const y=box.height*.52-data[index]*Math.min(box.height*.35,120);if(!x)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();$('zoomRuler').classList.toggle('hidden',!state.rulerOn);
       const cInfo = $('caliperInfo');
       if (cInfo) {
         cInfo.classList.toggle('hidden', !state.rulerOn);
