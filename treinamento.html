@@ -207,6 +207,13 @@
       box-shadow: 0 12px 32px var(--primary-shadow);
     }
 
+    .explain-action {
+      background: var(--lime) !important;
+      color: #020806 !important;
+      font-weight: 900 !important;
+      border-color: var(--lime) !important;
+      box-shadow: 0 0 16px var(--primary-shadow) !important;
+    }
     .muted-btn {
       border: 1px solid var(--btn-border);
       background: var(--btn);
@@ -899,14 +906,14 @@
 
   <!-- GAME PROJECTION: fullscreen viewport, pure ECG question and answer options -->
   <section id="projection" class="projection-layout hidden" aria-label="Projeção do jogo">
-    <div class="projection-header"><div class="flex items-center gap-3"><div id="roundBadge" class="text-xs font-black text-slate-400">RODADA <b id="roundNumber" class="text-white text-base">1</b><span id="roundTotal"></span></div><div><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span><b id="answerCount">0</b>/<b id="totalStudents">0</b> responderam</span></div><div class="progress-track"><div id="answerProgress" class="progress-fill"></div></div></div><div id="projectionFcBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-emerald-500/50"><span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">FC</span><b id="projectionFcValue" class="text-base font-black font-mono text-lime-300">--</b><span class="text-[10px] text-slate-400 font-semibold">bpm</span></div></div><h1 class="projection-question">QUE RITMO É ESSE?</h1><div class="flex justify-end mr-12 sm:mr-14"><div id="timerDisc" class="timer-disc"><span id="roundTimer">25</span></div></div></div>
+    <div class="projection-header"><div class="flex items-center gap-3"><div id="roundBadge" class="text-xs font-black text-slate-400">RODADA <b id="roundNumber" class="text-white text-base">1</b><span id="roundTotal"></span></div><div><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span><b id="answerCount">0</b>/<b id="totalStudents">0</b> responderam</span></div><div class="progress-track"><div id="answerProgress" class="progress-fill"></div></div></div><div id="projectionFcBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-emerald-500/50"><span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">FC</span><b id="projectionFcValue" class="text-base font-black font-mono text-lime-300">--</b><span class="text-[10px] text-slate-400 font-semibold">bpm</span></div><div id="projectionExplainBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-amber-500/50 bg-amber-500/10 text-amber-300 font-black"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span class="text-[10px] uppercase tracking-wider">Explicação · Traçado Congelado</span></div></div><h1 class="projection-question">QUE RITMO É ESSE?</h1><div class="flex justify-end mr-12 sm:mr-14"><div id="timerDisc" class="timer-disc"><span id="roundTimer">25</span></div></div></div>
     <div id="ecgStage" class="ecg-monitor projection-ecg"><canvas id="roundEcgCanvas"></canvas></div>
     <div id="projectionOptions" class="projection-options"></div>
     <div class="projection-footer" id="projectionFooter"><div class="flex items-center gap-2"><button id="btnPause" class="muted-btn text-xs">⏸ Pausar / Retomar</button><button id="btnReveal" class="muted-btn text-xs">👁 Revelar</button><button id="btnNextFooter" class="muted-btn text-xs">Próximo →</button><button id="btnAddTime" class="muted-btn text-xs">+10 s</button><button id="btnOpenZoom" class="muted-btn text-xs">🔍 Zoom</button><button id="btnThemeProjection" class="muted-btn text-xs">☀️/🌙</button></div><div class="text-[10px] text-slate-500">Arraste sobre o traçado para ampliar · Espaço pausa · Esc fecha zoom</div></div>
   </section>
 
   <!-- Teacher explanation controls -->
-  <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
+  <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnZoomReveal" class="primary px-3 py-2 text-xs font-black shadow-lg">👁 Revelar resposta ▶</button><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
   <div id="revealPanel" class="hidden fixed z-20 left-1/2 -translate-x-1/2 bottom-4 w-[min(1080px,96vw)] panel p-5 sm:p-6 border-emerald-500/40 shadow-2xl"><div class="flex flex-wrap items-center justify-between gap-4"><div class="flex-1 min-w-[240px]"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] uppercase tracking-[.16em] font-black text-emerald-300">Gabarito</span><span id="revealRate" class="text-[10px] text-slate-400"></span></div><h2 id="revealName" class="text-2xl font-black text-lime-300"></h2><p id="revealFeature" class="text-sm text-slate-200 mt-2"></p><p id="revealConduct" class="text-xs text-slate-400 mt-2"></p></div><div id="revealRankingSection" class="min-w-[260px] flex-1"><div class="flex items-center justify-between mb-2"><p class="section-label">Ranking ao vivo</p></div><div id="teacherLeaderboard" class="space-y-1 max-h-40 overflow-auto"></div></div><div class="w-full sm:w-auto flex items-center justify-center shrink-0"><button id="btnNext" class="primary w-full sm:w-auto px-8 py-4 text-lg font-black flex items-center justify-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer">Próximo ▶</button></div></div></div>
 
   <!-- Student input and game screens -->
@@ -1039,7 +1046,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       selectedRhythmIds:[],gameMode:'random',difficulty:'easy',roundLimit:null,
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
-      config:{explanationPause:'manual',rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:false},
+      isExplaining:false,config:{explanationPause:'manual',rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:false},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
@@ -1088,7 +1095,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
     function initHost(){state.role='host';state.pin=randomPin();state.participants.clear();state.roundNumber=0;state.lastRoundId=null;$('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);const url=location.origin+location.pathname+'?pin='+state.pin;$('hostDirectUrl').textContent=url;const qr=$('qrCodeContainer');qr.innerHTML='';if(window.QRCode)new QRCode(qr,{text:url,width:250,height:250,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});updateParticipants();switchView('viewHost');try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}setupPeer(state.pin)}
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=state.participants.get(conn.peer);if(p)removeParticipant(p.id)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
-    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();beep(520,.07);if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)revealRound()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();beep(520,.07);if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
     function sendParticipant(p,msg){if(p?.conn?.open)try{p.conn.send(msg)}catch(e){}}
     function sendToAll(msg){state.channel?.postMessage(msg);state.participants.forEach(p=>sendParticipant(p,msg))}
     function removeParticipant(id){if(state.participants.delete(id)){state.answersReceived.delete(id);updateParticipants();updateAnswerProgress();updateLeaderboard()}}
@@ -1096,7 +1103,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
     function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
     function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
-    function startRoundForRhythm(id){const rhythm=rhythmById(id);if(!rhythm)return;state.roundNumber++;state.currentRhythm=rhythm;state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));state.answersReceived.clear();state.isRevealed=false;state.roundLocked=false;state.isPaused=false;state.pauseReasons.clear();state.studentLastChoice=null;state.studentRank=0;state.sampleOffset=0;state.roundStartTime=Date.now();$('revealPanel').classList.add('hidden');$('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';$('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');$('answerCount').textContent='0';$('roundTimer').textContent=String(state.roundDuration);$('timerDisc').classList.remove('urgent');document.querySelector('.projection-question').textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
+    function startRoundForRhythm(id){const rhythm=rhythmById(id);if(!rhythm)return;state.roundNumber++;state.currentRhythm=rhythm;state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));state.answersReceived.clear();state.isRevealed=false;state.roundLocked=false;state.isPaused=false;state.isExplaining=false;state.pauseReasons.clear();state.studentLastChoice=null;state.studentRank=0;state.sampleOffset=0;state.roundStartTime=Date.now();$('revealPanel').classList.add('hidden');updateExplainStateUI(false);if($('btnPause'))$('btnPause').textContent='⏸ Pausar';$('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';$('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');$('answerCount').textContent='0';$('roundTimer').textContent=String(state.roundDuration);$('timerDisc').classList.remove('urgent');document.querySelector('.projection-question').textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
       const isNoPause=(state.config.explanationPause==='off');
       if($('btnPause'))$('btnPause').classList.toggle('hidden',isNoPause);
       if($('btnOpenZoom'))$('btnOpenZoom').classList.toggle('hidden',isNoPause);
@@ -1115,10 +1122,118 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition});startTimer()}
     function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
-    function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.isPaused||state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);revealRound()}},100)}
+    function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.isPaused||state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
     function updateTimerDisplay(){ $('roundTimer').textContent=String(state.timeLeft);$('timerDisc').classList.toggle('urgent',state.timeLeft<=5);$('studentTimer').textContent=String(state.timeLeft)}
     function updateAnswerProgress(){$('answerCount').textContent=String(state.answersReceived.size);$('totalStudents').textContent=String(state.participants.size);$('answerProgress').style.width=state.participants.size?Math.min(100,state.answersReceived.size/state.participants.size*100)+'%':'0%'}
-    function revealRound(){if(state.isRevealed||!state.currentRhythm)return;state.roundLocked=true;state.isRevealed=true;clearInterval(state.timerHandle);const autoPause=(state.config.explanationPause==='auto');state.isPaused=autoPause;state.pauseReasons.clear();if(autoPause)state.pauseReasons.add('auto');if($('btnPause'))$('btnPause').textContent=autoPause?'▶ Retomar':'⏸ Pausar';const correct=state.currentRhythm;const now=Date.now();const results=[];for(const [id,p] of state.participants){const answer=state.answersReceived.get(id);const isCorrect=!!answer&&answer.choiceId===correct.id;const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,answer.answeredAt-state.roundStartTime)):state.roundDuration*1000;const remaining=answer?Math.max(0,1-elapsed/(state.roundDuration*1000)):0;const points=isCorrect?500+Math.round(500*remaining):0;p.streak=isCorrect?p.streak+1:0;p.score+=points;results.push({p,points,isCorrect,elapsed})}results.sort((a,b)=>b.p.score-a.p.score);results.forEach((r,i)=>{const old=state.previousRank.get(r.p.id)||0;r.rank=i+1;r.rankDelta=old?old-(i+1):0;state.previousRank.set(r.p.id,i+1)});updateLeaderboard();const resultById=new Map(results.map(r=>[r.p.id,r]));$('revealName').textContent=correct.name;$('revealFeature').textContent=CLINICAL[correct.id]?.points||'';$('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'';$('revealRate').textContent='· '+(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`);$('revealPanel').classList.remove('hidden');$('projectionOptions').querySelectorAll('.answer-tile').forEach(tile=>{const c=state.currentChoices.find(x=>x.label===tile.lastElementChild?.textContent);if(c?.id===correct.id)tile.classList.add('ring-4','ring-white');else tile.classList.add('opacity-35','grayscale')});const votes={};state.currentChoices.forEach(c=>votes[c.id]=0);state.answersReceived.forEach(a=>{if(votes[a.choiceId]!==undefined)votes[a.choiceId]++});for(const [id,p] of state.participants){const r=resultById.get(id);const rank=r?.rank||0;const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');const payload={type:'ROUND_REVEAL',correctId:correct.id,name:correct.name,feature:CLINICAL[correct.id]?.points||'',pointsEarned:r?.points||0,totalScore:p.score,rank,rankDelta:r?.rankDelta||0,streak:p.streak,timeExpired:!state.answersReceived.has(id),votes,showPosition:studentSeesPosition};sendParticipant(p,payload)}if(autoPause){sendToAll({type:'ROUND_PAUSE',paused:true});$('studentWaitMessage')?.classList.remove('hidden')}fanfare()}
+    function handleRoundEnd(){
+      if(state.isRevealed)return;
+      state.roundLocked=true;
+      clearInterval(state.timerHandle);
+      if(state.config.explanationPause==='auto'){
+        enterExplanationState();
+      }else{
+        revealRound();
+      }
+    }
+    function enterExplanationState(){
+      if(state.isRevealed)return;
+      state.roundLocked=true;
+      state.isPaused=true;
+      state.isExplaining=true;
+      state.pauseReasons.add('auto_explain');
+      clearInterval(state.timerHandle);
+      state.timeLeft=0;
+      updateTimerDisplay();
+      sendToAll({type:'ROUND_PAUSE',paused:true});
+      $('studentWaitMessage')?.classList.remove('hidden');
+      updateExplainStateUI(true);
+    }
+    function updateExplainStateUI(active){
+      const badge=$('projectionExplainBadge');
+      if(badge)badge.classList.toggle('hidden',!active);
+      const btnRev=$('btnReveal');
+      if(btnRev){
+        if(active&&!state.isRevealed){
+          btnRev.textContent='👁 Revelar resposta ▶';
+          btnRev.classList.add('explain-action');
+        }else{
+          btnRev.textContent='👁 Revelar';
+          btnRev.classList.remove('explain-action');
+        }
+      }
+      const tDisc=$('timerDisc');
+      if(tDisc){
+        if(active&&!state.isRevealed)tDisc.classList.remove('urgent');
+      }
+    }
+    function revealRound(){
+      if(state.isRevealed||!state.currentRhythm)return;
+      state.roundLocked=true;
+      state.isRevealed=true;
+      state.isExplaining=false;
+      clearInterval(state.timerHandle);
+      // Mantenha o traçado congelado até o professor continuar:
+      state.isPaused=true;
+      state.pauseReasons.clear();
+      state.pauseReasons.add('revealed');
+      updateExplainStateUI(false);
+      if($('btnPause'))$('btnPause').textContent='⏸ Traçado congelado';
+      const correct=state.currentRhythm;
+      const now=Date.now();
+      const results=[];
+      for(const [id,p] of state.participants){
+        const answer=state.answersReceived.get(id);
+        const isCorrect=!!answer&&answer.choiceId===correct.id;
+        const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,answer.answeredAt-state.roundStartTime)):state.roundDuration*1000;
+        const remaining=answer?Math.max(0,1-elapsed/(state.roundDuration*1000)):0;
+        const points=isCorrect?500+Math.round(500*remaining):0;
+        p.streak=isCorrect?p.streak+1:0;
+        p.score+=points;
+        results.push({p,points,isCorrect,elapsed});
+      }
+      results.sort((a,b)=>b.p.score-a.p.score);
+      results.forEach((r,i)=>{
+        const old=state.previousRank.get(r.p.id)||0;
+        r.rank=i+1;
+        r.rankDelta=old?old-(i+1):0;
+        state.previousRank.set(r.p.id,i+1);
+      });
+      updateLeaderboard();
+      const resultById=new Map(results.map(r=>[r.p.id,r]));
+      $('revealName').textContent=correct.name;
+      $('revealFeature').textContent=CLINICAL[correct.id]?.points||'';
+      $('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'';
+      $('revealRate').textContent='· '+(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`);
+      $('revealPanel').classList.remove('hidden');
+      $('projectionOptions').querySelectorAll('.answer-tile').forEach(tile=>{
+        const c=state.currentChoices.find(x=>x.label===tile.lastElementChild?.textContent);
+        if(c?.id===correct.id)tile.classList.add('ring-4','ring-white');
+        else tile.classList.add('opacity-35','grayscale');
+      });
+      const votes={};
+      state.currentChoices.forEach(c=>votes[c.id]=0);
+      state.answersReceived.forEach(a=>{if(votes[a.choiceId]!==undefined)votes[a.choiceId]++});
+      for(const [id,p] of state.participants){
+        const r=resultById.get(id);
+        const rank=r?.rank||0;
+        const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
+        const payload={
+          type:'ROUND_REVEAL',
+          correctId:correct.id,
+          name:correct.name,
+          feature:CLINICAL[correct.id]?.points||'',
+          pointsEarned:r?.points||0,
+          totalScore:p.score,
+          rank,
+          rankDelta:r?.rankDelta||0,
+          streak:p.streak,
+          timeExpired:!state.answersReceived.has(id),
+          votes,
+          showPosition:studentSeesPosition
+        };
+        sendParticipant(p,payload);
+      }
+      fanfare()}
     function loadStoredConfig(){
       try{
         const raw=localStorage.getItem('arena_config');
@@ -1262,8 +1377,47 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ctx.stroke();
       ctx.shadowBlur=0;
     }
-    function togglePause(reason='teacher'){if(state.config.explanationPause==='off')return;if(state.isRevealed&&!state.currentRhythm)return;state.isPaused=!state.isPaused;if(state.isPaused){state.pauseReasons.add(reason);clearInterval(state.timerHandle);$('btnPause').textContent='▶ Retomar';sendToAll({type:'ROUND_PAUSE',paused:true});$('studentWaitMessage').classList.remove('hidden')}else{state.pauseReasons.clear();$('btnPause').textContent='⏸ Pausar';if(!state.isRevealed){state.roundDeadline=Date.now()+state.timeLeft*1000;startTimer()}sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});$('studentWaitMessage').classList.add('hidden')} }
-    function addTime(){if(state.isRevealed||state.roundLocked)return;state.timeLeft+=10;state.roundDeadline+=10000;updateTimerDisplay();sendToAll({type:'ROUND_TIME',seconds:state.timeLeft})}
+    function togglePause(reason='teacher'){
+      if(state.config.explanationPause==='off')return;
+      if(state.isRevealed)return;
+      state.isPaused=!state.isPaused;
+      if(state.isPaused){
+        state.pauseReasons.add(reason);
+        state.isExplaining=true;
+        clearInterval(state.timerHandle);
+        if($('btnPause'))$('btnPause').textContent='▶ Retomar';
+        sendToAll({type:'ROUND_PAUSE',paused:true});
+        $('studentWaitMessage')?.classList.remove('hidden');
+        updateExplainStateUI(true);
+      }else{
+        state.pauseReasons.clear();
+        state.isExplaining=false;
+        if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
+        if(state.timeLeft>0){
+          state.roundDeadline=Date.now()+state.timeLeft*1000;
+          startTimer();
+        }
+        sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});
+        $('studentWaitMessage')?.classList.add('hidden');
+        updateExplainStateUI(false);
+      }
+    }
+    function addTime(){
+      if(state.isRevealed)return;
+      state.timeLeft+=10;
+      state.roundLocked=false;
+      state.isPaused=false;
+      state.isExplaining=false;
+      state.pauseReasons.clear();
+      updateExplainStateUI(false);
+      if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
+      state.roundDeadline=Date.now()+state.timeLeft*1000;
+      updateTimerDisplay();
+      startTimer();
+      sendToAll({type:'ROUND_TIME',seconds:state.timeLeft});
+      sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});
+      $('studentWaitMessage')?.classList.add('hidden');
+    }
     function openZoom(rect){if(state.config.explanationPause==='off')return;if(!state.currentSamples.length)return;window.currentZoomRect=rect;$('explainOverlay').classList.remove('hidden');const canvas=$('zoomCanvas');const box=canvas.getBoundingClientRect();const dpr=Math.min(2,devicePixelRatio||1);canvas.width=box.width*dpr;canvas.height=box.height*dpr;const ctx=canvas.getContext('2d');const light=state.theme==='light';ctx.fillStyle=light?'#fff3f1':'#020806';ctx.fillRect(0,0,box.width,box.height);const minor=light?'#f7c8c6':'rgba(22,185,129,.08)',major=light?'#ec8c89':'rgba(22,185,129,.23)';for(let step of [10,50]){ctx.strokeStyle=step===10?minor:major;ctx.lineWidth=step===10?1:1.4;for(let x=0;x<box.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,box.height);ctx.stroke()}for(let y=0;y<box.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(box.width,y);ctx.stroke()}}ctx.beginPath();ctx.strokeStyle=light?'#111':'#54e7a8';ctx.lineWidth=3;ctx.shadowColor=light?'transparent':'#54e7a8';ctx.shadowBlur=light?0:8;const data=state.currentSamples;const canW=Math.max(1,$('roundEcgCanvas')?.clientWidth||1000);const startIdx=data.length-canW;let begin=Math.max(0,startIdx),end=data.length;if(rect){begin=Math.max(0,Math.min(data.length-1,startIdx+Math.floor(rect.x)));end=Math.max(begin+1,Math.min(data.length,startIdx+Math.floor(rect.x+rect.w)));}for(let x=0;x<box.width;x++){const index=begin+Math.floor(x/box.width*(end-begin));const y=box.height*.52-data[index]*Math.min(box.height*.35,120);if(!x)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();$('zoomRuler').classList.toggle('hidden',!state.rulerOn);
       const cInfo = $('caliperInfo');
       if (cInfo) {
@@ -1330,18 +1484,18 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
     function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
-    function handleStudentMessage(msg){if(!msg?.type)return;if(msg.type==='ROUND_QUESTION')showStudentQuestion(msg);else if(msg.type==='ROUND_PAUSE'){state.isPaused=msg.paused;$('studentWaitMessage').classList.toggle('hidden',!msg.paused)}else if(msg.type==='ROUND_TIME')$('studentTimer').textContent=String(msg.seconds);else if(msg.type==='ROUND_REVEAL')showStudentReveal(msg);else if(msg.type==='KICK'&&msg.studentId===state.studentId)switchView('viewStudentJoin')}
+    function handleStudentMessage(msg){if(!msg?.type)return;if(msg.type==='ROUND_QUESTION')showStudentQuestion(msg);else if(msg.type==='ROUND_PAUSE'){state.isPaused=msg.paused;$('studentWaitMessage').classList.toggle('hidden',!msg.paused);if(msg.paused){clearInterval(window.studentTimer)}}else if(msg.type==='ROUND_TIME')$('studentTimer').textContent=String(msg.seconds);else if(msg.type==='ROUND_REVEAL')showStudentReveal(msg);else if(msg.type==='KICK'&&msg.studentId===state.studentId)switchView('viewStudentJoin')}
     function showStudentQuestion(msg){switchView('studentGame');state.studentLastChoice=null;state.roundLocked=false;state.roundNumber=msg.round;state.timeLeft=msg.seconds;state.studentRank=state.studentPosition;$('studentRound').textContent=String(msg.round);$('studentScore').textContent=String(state.studentScore);
       const showPosition=(msg.showPosition!==false);state.showPosition=showPosition;
       if(showPosition&&state.studentPosition){$('studentRank').textContent='#'+state.studentPosition;$('studentRank').classList.remove('hidden')}else{$('studentRank').textContent='';$('studentRank').classList.add('hidden')}$('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
-    function showStudentReveal(msg){clearInterval(window.studentTimer);state.studentScore=msg.totalScore;state.studentPosition=msg.rank;state.studentStreak=msg.streak;$('studentReveal').classList.remove('hidden');const answered=state.studentLastChoice!==null;const correct=answered&&state.studentLastChoice===msg.correctId;const timedOut=!!msg.timeExpired;const bg=timedOut?'#963b20':correct?'#087646':'#a32d3a';$('studentReveal').style.background=bg;$('studentRevealIcon').textContent=timedOut?'⏱️':correct?'🎉':'💡';$('studentRevealTitle').textContent=timedOut?'TEMPO ESGOTADO':correct?'VOCÊ ACERTOU!':'QUASE!';animatePoints(msg.pointsEarned||0);$('studentRevealName').textContent=msg.name;$('studentRevealFeature').textContent=msg.feature;$('studentStreak').textContent=msg.streak>1?'🔥 '+msg.streak+' acertos seguidos':'';const showPos=(msg.showPosition!==false&&state.showPosition!==false);
+    function showStudentReveal(msg){clearInterval(window.studentTimer);state.studentScore=msg.totalScore;state.studentPosition=msg.rank;state.studentStreak=msg.streak;$('studentWaitMessage')?.classList.add('hidden');$('studentReveal').classList.remove('hidden');const answered=state.studentLastChoice!==null;const correct=answered&&state.studentLastChoice===msg.correctId;const timedOut=!!msg.timeExpired;const bg=timedOut?'#963b20':correct?'#087646':'#a32d3a';$('studentReveal').style.background=bg;$('studentRevealIcon').textContent=timedOut?'⏱️':correct?'🎉':'💡';$('studentRevealTitle').textContent=timedOut?'TEMPO ESGOTADO':correct?'VOCÊ ACERTOU!':'QUASE!';animatePoints(msg.pointsEarned||0);$('studentRevealName').textContent=msg.name;$('studentRevealFeature').textContent=msg.feature;$('studentStreak').textContent=msg.streak>1?'🔥 '+msg.streak+' acertos seguidos':'';const showPos=(msg.showPosition!==false&&state.showPosition!==false);
       if(showPos&&msg.rank){$('studentRevealRank').textContent=`#${msg.rank||'—'} na classificação ${msg.rankDelta>0?'⬆️ subiu '+msg.rankDelta:msg.rankDelta<0?'⬇️ desceu '+Math.abs(msg.rankDelta):''}`;$('studentRevealRank').classList.remove('hidden');$('studentRank').textContent='#'+msg.rank;$('studentRank').classList.remove('hidden')}else{$('studentRevealRank').textContent='';$('studentRevealRank').classList.add('hidden');$('studentRank').textContent='';$('studentRank').classList.add('hidden')}
       $('studentScore').textContent=String(state.studentScore);$('studentScoreLobby').textContent=String(state.studentScore);
       if($('studentRankLobby')){$('studentRankLobby').textContent=showPos?('Posição: '+(msg.rank?'#'+msg.rank:'—')):'';$('studentRankLobby').style.display=showPos?'':'none'}if(correct)fanfare();else beep(220,.12,'sawtooth')}
     function animatePoints(points){const el=$('pointsAnimation');el.textContent='+0';const start=performance.now(),duration=600;function frame(now){const p=Math.min(1,(now-start)/duration);el.textContent='+'+Math.round(points*p);if(p<1)requestAnimationFrame(frame)}requestAnimationFrame(frame)}
 
     // EVENT WIRING
-    $('btnStartHost').onclick=()=>{renderRhythmLibrary();loadStoredConfig();switchView('viewHostSetup')};$('btnSetupBack').onclick=()=>switchView('viewHome');$('btnSelectAll').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=true;i.closest('.rhythm-card').classList.add('selected')});updateSelectedCount();renderSequence()};$('btnSelectBlocks').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock==='conduction';i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnSelectPcr').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=['ventricular'].includes(i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock);i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnClearSelection').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=false;i.closest('.rhythm-card').classList.remove('selected')});updateSelectedCount();renderSequence()};$('gameMode').onchange=toggleSequenceEditor;$('difficultySelect').onchange=()=>state.difficulty=$('difficultySelect').value;$('btnCreateRoom').onclick=()=>{state.selectedRhythmIds=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);if(!state.selectedRhythmIds.length){$('setupError').classList.remove('hidden');return}state.gameMode=$('gameMode').value;state.difficulty=$('difficultySelect').value;state.roundDuration=Number($('roundDurationSelect').value)||25;const n=$('roundCountSelect').value;state.roundLimit=n==='all'?null:Number(n);if(state.gameMode==='sequence')state.answerOrder=state.answerOrder.filter(id=>state.selectedRhythmIds.includes(id));saveStoredConfig();updateHostLobbySummary();initHost()};$('btnGoToJoin').onclick=()=>showJoin('');$('joinForm').onsubmit=submitJoin;$('joinBack').onclick=()=>switchView('viewHome');$('btnStartGame').onclick=()=>{buildRoundQueue();startNextRound()};$('btnPause').onclick=()=>togglePause();$('btnReveal').onclick=revealRound;const handleNext=()=>{if(!state.isRevealed)revealRound();else startNextRound()};if($('btnNext'))$('btnNext').onclick=handleNext;if($('btnNextFooter'))$('btnNextFooter').onclick=handleNext;$('btnAddTime').onclick=addTime; $('btnOpenZoom').onclick=()=>{ if(!state.isPaused) togglePause('zoom'); openZoom(null); };$('btnThemeToggle').onclick=toggleTheme;$('btnThemeProjection').onclick=toggleTheme;$('btnFullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};$('btnLeaveHost').onclick=()=>{if(confirm('Encerrar esta sala?')){state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')}};$('btnCopyPin').onclick=()=>navigator.clipboard?.writeText(state.pin).then(()=>showToast('PIN copiado'));$('btnCopyLink').onclick=()=>navigator.clipboard?.writeText(location.origin+location.pathname+'?pin='+state.pin).then(()=>showToast('Link copiado'));if($('explanationPauseSelect'))$('explanationPauseSelect').onchange=saveStoredConfig;if($('rankingFrequencySelect'))$('rankingFrequencySelect').onchange=saveStoredConfig;if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').onchange=saveStoredConfig;if($('showFcSelect'))$('showFcSelect').onchange=saveStoredConfig;$('btnCloseZoom').onclick=()=>$('explainOverlay').classList.add('hidden');$('btnRuler').onclick=()=>{state.rulerOn=!state.rulerOn;openZoom(state.zoomRect)};$('btnPodiumRestart').onclick=()=>switchView('viewHostSetup');$('podiumBack').onclick=()=>switchView('viewHome');$('studentRevealContinue').onclick=()=>$('studentReveal').classList.add('hidden');$('btnToggleSound')?.addEventListener('click',()=>soundOn=!soundOn);setupZoomSelection();document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explainOverlay').classList.add('hidden');if(e.code==='Space'&&state.role==='host'&&state.projection){e.preventDefault();togglePause()}if((e.key==='n'||e.key==='N')&&state.role==='host'&&state.isRevealed)startNextRound()});document.addEventListener('mousemove',()=>{if(state.projection){$('projection').classList.add('controls-visible');clearTimeout(window.hideControls);window.hideControls=setTimeout(()=>$('projection').classList.remove('controls-visible'),2400)}});$('projection').addEventListener('dblclick',()=>togglePause());loadStoredConfig();
+    $('btnStartHost').onclick=()=>{renderRhythmLibrary();loadStoredConfig();switchView('viewHostSetup')};$('btnSetupBack').onclick=()=>switchView('viewHome');$('btnSelectAll').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=true;i.closest('.rhythm-card').classList.add('selected')});updateSelectedCount();renderSequence()};$('btnSelectBlocks').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock==='conduction';i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnSelectPcr').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=['ventricular'].includes(i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock);i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnClearSelection').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=false;i.closest('.rhythm-card').classList.remove('selected')});updateSelectedCount();renderSequence()};$('gameMode').onchange=toggleSequenceEditor;$('difficultySelect').onchange=()=>state.difficulty=$('difficultySelect').value;$('btnCreateRoom').onclick=()=>{state.selectedRhythmIds=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);if(!state.selectedRhythmIds.length){$('setupError').classList.remove('hidden');return}state.gameMode=$('gameMode').value;state.difficulty=$('difficultySelect').value;state.roundDuration=Number($('roundDurationSelect').value)||25;const n=$('roundCountSelect').value;state.roundLimit=n==='all'?null:Number(n);if(state.gameMode==='sequence')state.answerOrder=state.answerOrder.filter(id=>state.selectedRhythmIds.includes(id));saveStoredConfig();updateHostLobbySummary();initHost()};$('btnGoToJoin').onclick=()=>showJoin('');$('joinForm').onsubmit=submitJoin;$('joinBack').onclick=()=>switchView('viewHome');$('btnStartGame').onclick=()=>{buildRoundQueue();startNextRound()};$('btnPause').onclick=()=>togglePause();$('btnReveal').onclick=revealRound;const handleNext=()=>{if(!state.isRevealed)revealRound();else startNextRound()};if($('btnNext'))$('btnNext').onclick=handleNext;if($('btnNextFooter'))$('btnNextFooter').onclick=handleNext;$('btnAddTime').onclick=addTime; $('btnOpenZoom').onclick=()=>{ if(!state.isPaused) togglePause('zoom'); openZoom(null); };$('btnThemeToggle').onclick=toggleTheme;$('btnThemeProjection').onclick=toggleTheme;$('btnFullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};$('btnLeaveHost').onclick=()=>{if(confirm('Encerrar esta sala?')){state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')}};$('btnCopyPin').onclick=()=>navigator.clipboard?.writeText(state.pin).then(()=>showToast('PIN copiado'));$('btnCopyLink').onclick=()=>navigator.clipboard?.writeText(location.origin+location.pathname+'?pin='+state.pin).then(()=>showToast('Link copiado'));if($('explanationPauseSelect'))$('explanationPauseSelect').onchange=saveStoredConfig;if($('rankingFrequencySelect'))$('rankingFrequencySelect').onchange=saveStoredConfig;if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').onchange=saveStoredConfig;if($('showFcSelect'))$('showFcSelect').onchange=saveStoredConfig;$('btnCloseZoom').onclick=()=>$('explainOverlay').classList.add('hidden');if($('btnZoomReveal'))$('btnZoomReveal').onclick=()=>{ $('explainOverlay').classList.add('hidden'); revealRound(); };$('btnRuler').onclick=()=>{state.rulerOn=!state.rulerOn;openZoom(state.zoomRect)};$('btnPodiumRestart').onclick=()=>switchView('viewHostSetup');$('podiumBack').onclick=()=>switchView('viewHome');$('studentRevealContinue').onclick=()=>$('studentReveal').classList.add('hidden');$('btnToggleSound')?.addEventListener('click',()=>soundOn=!soundOn);setupZoomSelection();document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explainOverlay').classList.add('hidden');if(e.code==='Space'&&state.role==='host'&&state.projection){e.preventDefault();togglePause()}if((e.key==='n'||e.key==='N')&&state.role==='host'&&state.isRevealed)startNextRound()});document.addEventListener('mousemove',()=>{if(state.projection){$('projection').classList.add('controls-visible');clearTimeout(window.hideControls);window.hideControls=setTimeout(()=>$('projection').classList.remove('controls-visible'),2400)}});$('projection').addEventListener('dblclick',()=>togglePause());loadStoredConfig();
     window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)studentSend({type:'LEAVE',studentId:state.studentId})});
     function getInitialTheme(){
       try{
