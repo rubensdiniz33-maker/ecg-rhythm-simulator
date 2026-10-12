@@ -974,7 +974,113 @@
         scroll-behavior: auto !important;
       }
     }
-  </style>
+  
+    /* === SETUP REDESIGN: PRESETS, CLINICAL CATEGORIES, STICKY SUMMARY, PREVIEW === */
+    .preset-card {
+      border: 1px solid var(--line);
+      background: var(--panel-card);
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      transition: all .16s ease;
+      outline: none;
+      border-radius: 14px;
+    }
+    .preset-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+      background: var(--panel-subtle);
+    }
+    .preset-card:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 1px;
+    }
+    .preset-card.active {
+      border-color: var(--lime);
+      background: var(--panel-subtle);
+      box-shadow: 0 0 0 1px var(--lime) inset, 0 8px 20px var(--primary-shadow);
+    }
+
+    .category-group {
+      border: 1px solid var(--line);
+      background: var(--panel-card);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .category-group:hover {
+      border-color: var(--line-strong);
+    }
+    .category-header {
+      padding: 12px 14px;
+      background: var(--panel-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      user-select: none;
+    }
+    .category-chevron {
+      display: inline-block;
+      transition: transform .2s ease;
+      font-size: 11px;
+    }
+    .category-group.collapsed .category-chevron {
+      transform: rotate(-90deg);
+    }
+    .category-group.collapsed .category-body {
+      display: none;
+    }
+    .category-body {
+      padding: 12px;
+    }
+
+    .rhythm-card {
+      border: 1px solid var(--line);
+      background: var(--panel-card);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .14s ease, background .14s ease, transform .1s ease, box-shadow .14s ease;
+    }
+    .rhythm-card:hover {
+      border-color: var(--btn-hover-border);
+      background: var(--panel-subtle);
+      transform: translateY(-1px);
+    }
+    .rhythm-card:focus-within {
+      outline: 2px solid var(--cyan);
+      outline-offset: 1px;
+    }
+    .rhythm-card.selected {
+      border-color: var(--lime);
+      background: var(--panel-subtle);
+      box-shadow: 0 0 0 1px var(--lime) inset;
+    }
+    .rhythm-card input {
+      accent-color: var(--lime);
+      width: 17px;
+      height: 17px;
+      margin-top: 2px;
+      flex: none;
+      cursor: pointer;
+    }
+
+    @media (min-width: 1024px) {
+      .summary-sticky {
+        position: sticky;
+        top: 1.5rem;
+        max-height: calc(100vh - 3rem);
+      }
+    }
+</style>
 </head>
 <body>
   <!-- Botão sol/lua SEMPRE visível em todas as telas -->
@@ -996,45 +1102,320 @@
       </div>
     </section>
 
-    <section id="viewHostSetup" class="hidden my-auto">
-      <div class="flex items-start justify-between gap-4 mb-6"><div><p class="section-label mb-1">Configuração da partida</p><h1 class="text-3xl sm:text-4xl font-black">Personalize sua sessão</h1><p class="text-sm text-slate-400 mt-1">Selecione ritmos, personalize a sequência e defina a dificuldade.</p></div><button id="btnSetupBack" class="muted-btn">← Voltar</button></div>
-      <div class="grid lg:grid-cols-[1fr_335px] gap-5">
-        <div class="panel p-5 sm:p-6"><div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><h2 class="font-black text-lg">Biblioteca de ritmos</h2><p class="text-xs text-slate-400 mt-1"><span id="selectedCount">0</span> selecionados</p></div><div class="flex flex-wrap gap-2"><button id="btnSelectAll" class="muted-btn text-xs">Selecionar todos</button><button id="btnSelectBlocks" class="muted-btn text-xs">Bloqueios</button><button id="btnSelectPcr" class="muted-btn text-xs">PCR/Ventriculares</button><button id="btnClearSelection" class="muted-btn text-xs">Limpar</button></div></div><div id="rhythmLibrary" class="grid sm:grid-cols-2 gap-3 scroll-list pr-1"></div></div>
-        <aside class="panel p-5 sm:p-6 h-fit"><p class="section-label mb-3">Regras da sessão</p><div class="space-y-4"><label class="block"><span class="text-sm font-bold">Ordem</span><select id="gameMode" class="field mt-2"><option value="random">Sorteio aleatório pelo sistema</option><option value="sequence">Sequência personalizada</option></select></label><div id="sequenceEditor" class="hidden rounded-xl border border-slate-700 bg-slate-950/70 p-3"><div class="flex items-center justify-between mb-2"><span class="text-xs font-black text-slate-300">ORDEM DAS RODADAS</span><span class="text-[10px] text-slate-500">Arraste ou use setas</span></div><ol id="selectedRhythmOrder" class="space-y-2 max-h-64 overflow-y-auto"></ol><p id="sequenceEmpty" class="hidden text-xs text-amber-300 mt-2">Selecione ritmos na lista para montar a sequência.</p></div><label class="block"><span class="text-sm font-bold">Dificuldade</span><select id="difficultySelect" class="field mt-2"><option value="easy">Fácil · ritmos visualmente distintos</option><option value="hard">Difícil · ritmos semelhantes</option></select></label><label class="block"><span class="text-sm font-bold">Tempo de resposta</span><select id="roundDurationSelect" class="field mt-2"><option value="15">15 segundos</option><option value="25" selected>25 segundos</option><option value="40">40 segundos</option><option value="60">60 segundos</option></select></label><label class="block"><span class="text-sm font-bold">Quantidade de rodadas</span><select id="roundCountSelect" class="field mt-2"><option value="all">Todos os ritmos selecionados</option><option value="5">5 rodadas</option><option value="10">10 rodadas</option><option value="15">15 rodadas</option></select></label>
-          <div class="pt-4 border-t border-slate-700/60 space-y-4">
-            <p class="section-label mb-0">Experiência da aula</p>
-            <label class="block">
-              <span class="text-sm font-bold">Pausa para explicação</span>
-              <select id="explanationPauseSelect" class="field mt-2">
-                <option value="off">Desligada</option>
-                <option value="manual" selected>Mostrar botão de pausa</option>
-                <option value="auto">Pausar automaticamente ao fim do tempo</option>
-              </select>
-            </label>
-            <div class="space-y-2">
-              <label class="block">
-                <span class="text-sm font-bold">Ranking</span>
-                <select id="rankingFrequencySelect" class="field mt-2">
-                  <option value="every_question" selected>A cada pergunta</option>
-                  <option value="every_5">A cada 5 perguntas</option>
-                  <option value="end_only">Só no final</option>
-                  <option value="never">Nunca</option>
-                </select>
-              </label>
-              <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300 select-none">
-                <input type="checkbox" id="studentShowsPositionCheck" class="w-4 h-4 rounded accent-lime-400 cursor-pointer" checked>
-                <span>Aluno vê a própria posição</span>
-              </label>
-            </div>
-            <label class="block">
-              <span class="text-sm font-bold">Mostrar FC durante a pergunta</span>
-              <select id="showFcSelect" class="field mt-2">
-                <option value="no" selected>Não</option>
-                <option value="yes">Sim</option>
-              </select>
-            </label>
+    <section id="viewHostSetup" class="hidden my-auto w-full">
+      <!-- Topo da tela de configuração -->
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 mb-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            Configuração da Partida
           </div>
-          <div id="setupError" class="hidden text-sm text-rose-300 bg-rose-950/40 border border-rose-900 rounded-xl p-3">Selecione pelo menos um ritmo.</div><button id="btnCreateRoom" class="primary w-full">CRIAR SALA →</button></div></aside>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">Personalize sua sessão</h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+            Selecione ritmos por categorias clínicas, aplique modelos pedagógicos e configure a dinâmica da arena para sua aula.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnSetupBack" type="button" class="muted-btn text-xs flex items-center gap-1.5 font-bold">
+            <span>←</span> Voltar ao início
+          </button>
+        </div>
+      </div>
+
+      <!-- Layout Principal em 2 colunas no Desktop -->
+      <div class="grid lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_390px] gap-6 items-start">
+        
+        <!-- Coluna da Esquerda: Presets + Biblioteca de Ritmos + Configurações -->
+        <div class="space-y-6">
+          
+          <!-- 1. MODELOS DE AULA (PRESETS) -->
+          <section class="panel p-5 sm:p-6" aria-labelledby="presetsHeading">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 id="presetsHeading" class="font-black text-lg text-white flex items-center gap-2">
+                  <span>📋</span> Modelos de aula
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">Aplique uma seleção recomendada para o nível da sua turma ou personalize abaixo.</p>
+              </div>
+              <div id="undoPresetBox" class="hidden">
+                <button id="btnUndoPreset" type="button" class="text-xs font-bold text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center gap-1.5 transition cursor-pointer">
+                  <span>↩</span> Desfazer modelo
+                </button>
+              </div>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3" id="presetsGrid">
+              <!-- Preset 1: Fundamentos -->
+              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="fundamentos">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🩺</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono">4 ritmos</span>
+                </div>
+                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Fundamentos</div>
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">Sinusais normais e BAV 1º grau para introdução clínica.</p>
+              </button>
+
+              <!-- Preset 2: Arritmias -->
+              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="arritmias">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">⚡</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono">6 ritmos</span>
+                </div>
+                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Arritmias</div>
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">FA, Flutter, TSV e extrassístoles ventriculares.</p>
+              </button>
+
+              <!-- Preset 3: Ritmos de Emergência -->
+              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="emergencia">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🚨</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950/80 text-rose-300 font-mono">7 ritmos</span>
+                </div>
+                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Ritmos de emergência</div>
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">PCR (FV, TV, AESP, Assistolia) e bradiarritmias críticas.</p>
+              </button>
+
+              <!-- Preset 4: Desafio Avançado -->
+              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="avancado">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🏆</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 font-mono">8 ritmos</span>
+                </div>
+                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Desafio avançado</div>
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">Bloqueios de 2º/3º grau, dissociação e diferenciais complexos.</p>
+              </button>
+            </div>
+          </section>
+
+          <!-- 2. BIBLIOTECA DE RITMOS POR CATEGORIAS CLÍNICAS -->
+          <section class="panel p-5 sm:p-6" aria-labelledby="libraryHeading">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 id="libraryHeading" class="font-black text-lg text-white flex items-center gap-2">
+                  <span>🫀</span> Biblioteca de ritmos clínicos
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  <span id="selectedCount" class="font-bold text-lime-300">0</span> de 18 ritmos selecionados
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="btnSelectAll" type="button" class="muted-btn text-xs font-bold">Selecionar todos</button>
+                <button id="btnClearSelection" type="button" class="muted-btn text-xs font-bold">Limpar</button>
+                <button id="btnExpandAllCategories" type="button" class="muted-btn text-xs">Expandir todas</button>
+                <button id="btnCollapseAllCategories" type="button" class="muted-btn text-xs">Recolher todas</button>
+                <!-- Botões de compatibilidade mantidos de forma invisível -->
+                <button id="btnSelectBlocks" type="button" class="hidden" aria-hidden="true">Bloqueios</button>
+                <button id="btnSelectPcr" type="button" class="hidden" aria-hidden="true">PCR</button>
+              </div>
+            </div>
+
+            <!-- Filtro de Busca Integrado -->
+            <div class="mb-4">
+              <div class="relative">
+                <input id="rhythmSearchInput" type="search" placeholder="🔍 Buscar por ritmo, sigla ou característica (ex: BAV, fibrilação, QRS, sinusal...)" class="field w-full text-xs py-2.5 pl-3 pr-8">
+                <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1" aria-label="Limpar busca">✕</button>
+              </div>
+              <p id="searchResultNotice" class="hidden text-[11px] text-cyan-300 mt-1 font-semibold"></p>
+            </div>
+
+            <!-- Categorias Clínicas Renderizadas Dinamicamente em #rhythmLibrary -->
+            <div id="rhythmLibrary" class="space-y-3.5"></div>
+          </section>
+
+          <!-- 3. CONFIGURAÇÕES DA PARTIDA (3 GRUPOS CLAROS) -->
+          <section class="panel p-5 sm:p-6" aria-labelledby="settingsHeading">
+            <h2 id="settingsHeading" class="font-black text-lg text-white mb-4 flex items-center gap-2">
+              <span>⚙️</span> Configurações da partida
+            </h2>
+            
+            <div class="grid md:grid-cols-3 gap-5">
+              <!-- GRUPO A: REGRAS DA PARTIDA -->
+              <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-lime-300">A. Regras da Partida</span>
+                </div>
+                
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Ordem das questões</span>
+                  <select id="gameMode" class="field text-xs mt-1.5 w-full">
+                    <option value="random">Sorteio aleatório pelo sistema</option>
+                    <option value="sequence">Sequência personalizada</option>
+                  </select>
+                </label>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Dificuldade</span>
+                  <select id="difficultySelect" class="field text-xs mt-1.5 w-full">
+                    <option value="easy">Fácil · distratores distintos</option>
+                    <option value="hard">Difícil · distratores semelhantes</option>
+                  </select>
+                </label>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Tempo de resposta</span>
+                  <select id="roundDurationSelect" class="field text-xs mt-1.5 w-full">
+                    <option value="15">15 segundos</option>
+                    <option value="25" selected>25 segundos (padrão)</option>
+                    <option value="40">40 segundos</option>
+                    <option value="60">60 segundos</option>
+                  </select>
+                </label>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Quantidade de rodadas</span>
+                  <select id="roundCountSelect" class="field text-xs mt-1.5 w-full">
+                    <option value="all">Todos os ritmos selecionados</option>
+                    <option value="5">5 rodadas</option>
+                    <option value="10">10 rodadas</option>
+                    <option value="15">15 rodadas</option>
+                  </select>
+                </label>
+              </div>
+
+              <!-- GRUPO B: EXPERIÊNCIA DA AULA -->
+              <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-cyan-300">B. Experiência da Aula</span>
+                </div>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Pausa para explicação</span>
+                  <select id="explanationPauseSelect" class="field text-xs mt-1.5 w-full">
+                    <option value="off">Desligada</option>
+                    <option value="manual" selected>Mostrar botão de pausa</option>
+                    <option value="auto">Pausar automaticamente ao fim do tempo</option>
+                  </select>
+                </label>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Mostrar FC durante pergunta</span>
+                  <select id="showFcSelect" class="field text-xs mt-1.5 w-full">
+                    <option value="no" selected>Não</option>
+                    <option value="yes">Sim (selo no monitor)</option>
+                  </select>
+                </label>
+              </div>
+
+              <!-- GRUPO C: PONTUAÇÃO E COMPETIÇÃO -->
+              <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-amber-300">C. Pontuação e Competição</span>
+                </div>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Frequência do ranking</span>
+                  <select id="rankingFrequencySelect" class="field text-xs mt-1.5 w-full">
+                    <option value="every_question" selected>A cada pergunta</option>
+                    <option value="every_5">A cada 5 perguntas</option>
+                    <option value="end_only">Só no final da partida</option>
+                    <option value="never">Nunca (sem ranking)</option>
+                  </select>
+                </label>
+
+                <div class="pt-2">
+                  <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300 select-none">
+                    <input type="checkbox" id="studentShowsPositionCheck" class="w-4 h-4 rounded accent-lime-400 cursor-pointer" checked>
+                    <span>Aluno vê sua colocação</span>
+                  </label>
+                  <p class="text-[10px] text-slate-500 mt-1 pl-6.5">Exibe a posição individual no resultado de cada rodada do aluno.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sequenciador (quando Ordem == sequence) -->
+            <div id="sequenceEditor" class="hidden mt-4 rounded-xl border border-slate-700 bg-slate-950/70 p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-black text-slate-300 uppercase tracking-wider">Ordem Personalizada das Rodadas</span>
+                <span class="text-[10px] text-slate-400">Arraste os itens ou use as setas para ordenar</span>
+              </div>
+              <ol id="selectedRhythmOrder" class="space-y-2 max-h-64 overflow-y-auto pr-1"></ol>
+              <p id="sequenceEmpty" class="hidden text-xs text-amber-300 mt-2 font-semibold">Selecione ritmos na biblioteca para montar a sequência.</p>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Coluna da Direita: RESUMO PERSISTENTE DA SESSÃO (Sticky no Desktop) -->
+        <aside class="panel p-5 sm:p-6 lg:sticky lg:top-6 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h2 id="summaryHeading" class="font-black text-base text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-lime-400 animate-pulse"></span>
+              Resumo da Sessão
+            </h2>
+            <span id="summaryBadgeStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 font-mono">Pronto</span>
+          </div>
+
+          <!-- Métricas Reais e Atualizadas -->
+          <div class="space-y-3">
+            <!-- Ritmos selecionados -->
+            <div>
+              <div class="flex justify-between items-center text-xs mb-1">
+                <span class="text-slate-400 font-medium">Ritmos selecionados</span>
+                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300">0</b> / 18</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div id="sumRhythmsBar" class="bg-lime-400 h-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Rodadas e Tempo -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Rodadas</div>
+                <div id="sumRounds" class="text-lg font-black text-white mt-0.5">0</div>
+                <div id="sumRoundsDetail" class="text-[10px] text-slate-500 truncate">Todos os ritmos</div>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+                <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Tempo estimado</div>
+                <div id="sumEstimatedTime" class="text-lg font-black text-white mt-0.5">0 min</div>
+                <div id="sumRoundDuration" class="text-[10px] text-slate-500">25s por rodada</div>
+              </div>
+            </div>
+
+            <!-- Badges das Regras -->
+            <div class="pt-2 border-t border-slate-800/80">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Regras da Partida</span>
+              <div class="flex flex-wrap gap-1.5" id="summaryRulesBadges">
+                <span id="sumBadgeMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sorteio aleatório</span>
+                <span id="sumBadgeDiff" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Fácil</span>
+                <span id="sumBadgePause" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Pausa manual</span>
+                <span id="sumBadgeFc" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sem FC</span>
+                <span id="sumBadgeRank" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Ranking a cada rodada</span>
+              </div>
+            </div>
+
+            <!-- Lista compacta de ritmos selecionados -->
+            <div class="pt-2 border-t border-slate-800/80">
+              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                <span>Ritmos no jogo</span>
+                <span id="sumRhythmsPreviewCount" class="text-slate-500 font-mono">0 itens</span>
+              </div>
+              <div id="summaryRhythmsChips" class="flex flex-wrap gap-1 max-h-28 overflow-y-auto pr-1">
+                <span class="text-xs text-slate-500 italic">Nenhum ritmo selecionado</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feedback de erro na validação -->
+          <div id="setupError" class="hidden text-xs text-rose-300 bg-rose-950/60 border border-rose-800 rounded-xl p-3 flex items-center gap-2">
+            <span>⚠️</span>
+            <span>Selecione pelo menos um ritmo para criar a sala.</span>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="pt-2 space-y-2">
+            <button id="btnCreateRoom" type="button" class="primary w-full py-3.5 text-base font-black tracking-wide rounded-xl shadow-xl hover:scale-[1.01] active:scale-[0.99] transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>CRIAR SALA</span>
+              <span class="text-lg">→</span>
+            </button>
+
+            <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+              <span>👁</span>
+              <span>Visualizar partida</span>
+            </button>
+          </div>
+        </aside>
+
       </div>
     </section>
 
@@ -1071,6 +1452,75 @@
   <!-- Teacher explanation controls -->
   <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnZoomReveal" class="primary px-3 py-2 text-xs font-black shadow-lg">👁 Revelar resposta ▶</button><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
   <div id="revealPanel" class="hidden fixed z-20 left-1/2 -translate-x-1/2 bottom-4 w-[min(1080px,96vw)] panel p-5 sm:p-6 border-emerald-500/40 shadow-2xl"><div class="flex flex-wrap items-center justify-between gap-4"><div class="flex-1 min-w-[240px]"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] uppercase tracking-[.16em] font-black text-emerald-300">Gabarito</span><span id="revealRate" class="text-[10px] text-slate-400"></span></div><h2 id="revealName" class="text-2xl font-black text-lime-300"></h2><p id="revealFeature" class="text-sm text-slate-200 mt-2"></p><p id="revealConduct" class="text-xs text-slate-400 mt-2"></p></div><div id="revealRankingSection" class="min-w-[260px] flex-1"><div class="flex items-center justify-between mb-2"><p class="section-label">Ranking ao vivo</p></div><div id="teacherLeaderboard" class="space-y-1 max-h-40 overflow-auto"></div></div><div class="w-full sm:w-auto flex items-center justify-center shrink-0"><button id="btnNext" class="primary w-full sm:w-auto px-8 py-4 text-lg font-black flex items-center justify-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer">Próximo ▶</button></div></div></div>
+
+  <!-- MODAL DE PRÉ-VISUALIZAÇÃO DA PARTIDA -->
+  <div id="previewModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+    <div class="panel max-w-4xl w-full p-4 sm:p-6 border-cyan-500/40 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+      <!-- Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <div>
+            <h2 id="previewModalTitle" class="text-base sm:text-lg font-black text-white">Pré-visualização da partida</h2>
+            <p class="text-[11px] text-slate-400">Avalie a hierarquia visual do traçado, alternativas e informações em tempo real.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="flex items-center gap-1.5 text-xs text-slate-300">
+            <span class="hidden sm:inline">Testar ritmo:</span>
+            <select id="previewRhythmSelect" class="field text-xs py-1 px-2 font-bold max-w-[200px]"></select>
+          </label>
+          <button id="btnClosePreview" type="button" class="muted-btn text-xs px-2.5 py-1 text-slate-400 hover:text-white cursor-pointer" aria-label="Fechar pré-visualização">✕</button>
+        </div>
+      </div>
+
+      <!-- Mini-Monitor Preview Container -->
+      <div class="flex-1 overflow-y-auto space-y-3 pr-1">
+        <!-- Topo simulado da projeção -->
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs">
+          <div class="flex items-center gap-2 font-bold">
+            <span class="text-slate-400">RODADA <b class="text-white">1</b> de <span id="previewTotalRounds">8</span></span>
+            <span class="text-slate-600">·</span>
+            <span class="text-cyan-300 font-mono">DEMONSTRAÇÃO</span>
+          </div>
+          <div class="font-black text-white sm:text-sm tracking-wide">QUE RITMO É ESSE?</div>
+          <div class="flex items-center gap-2">
+            <span id="previewTimerDisplay" class="font-mono font-black text-lime-300 text-sm">25s</span>
+          </div>
+        </div>
+
+        <!-- Monitor de ECG do Preview -->
+        <div class="ecg-monitor relative rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#020806]" style="height: 220px;">
+          <div id="previewFcBadge" class="hidden monitor-fc-badge" style="position: absolute; right: 12px; top: 12px; z-index: 10;">
+            <span class="pulse-dot"></span>
+            <span class="fc-label">FC</span>
+            <b id="previewFcValue" class="fc-value">75</b>
+            <span class="fc-unit">bpm</span>
+          </div>
+          <canvas id="previewEcgCanvas" class="w-full h-full block"></canvas>
+        </div>
+
+        <!-- Alternativas Simuladas -->
+        <div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alternativas simuladas da rodada</div>
+          <div id="previewChoicesGrid" class="grid grid-cols-2 gap-2">
+            <!-- 4 escolhas simuladas -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Rodapé informativo do Preview -->
+      <div class="border-t border-slate-800 pt-3 mt-3 flex items-center justify-between text-xs text-slate-400">
+        <span class="flex items-center gap-1.5 text-[11px] text-cyan-300">
+          <span>🔒</span>
+          <span>Modo de prévia isolado: nenhuma sala criada e nenhuma resposta computada.</span>
+        </span>
+        <button id="btnClosePreviewBtn" type="button" class="primary py-1.5 px-4 text-xs font-black cursor-pointer">
+          Fechar prévia (Esc)
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Student input and game screens -->
   <section id="viewStudentJoin" class="student-join-screen hidden" aria-label="Cadastro de participante">
@@ -1244,10 +1694,477 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function randomPin(){return String(Math.floor(100000+Math.random()*900000))}
     function rhythmById(id){return ECG_RHYTHMS.find(r=>r.id===id)}
     function escapeHTML(value){const el=document.createElement('div');el.textContent=value;return el.innerHTML}
-    function updateSelectedCount(){const n=document.querySelectorAll('#rhythmLibrary input:checked').length;$('selectedCount').textContent=String(n);if(n)$('setupError').classList.add('hidden')}
-    function renderRhythmLibrary(){const categories={sinus:'Sinusais',supraventricular:'Atrial e supraventricular',ventricular:'Ventriculares e PCR',conduction:'Bloqueios AV',other:'Juncionais e outros'};$('rhythmLibrary').innerHTML=Object.entries(categories).map(([cat,label])=>`<div class="category-block sm:col-span-2" data-category-block="${cat}"><h3 class="text-xs font-black tracking-wide mb-2 text-slate-300">${label}</h3><div class="grid sm:grid-cols-2 gap-2">${ECG_RHYTHMS.filter(r=>r.category===cat).map(r=>`<label class="rhythm-card" data-id="${r.id}"><input type="checkbox" value="${r.id}"><span class="text-sm font-bold">${r.name}</span></label>`).join('')}</div></div>`).join('');$('rhythmLibrary').querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{i.closest('.rhythm-card').classList.toggle('selected',i.checked);updateSelectedCount();renderSequence()}));updateSelectedCount()}
-    function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence()}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence()})})}
-    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if(show)renderSequence()}
+    // CLINICAL CATEGORIES METADATA & PRESETS CONFIG
+    const CLINICAL_CATEGORIES = window.CLINICAL_CATEGORIES = {
+      sinus: { label: 'Ritmos Sinusais', icon: '🫀', desc: 'Automotismo fisiológico, bradicardia e taquicardia sinusal' },
+      supraventricular: { label: 'Arritmias Atriais e Supraventriculares', icon: '⚡', desc: 'Fibrilação atrial, Flutter e Taquicardias com QRS estreito' },
+      ventricular: { label: 'Ritmos Ventriculares e PCR', icon: '🚨', desc: 'Extrassístoles, TV monomórfica/polimórfica, FV e ritmo idioventricular' },
+      conduction: { label: 'Bloqueios Atrioventriculares (BAV)', icon: '⏱️', desc: 'Atrasos de condução AV de 1º, 2º (Mobitz I e II) e 3º grau (BAVT)' },
+      other: { label: 'Ritmos Juncionais e Parada Cardíaca', icon: '🧬', desc: 'Escape juncional, Atividade Elétrica Sem Pulso (AESP) e Assistolia' }
+    };
+
+    const CLASS_PRESETS = window.CLASS_PRESETS = {
+      fundamentos: { name: 'Fundamentos', rhythmIds: ['sinus', 'sinus-brady', 'sinus-tachy', 'avb1'] },
+      arritmias: { name: 'Arritmias', rhythmIds: ['afib', 'flutter', 'svt', 'pvc', 'vt', 'vt-poly'] },
+      emergencia: { name: 'Ritmos de emergência', rhythmIds: ['vf', 'asystole', 'aesp', 'vt', 'vt-poly', 'avb3', 'idioventricular'] },
+      avancado: { name: 'Desafio avançado', rhythmIds: ['avb2-1', 'avb2-2', 'avb3', 'flutter', 'svt', 'vt', 'junctional', 'idioventricular'] }
+    };
+
+    function updateSelectedCount(){
+      const n = document.querySelectorAll('#rhythmLibrary input:checked').length;
+      if ($('selectedCount')) $('selectedCount').textContent = String(n);
+      if (n && $('setupError')) $('setupError').classList.add('hidden');
+      
+      // Update each category badge count
+      document.querySelectorAll('.category-group').forEach(grp => {
+        const cat = grp.dataset.categoryBlock;
+        const total = grp.querySelectorAll('input').length;
+        const checked = grp.querySelectorAll('input:checked').length;
+        const countSpan = grp.querySelector('.cat-selected-count');
+        if (countSpan) countSpan.textContent = String(checked);
+        const badge = grp.querySelector('.category-badge');
+        if (badge) {
+          badge.classList.toggle('text-lime-300', checked > 0);
+          badge.classList.toggle('text-slate-300', checked === 0);
+        }
+      });
+
+      updateSessionSummary();
+    }
+
+    function renderRhythmLibrary(){
+      const container = $('rhythmLibrary');
+      if (!container) return;
+
+      container.innerHTML = Object.entries(CLINICAL_CATEGORIES).map(([cat, meta]) => {
+        const rhythms = ECG_RHYTHMS.filter(r => r.category === cat);
+        return `
+          <div class="category-group panel mb-3 border border-slate-700/60 rounded-xl overflow-hidden" data-category-block="${cat}">
+            <div class="category-header p-3 sm:px-4 bg-slate-900/90 flex flex-wrap items-center justify-between gap-2 cursor-pointer border-b border-slate-800" data-cat-toggle="${cat}">
+              <div class="flex items-center gap-2.5">
+                <span class="category-chevron text-slate-400 hover:text-white transition-transform text-xs" aria-hidden="true">▼</span>
+                <span class="text-xl">${meta.icon}</span>
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    ${meta.label}
+                  </h3>
+                  <p class="text-[10px] text-slate-400">${meta.desc}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="category-badge text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 transition-colors">
+                  <span class="cat-selected-count">0</span> / ${rhythms.length}
+                </span>
+                <div class="flex items-center gap-1">
+                  <button type="button" class="btn-cat-all muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Todos</button>
+                  <button type="button" class="btn-cat-none muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Nenhum</button>
+                </div>
+              </div>
+            </div>
+            <div class="category-body p-3 grid sm:grid-cols-2 gap-2.5">
+              ${rhythms.map(r => `
+                <label class="rhythm-card" data-id="${r.id}" data-name="${r.name.toLowerCase()}" data-short="${r.shortName.toLowerCase()}" data-feature="${(r.teaching?.keyFeature || '').toLowerCase()}">
+                  <input type="checkbox" value="${r.id}">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1 mb-0.5">
+                      <span class="text-xs sm:text-sm font-bold truncate text-white">${r.name}</span>
+                      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-bold shrink-0">${r.shortName}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 line-clamp-1">${r.teaching?.keyFeature || ''}</p>
+                  </div>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Wire change listeners on rhythm inputs
+      container.querySelectorAll('input').forEach(i => {
+        i.addEventListener('change', () => {
+          i.closest('.rhythm-card').classList.toggle('selected', i.checked);
+          // When manually toggling, clear active preset highlight
+          document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
+          updateSelectedCount();
+          renderSequence();
+        });
+      });
+
+      // Wire Category Expand / Collapse toggles
+      container.querySelectorAll('[data-cat-toggle]').forEach(hdr => {
+        hdr.addEventListener('click', (e) => {
+          if (e.target.closest('button')) return; // Ignore button clicks inside header
+          const grp = hdr.closest('.category-group');
+          grp.classList.toggle('collapsed');
+        });
+      });
+
+      // Wire Category "Todos" and "Nenhum"
+      container.querySelectorAll('.btn-cat-all').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const cat = btn.dataset.cat;
+          const grp = container.querySelector(`[data-category-block="${cat}"]`);
+          if (!grp) return;
+          grp.querySelectorAll('input').forEach(i => {
+            i.checked = true;
+            i.closest('.rhythm-card').classList.add('selected');
+          });
+          document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
+          updateSelectedCount();
+          renderSequence();
+        });
+      });
+
+      container.querySelectorAll('.btn-cat-none').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const cat = btn.dataset.cat;
+          const grp = container.querySelector(`[data-category-block="${cat}"]`);
+          if (!grp) return;
+          grp.querySelectorAll('input').forEach(i => {
+            i.checked = false;
+            i.closest('.rhythm-card').classList.remove('selected');
+          });
+          document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
+          updateSelectedCount();
+          renderSequence();
+        });
+      });
+
+      updateSelectedCount();
+    }
+
+    function updateSessionSummary(){
+      const checkedInputs = document.querySelectorAll('#rhythmLibrary input:checked');
+      const count = checkedInputs.length;
+      const totalRhythms = 18;
+
+      // 1. Rhythms count & progress bar
+      if ($('sumRhythms')) $('sumRhythms').textContent = String(count);
+      if ($('sumRhythmsBar')) $('sumRhythmsBar').style.width = Math.min(100, Math.round((count / totalRhythms) * 100)) + '%';
+
+      // 2. Rounds & estimated time calculation
+      const roundChoice = $('roundCountSelect')?.value || 'all';
+      let effectiveRounds = 0;
+      let roundsDetail = '';
+
+      if (count === 0) {
+        effectiveRounds = 0;
+        roundsDetail = 'Selecione ritmos';
+      } else if (roundChoice === 'all') {
+        effectiveRounds = count;
+        roundsDetail = `${count} ritmos (completo)`;
+      } else {
+        const limit = Number(roundChoice);
+        effectiveRounds = Math.min(count, limit);
+        if (count < limit) {
+          roundsDetail = `${count} de ${limit} solicitadas`;
+        } else {
+          roundsDetail = `${limit} rodadas sorteadas`;
+        }
+      }
+
+      if ($('sumRounds')) $('sumRounds').textContent = String(effectiveRounds);
+      if ($('sumRoundsDetail')) $('sumRoundsDetail').textContent = roundsDetail;
+
+      const duration = Number($('roundDurationSelect')?.value) || 25;
+      if ($('sumRoundDuration')) $('sumRoundDuration').textContent = `${duration}s por rodada`;
+
+      const totalSeconds = effectiveRounds * (duration + 5);
+      const estMinutes = effectiveRounds > 0 ? Math.max(1, Math.round(totalSeconds / 60)) : 0;
+      if ($('sumEstimatedTime')) $('sumEstimatedTime').textContent = `${estMinutes} min`;
+
+      // 3. Active rules badges
+      const gameMode = $('gameMode')?.value || 'random';
+      if ($('sumBadgeMode')) $('sumBadgeMode').textContent = gameMode === 'sequence' ? 'Sequência personalizada' : 'Sorteio aleatório';
+
+      const diff = $('difficultySelect')?.value || 'easy';
+      if ($('sumBadgeDiff')) $('sumBadgeDiff').textContent = diff === 'hard' ? 'Difícil (semelhantes)' : 'Fácil (distintos)';
+
+      const pause = $('explanationPauseSelect')?.value || 'manual';
+      const pauseLabels = { off: 'Pausa: desligada', manual: 'Pausa: manual', auto: 'Pausa: automática' };
+      if ($('sumBadgePause')) $('sumBadgePause').textContent = pauseLabels[pause] || 'Pausa manual';
+
+      const showFc = $('showFcSelect')?.value === 'yes';
+      if ($('sumBadgeFc')) $('sumBadgeFc').textContent = showFc ? 'FC no monitor' : 'Sem FC';
+
+      const rank = $('rankingFrequencySelect')?.value || 'every_question';
+      const rankLabels = { every_question: 'Ranking por rodada', every_5: 'Ranking a cada 5', end_only: 'Ranking final', never: 'Sem ranking' };
+      if ($('sumBadgeRank')) $('sumBadgeRank').textContent = rankLabels[rank] || 'Ranking';
+
+      // 4. Compact chips of selected rhythms
+      const chipsContainer = $('summaryRhythmsChips');
+      const countPreview = $('sumRhythmsPreviewCount');
+      if (chipsContainer) {
+        if (count === 0) {
+          chipsContainer.innerHTML = '<span class="text-xs text-slate-500 italic">Nenhum ritmo selecionado</span>';
+          if (countPreview) countPreview.textContent = '0 itens';
+        } else {
+          if (countPreview) countPreview.textContent = `${count} itens`;
+          chipsContainer.innerHTML = [...checkedInputs].map(i => {
+            const r = rhythmById(i.value);
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700/80">${r?.shortName || i.value}</span>`;
+          }).join('');
+        }
+      }
+
+      // 5. Status badge
+      if ($('summaryBadgeStatus')) {
+        if (count === 0) {
+          $('summaryBadgeStatus').textContent = 'Pendente';
+          $('summaryBadgeStatus').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950/80 text-rose-300 font-mono';
+        } else {
+          $('summaryBadgeStatus').textContent = 'Configurada';
+          $('summaryBadgeStatus').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono';
+        }
+      }
+    }
+
+    function applyClassPreset(presetKey){
+      const preset = CLASS_PRESETS[presetKey];
+      if (!preset) return;
+
+      // Save previous selection for undo
+      const current = [...document.querySelectorAll('#rhythmLibrary input:checked')].map(x => x.value);
+      state.previousSelection = current;
+
+      // Apply preset IDs
+      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
+        const match = preset.rhythmIds.includes(i.value);
+        i.checked = match;
+        i.closest('.rhythm-card')?.classList.toggle('selected', match);
+      });
+
+      // Highlight active preset card
+      document.querySelectorAll('.preset-card').forEach(p => {
+        p.classList.toggle('active', p.dataset.preset === presetKey);
+      });
+
+      // Show Undo button
+      if ($('undoPresetBox')) $('undoPresetBox').classList.remove('hidden');
+
+      showToast(`Modelo "${preset.name}" aplicado (${preset.rhythmIds.length} ritmos).`);
+      updateSelectedCount();
+      renderSequence();
+    }
+
+    function undoClassPreset(){
+      if (!state.previousSelection) return;
+
+      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
+        const match = state.previousSelection.includes(i.value);
+        i.checked = match;
+        i.closest('.rhythm-card')?.classList.toggle('selected', match);
+      });
+
+      state.previousSelection = null;
+      document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
+      if ($('undoPresetBox')) $('undoPresetBox').classList.add('hidden');
+
+      showToast('Seleção anterior de ritmos restaurada.');
+      updateSelectedCount();
+      renderSequence();
+    }
+
+    function filterRhythms(query){
+      const q = (query || '').trim().toLowerCase();
+      if ($('btnClearSearch')) $('btnClearSearch').classList.toggle('hidden', !q);
+      let matchedTotal = 0;
+
+      document.querySelectorAll('.category-group').forEach(grp => {
+        let groupMatches = 0;
+        grp.querySelectorAll('.rhythm-card').forEach(card => {
+          const name = card.dataset.name || '';
+          const shortName = card.dataset.short || '';
+          const feature = card.dataset.feature || '';
+          const matches = !q || name.includes(q) || shortName.includes(q) || feature.includes(q);
+          card.classList.toggle('hidden', !matches);
+          if (matches) groupMatches++;
+        });
+
+        if (q) {
+          grp.classList.toggle('hidden', groupMatches === 0);
+          if (groupMatches > 0) grp.classList.remove('collapsed');
+        } else {
+          grp.classList.remove('hidden');
+        }
+        matchedTotal += groupMatches;
+      });
+
+      const notice = $('searchResultNotice');
+      if (notice) {
+        if (q) {
+          notice.classList.remove('hidden');
+          notice.textContent = `${matchedTotal} ritmo(s) encontrado(s) para "${query}"`;
+        } else {
+          notice.classList.add('hidden');
+        }
+      }
+    }
+
+    // === PREVIEW MODAL LOGIC ===
+    let previewEngine = window.previewEngine = null;
+    window.getPreviewEngine = () => previewEngine;
+    let previewFrame = null;
+    let previewSamples = null;
+    let previewLastTime = 0;
+
+    function openPreviewModal(){
+      const checked = [...document.querySelectorAll('#rhythmLibrary input:checked')].map(x => x.value);
+      const availableIds = checked.length ? checked : ECG_RHYTHMS.map(r => r.id);
+      
+      const select = $('previewRhythmSelect');
+      if (select) {
+        select.innerHTML = availableIds.map(id => {
+          const r = rhythmById(id);
+          return `<option value="${id}">${r?.name || id}</option>`;
+        }).join('');
+      }
+
+      const totalRoundsSpan = $('previewTotalRounds');
+      if (totalRoundsSpan) {
+        const rc = $('roundCountSelect')?.value || 'all';
+        totalRoundsSpan.textContent = rc === 'all' ? String(checked.length || 18) : rc;
+      }
+
+      const timerDisplay = $('previewTimerDisplay');
+      if (timerDisplay) {
+        const dur = $('roundDurationSelect')?.value || '25';
+        timerDisplay.textContent = `${dur}s`;
+      }
+
+      startPreviewRhythm(availableIds[0] || 'sinus');
+      $('previewModal')?.classList.remove('hidden');
+    }
+
+    function closePreviewModal(){
+      cancelAnimationFrame(previewFrame);
+      previewFrame = null;
+      previewEngine = null;
+      $('previewModal')?.classList.add('hidden');
+    }
+
+    function startPreviewRhythm(rhythmId){
+      const rhythm = rhythmById(rhythmId);
+      if (!rhythm) return;
+
+      const defs = ECG_CORE.defaults(rhythm);
+      previewEngine = new ECG_CORE.RhythmSimulator(rhythm, defs, 9999);
+      previewEngine.setSignal(1, true);
+
+      // Pre-roll ~8s of ECG signal
+      const targetSeconds = 8;
+      const preSteps = Math.round(targetSeconds / 0.04);
+      const chunks = [];
+      let totalSamples = 0;
+      for (let i = 0; i < preSteps; i++) {
+        const s = previewEngine.advance(0.04);
+        if (s.length > 0) { chunks.push(s); totalSamples += s.length; }
+      }
+      const initialSamples = new Float32Array(totalSamples);
+      let offset = 0;
+      for (const chunk of chunks) {
+        initialSamples.set(chunk, offset);
+        offset += chunk.length;
+      }
+      previewSamples = initialSamples;
+      previewLastTime = 0;
+
+      // Update FC Badge in preview if option enabled
+      const showFc = $('showFcSelect')?.value === 'yes';
+      const fcBadge = $('previewFcBadge');
+      const fcVal = $('previewFcValue');
+      if (fcBadge) {
+        fcBadge.classList.toggle('hidden', !showFc);
+        if (fcVal) fcVal.textContent = rhythm.defaultRate ? String(rhythm.defaultRate) : '--';
+      }
+
+      // Build simulated choices
+      const distractors = chooseDistractors(rhythm);
+      const choices = [rhythm, ...distractors].sort(() => Math.random() - 0.5);
+      const choicesGrid = $('previewChoicesGrid');
+      if (choicesGrid) {
+        choicesGrid.innerHTML = choices.map((c, idx) => `
+          <div class="answer-tile ${ANSWER_COLORS[idx]} p-3 rounded-xl flex items-center gap-3 shadow-md">
+            <span class="shape text-2xl font-black">${ANSWER_SHAPES[idx]}</span>
+            <span class="text-xs sm:text-sm font-black truncate">${c.name}</span>
+          </div>
+        `).join('');
+      }
+
+      cancelAnimationFrame(previewFrame);
+      previewFrame = requestAnimationFrame(previewLoop);
+    }
+
+    function previewLoop(timestamp){
+      if (!previewEngine) return;
+      const dt = previewLastTime ? Math.min(0.08, (timestamp - previewLastTime) / 1000) : 0.016;
+      previewLastTime = timestamp;
+      const samples = previewEngine.advance(dt);
+      if (samples.length) {
+        const maxSamples = 10000;
+        const combined = new Float32Array(Math.min(maxSamples, previewSamples.length + samples.length));
+        const keep = Math.min(previewSamples.length, combined.length - samples.length);
+        if (keep > 0) combined.set(previewSamples.subarray(previewSamples.length - keep), 0);
+        const newCount = combined.length - keep;
+        if (newCount > 0) combined.set(samples.subarray(samples.length - newCount), keep);
+        previewSamples = combined;
+      }
+      drawPreviewCanvas();
+      previewFrame = requestAnimationFrame(previewLoop);
+    }
+
+    function drawPreviewCanvas(){
+      const canvas = $('previewEcgCanvas');
+      if (!canvas || !previewSamples || !previewSamples.length) return;
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      const w = Math.floor(rect.width);
+      const h = Math.floor(rect.height);
+      if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+      }
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const colors = ecgPalette();
+      ctx.fillStyle = colors.bg;
+      ctx.fillRect(0, 0, w, h);
+
+      for (const [step, color, width] of [[10, colors.small, 1], [50, colors.large, 1.2]]) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        for (let x = 0; x < w; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+        for (let y = 0; y < h; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+      }
+
+      const data = previewSamples;
+      const start = data.length - w;
+      const scale = Math.min(h * 0.42, 90);
+      const baseline = h * 0.52;
+
+      ctx.beginPath();
+      ctx.strokeStyle = colors.trace;
+      ctx.lineWidth = state.theme === 'light' ? 2.6 : 2.8;
+      ctx.shadowColor = state.theme === 'light' ? 'transparent' : '#54e7a8';
+      ctx.shadowBlur = state.theme === 'light' ? 0 : 8;
+
+      let started = false;
+      for (let x = 0; x < w; x++) {
+        const idx = start + x;
+        if (idx < 0) continue;
+        const y = baseline - data[idx] * scale;
+        if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
+    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
     function initHost(){state.role='host';state.pin=randomPin();state.participants.clear();state.roundNumber=0;state.lastRoundId=null;$('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);const url=location.origin+location.pathname+'?pin='+state.pin;$('hostDirectUrl').textContent=url;const qr=$('qrCodeContainer');qr.innerHTML='';if(window.QRCode)new QRCode(qr,{text:url,width:250,height:250,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});updateParticipants();switchView('viewHost');try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}setupPeer(state.pin)}
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=state.participants.get(conn.peer);if(p)removeParticipant(p.id)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
@@ -1754,7 +2671,121 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function animatePoints(points){const el=$('pointsAnimation');el.textContent='+0';const start=performance.now(),duration=600;function frame(now){const p=Math.min(1,(now-start)/duration);el.textContent='+'+Math.round(points*p);if(p<1)requestAnimationFrame(frame)}requestAnimationFrame(frame)}
 
     // EVENT WIRING
-    $('btnStartHost').onclick=()=>{renderRhythmLibrary();loadStoredConfig();switchView('viewHostSetup')};$('btnSetupBack').onclick=()=>switchView('viewHome');$('btnSelectAll').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=true;i.closest('.rhythm-card').classList.add('selected')});updateSelectedCount();renderSequence()};$('btnSelectBlocks').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock==='conduction';i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnSelectPcr').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{const v=['ventricular'].includes(i.closest('.rhythm-card').parentElement.parentElement.dataset.categoryBlock);i.checked=v;i.closest('.rhythm-card').classList.toggle('selected',v)});updateSelectedCount();renderSequence()};$('btnClearSelection').onclick=()=>{document.querySelectorAll('#rhythmLibrary input').forEach(i=>{i.checked=false;i.closest('.rhythm-card').classList.remove('selected')});updateSelectedCount();renderSequence()};$('gameMode').onchange=toggleSequenceEditor;$('difficultySelect').onchange=()=>state.difficulty=$('difficultySelect').value;$('btnCreateRoom').onclick=()=>{state.selectedRhythmIds=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);if(!state.selectedRhythmIds.length){$('setupError').classList.remove('hidden');return}state.gameMode=$('gameMode').value;state.difficulty=$('difficultySelect').value;state.roundDuration=Number($('roundDurationSelect').value)||25;const n=$('roundCountSelect').value;state.roundLimit=n==='all'?null:Number(n);if(state.gameMode==='sequence')state.answerOrder=state.answerOrder.filter(id=>state.selectedRhythmIds.includes(id));saveStoredConfig();updateHostLobbySummary();initHost()};$('btnGoToJoin').onclick=()=>showJoin('');$('joinForm').onsubmit=submitJoin;$('joinBack').onclick=()=>switchView('viewHome');$('btnStartGame').onclick=()=>{buildRoundQueue();startNextRound()};$('btnPause').onclick=()=>togglePause();$('btnReveal').onclick=revealRound;const handleNext=()=>{if(!state.isRevealed)revealRound();else startNextRound()};if($('btnNext'))$('btnNext').onclick=handleNext;if($('btnNextFooter'))$('btnNextFooter').onclick=handleNext;$('btnAddTime').onclick=addTime; $('btnOpenZoom').onclick=()=>{ if(!state.isPaused) togglePause('zoom'); openZoom(null); };$('btnThemeToggle').onclick=toggleTheme;$('btnThemeProjection').onclick=toggleTheme;$('btnFullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};$('btnLeaveHost').onclick=()=>{if(confirm('Encerrar esta sala?')){state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')}};$('btnCopyPin').onclick=()=>navigator.clipboard?.writeText(state.pin).then(()=>showToast('PIN copiado'));$('btnCopyLink').onclick=()=>navigator.clipboard?.writeText(location.origin+location.pathname+'?pin='+state.pin).then(()=>showToast('Link copiado'));if($('explanationPauseSelect'))$('explanationPauseSelect').onchange=saveStoredConfig;if($('rankingFrequencySelect'))$('rankingFrequencySelect').onchange=saveStoredConfig;if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').onchange=saveStoredConfig;if($('showFcSelect'))$('showFcSelect').onchange=saveStoredConfig;$('btnCloseZoom').onclick=()=>$('explainOverlay').classList.add('hidden');if($('btnZoomReveal'))$('btnZoomReveal').onclick=()=>{ $('explainOverlay').classList.add('hidden'); revealRound(); };$('btnRuler').onclick=()=>{state.rulerOn=!state.rulerOn;openZoom(state.zoomRect)};$('btnPodiumRestart').onclick=()=>switchView('viewHostSetup');$('podiumBack').onclick=()=>switchView('viewHome');$('studentRevealContinue').onclick=()=>$('studentReveal').classList.add('hidden');$('btnToggleSound')?.addEventListener('click',()=>soundOn=!soundOn);setupZoomSelection();document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explainOverlay').classList.add('hidden');if(e.code==='Space'&&state.role==='host'&&state.projection){e.preventDefault();togglePause()}if((e.key==='n'||e.key==='N')&&state.role==='host'&&state.isRevealed)startNextRound()});document.addEventListener('mousemove',()=>{if(state.projection){$('projection').classList.add('controls-visible');clearTimeout(window.hideControls);window.hideControls=setTimeout(()=>$('projection').classList.remove('controls-visible'),2400)}});$('projection').addEventListener('dblclick',()=>togglePause());loadStoredConfig();
+    $('btnStartHost').onclick = () => {
+      renderRhythmLibrary();
+      loadStoredConfig();
+      updateSessionSummary();
+      switchView('viewHostSetup');
+    };
+    $('btnSetupBack').onclick = () => switchView('viewHome');
+    $('btnSelectAll').onclick = () => {
+      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
+        i.checked = true;
+        i.closest('.rhythm-card').classList.add('selected');
+      });
+      document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
+      updateSelectedCount();
+      renderSequence();
+    };
+    $('btnClearSelection').onclick = () => {
+      document.querySelectorAll('#rhythmLibrary input').forEach(i => {
+        i.checked = false;
+        i.closest('.rhythm-card').classList.remove('selected');
+      });
+      document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
+      updateSelectedCount();
+      renderSequence();
+    };
+    $('btnExpandAllCategories').onclick = () => {
+      document.querySelectorAll('.category-group').forEach(grp => grp.classList.remove('collapsed'));
+    };
+    $('btnCollapseAllCategories').onclick = () => {
+      document.querySelectorAll('.category-group').forEach(grp => grp.classList.add('collapsed'));
+    };
+    
+    // Compatibility hooks
+    if ($('btnSelectBlocks')) {
+      $('btnSelectBlocks').onclick = () => {
+        document.querySelectorAll('#rhythmLibrary input').forEach(i => {
+          const v = i.closest('.category-group')?.dataset.categoryBlock === 'conduction';
+          i.checked = v;
+          i.closest('.rhythm-card').classList.toggle('selected', v);
+        });
+        updateSelectedCount(); renderSequence();
+      };
+    }
+    if ($('btnSelectPcr')) {
+      $('btnSelectPcr').onclick = () => {
+        document.querySelectorAll('#rhythmLibrary input').forEach(i => {
+          const v = i.closest('.category-group')?.dataset.categoryBlock === 'ventricular';
+          i.checked = v;
+          i.closest('.rhythm-card').classList.toggle('selected', v);
+        });
+        updateSelectedCount(); renderSequence();
+      };
+    }
+
+    // Presets event listeners
+    document.querySelectorAll('.preset-card').forEach(card => {
+      card.addEventListener('click', () => applyClassPreset(card.dataset.preset));
+    });
+    if ($('btnUndoPreset')) $('btnUndoPreset').onclick = undoClassPreset;
+
+    // Search filter
+    if ($('rhythmSearchInput')) {
+      $('rhythmSearchInput').addEventListener('input', (e) => filterRhythms(e.target.value));
+    }
+    if ($('btnClearSearch')) {
+      $('btnClearSearch').onclick = () => {
+        if ($('rhythmSearchInput')) $('rhythmSearchInput').value = '';
+        filterRhythms('');
+      };
+    }
+
+    // Settings listeners
+    $('gameMode').onchange = () => { toggleSequenceEditor(); updateSessionSummary(); };
+    $('difficultySelect').onchange = () => { state.difficulty = $('difficultySelect').value; updateSessionSummary(); };
+    $('roundDurationSelect').onchange = () => { state.roundDuration = Number($('roundDurationSelect').value) || 25; updateSessionSummary(); };
+    $('roundCountSelect').onchange = () => updateSessionSummary();
+    $('explanationPauseSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
+    $('showFcSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
+    $('rankingFrequencySelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
+    $('studentShowsPositionCheck').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
+
+    // Preview listeners
+    if ($('btnPreviewRound')) $('btnPreviewRound').onclick = openPreviewModal;
+    if ($('btnClosePreview')) $('btnClosePreview').onclick = closePreviewModal;
+    if ($('btnClosePreviewBtn')) $('btnClosePreviewBtn').onclick = closePreviewModal;
+    if ($('previewRhythmSelect')) {
+      $('previewRhythmSelect').onchange = (e) => startPreviewRhythm(e.target.value);
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !$('previewModal')?.classList.contains('hidden')) {
+        closePreviewModal();
+      }
+    });
+
+    // Create Room
+    $('btnCreateRoom').onclick = () => {
+      state.selectedRhythmIds = [...document.querySelectorAll('#rhythmLibrary input:checked')].map(x => x.value);
+      if (!state.selectedRhythmIds.length) {
+        $('setupError').classList.remove('hidden');
+        $('setupError').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      state.gameMode = $('gameMode').value;
+      state.difficulty = $('difficultySelect').value;
+      state.roundDuration = Number($('roundDurationSelect').value) || 25;
+      const n = $('roundCountSelect').value;
+      state.roundLimit = n === 'all' ? null : Number(n);
+      if (state.gameMode === 'sequence') {
+        state.answerOrder = state.answerOrder.filter(id => state.selectedRhythmIds.includes(id));
+      }
+      saveStoredConfig();
+      updateHostLobbySummary();
+      initHost();
+    };
+    $('btnGoToJoin').onclick=()=>showJoin('');$('joinForm').onsubmit=submitJoin;$('joinBack').onclick=()=>switchView('viewHome');$('btnStartGame').onclick=()=>{buildRoundQueue();startNextRound()};$('btnPause').onclick=()=>togglePause();$('btnReveal').onclick=revealRound;const handleNext=()=>{if(!state.isRevealed)revealRound();else startNextRound()};if($('btnNext'))$('btnNext').onclick=handleNext;if($('btnNextFooter'))$('btnNextFooter').onclick=handleNext;$('btnAddTime').onclick=addTime; $('btnOpenZoom').onclick=()=>{ if(!state.isPaused) togglePause('zoom'); openZoom(null); };$('btnThemeToggle').onclick=toggleTheme;$('btnThemeProjection').onclick=toggleTheme;$('btnFullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};$('btnLeaveHost').onclick=()=>{if(confirm('Encerrar esta sala?')){state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')}};$('btnCopyPin').onclick=()=>navigator.clipboard?.writeText(state.pin).then(()=>showToast('PIN copiado'));$('btnCopyLink').onclick=()=>navigator.clipboard?.writeText(location.origin+location.pathname+'?pin='+state.pin).then(()=>showToast('Link copiado'));if($('explanationPauseSelect'))$('explanationPauseSelect').onchange=saveStoredConfig;if($('rankingFrequencySelect'))$('rankingFrequencySelect').onchange=saveStoredConfig;if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').onchange=saveStoredConfig;if($('showFcSelect'))$('showFcSelect').onchange=saveStoredConfig;$('btnCloseZoom').onclick=()=>$('explainOverlay').classList.add('hidden');if($('btnZoomReveal'))$('btnZoomReveal').onclick=()=>{ $('explainOverlay').classList.add('hidden'); revealRound(); };$('btnRuler').onclick=()=>{state.rulerOn=!state.rulerOn;openZoom(state.zoomRect)};$('btnPodiumRestart').onclick=()=>switchView('viewHostSetup');$('podiumBack').onclick=()=>switchView('viewHome');$('studentRevealContinue').onclick=()=>$('studentReveal').classList.add('hidden');$('btnToggleSound')?.addEventListener('click',()=>soundOn=!soundOn);setupZoomSelection();document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explainOverlay').classList.add('hidden');if(e.code==='Space'&&state.role==='host'&&state.projection){e.preventDefault();togglePause()}if((e.key==='n'||e.key==='N')&&state.role==='host'&&state.isRevealed)startNextRound()});document.addEventListener('mousemove',()=>{if(state.projection){$('projection').classList.add('controls-visible');clearTimeout(window.hideControls);window.hideControls=setTimeout(()=>$('projection').classList.remove('controls-visible'),2400)}});$('projection').addEventListener('dblclick',()=>togglePause());loadStoredConfig();
     window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)studentSend({type:'LEAVE',studentId:state.studentId})});
     function getInitialTheme(){
       try{
@@ -1776,7 +2807,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       });
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
-    const params=new URLSearchParams(location.search);if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();switchView('viewHostSetup')}else switchView('viewHome');
+    const params=new URLSearchParams(location.search);if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();switchView('viewHostSetup')}else switchView('viewHome');
   </script>
 </body>
 </html>
