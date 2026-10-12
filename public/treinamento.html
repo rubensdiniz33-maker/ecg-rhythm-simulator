@@ -414,22 +414,140 @@
     }
 
     .timer-disc {
-      width: 46px;
-      height: 46px;
+      width: 78px;
+      height: 78px;
       border-radius: 50%;
-      border: 3px solid var(--amber);
-      color: var(--text);
+      position: relative;
       display: grid;
       place-items: center;
-      font-size: 19px;
-      font-weight: 900;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      background: var(--panel);
+      border: 2px solid var(--line);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .timer-ring-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .timer-ring-bg {
+      fill: rgba(0, 0, 0, 0.25);
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 6;
+    }
+    .theme-light .timer-ring-bg {
+      fill: rgba(255, 255, 255, 0.85);
+      stroke: rgba(0, 0, 0, 0.08);
+    }
+    .timer-ring-progress {
+      fill: none;
+      stroke: var(--lime);
+      stroke-width: 6;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 238.76;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.12s linear, stroke 0.25s ease;
+    }
+    .timer-digits {
+      font-size: 32px;
+      font-weight: 1000;
+      line-height: 1;
       font-variant-numeric: tabular-nums;
-      box-shadow: inset 0 0 12px rgba(240, 182, 75, 0.15);
+      color: var(--text-title);
+      position: relative;
+      z-index: 2;
+      transition: color 0.2s ease;
+    }
+    @keyframes timerUrgentPulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 28px 8px rgba(239, 68, 68, 0.95);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
     }
     .timer-disc.urgent {
-      color: #ff5454;
-      border-color: #ff5454;
-      animation: pulse 700ms infinite;
+      animation: timerUrgentPulse 0.6s infinite ease-in-out;
+      border-color: #ef4444;
+    }
+    .timer-disc.urgent .timer-digits {
+      color: #ef4444;
+      text-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+    }
+    .timer-disc.urgent .timer-ring-progress {
+      stroke: #ef4444;
+      filter: drop-shadow(0 0 6px #ef4444);
+    }
+    @media (max-width: 768px) {
+      .timer-disc { width: 66px; height: 66px; }
+      .timer-digits { font-size: 25px; }
+    }
+
+    .monitor-fc-badge {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background: rgba(8, 14, 24, 0.82);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      pointer-events: none;
+      user-select: none;
+    }
+    .theme-light .monitor-fc-badge {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: rgba(5, 150, 105, 0.4);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    .monitor-fc-badge .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.2s infinite;
+    }
+    .monitor-fc-badge .fc-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: #10b981;
+      letter-spacing: 0.06em;
+    }
+    .monitor-fc-badge .fc-value {
+      font-size: 26px;
+      font-weight: 1000;
+      line-height: 1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #a3e635;
+      min-width: 44px;
+      text-align: right;
+    }
+    .theme-light .monitor-fc-badge .fc-value {
+      color: #15803d;
+    }
+    .monitor-fc-badge .fc-unit {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
     }
     @keyframes pulse {
       50% { transform: scale(1.07); box-shadow: 0 0 18px rgba(255, 84, 84, 0.4); }
@@ -593,45 +711,63 @@
       z-index: 15;
       background: var(--bg);
       color: var(--text);
-      padding: max(8px, env(safe-area-inset-top)) 9px max(8px, env(safe-area-inset-bottom));
-      display: grid;
-      grid-template-rows: 34px minmax(0,1fr);
-      gap: 8px;
+      padding: max(6px, env(safe-area-inset-top)) 8px max(6px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100vw;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .student-topline {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 6px;
-      padding-right: 52px;
+      padding-right: 48px;
       color: var(--muted);
       font-size: 12px;
+      font-weight: 700;
+      height: 32px;
+      flex-shrink: 0;
+    }
+    .student-topline .sep {
+      opacity: 0.4;
+      margin: 0 4px;
     }
     .student-topline .timer {
       font-variant-numeric: tabular-nums;
-      font-size: 17px;
-      font-weight: 900;
+      font-size: 18px;
+      font-weight: 1000;
       color: var(--amber);
     }
 
     .student-answer-grid {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 10px;
-      min-height: 0;
+      gap: 8px;
+      box-sizing: border-box;
     }
     .student-answer-grid .answer-tile {
       min-height: 0;
+      height: 100%;
+      width: 100%;
       display: grid;
       place-items: center;
       position: relative;
       overflow: hidden;
+      border-radius: 18px;
+      border: none;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
       cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
     }
     .student-answer-grid .shape,
     .student-answer-grid .answer-status {
@@ -639,9 +775,9 @@
       user-select: none;
     }
     .student-answer-grid .shape {
-      font-size: clamp(68px, 15vw, 130px);
+      font-size: clamp(68px, 16vw, 130px);
       line-height: 1;
-      text-shadow: 0 3px 12px rgba(0,0,0,.2);
+      text-shadow: 0 3px 12px rgba(0,0,0,.25);
     }
     .student-answer-grid .answer-status {
       position: absolute;
@@ -649,9 +785,13 @@
       text-align: center;
       font-size: 13px;
       font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
       opacity: 0;
       transform: translateY(5px);
       transition: .2s;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0,0,0,.6);
     }
     .student-answer-grid.answered .answer-status {
       opacity: 1;
@@ -906,8 +1046,24 @@
 
   <!-- GAME PROJECTION: fullscreen viewport, pure ECG question and answer options -->
   <section id="projection" class="projection-layout hidden" aria-label="Projeção do jogo">
-    <div class="projection-header"><div class="flex items-center gap-3"><div id="roundBadge" class="text-xs font-black text-slate-400">RODADA <b id="roundNumber" class="text-white text-base">1</b><span id="roundTotal"></span></div><div><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span><b id="answerCount">0</b>/<b id="totalStudents">0</b> responderam</span></div><div class="progress-track"><div id="answerProgress" class="progress-fill"></div></div></div><div id="projectionFcBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-emerald-500/50"><span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">FC</span><b id="projectionFcValue" class="text-base font-black font-mono text-lime-300">--</b><span class="text-[10px] text-slate-400 font-semibold">bpm</span></div><div id="projectionExplainBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-amber-500/50 bg-amber-500/10 text-amber-300 font-black"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span class="text-[10px] uppercase tracking-wider">Explicação · Traçado Congelado</span></div></div><h1 class="projection-question">QUE RITMO É ESSE?</h1><div class="flex justify-end mr-12 sm:mr-14"><div id="timerDisc" class="timer-disc"><span id="roundTimer">25</span></div></div></div>
-    <div id="ecgStage" class="ecg-monitor projection-ecg"><canvas id="roundEcgCanvas"></canvas></div>
+    <div class="projection-header"><div class="flex items-center gap-3"><div id="roundBadge" class="text-xs font-black text-slate-400">RODADA <b id="roundNumber" class="text-white text-base">1</b><span id="roundTotal"></span></div><div><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span><b id="answerCount">0</b>/<b id="totalStudents">0</b> responderam</span></div><div class="progress-track"><div id="answerProgress" class="progress-fill"></div></div></div><div id="projectionFcBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-emerald-500/50"><span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">FC</span><b id="projectionFcValue" class="text-base font-black font-mono text-lime-300">--</b><span class="text-[10px] text-slate-400 font-semibold">bpm</span></div><div id="projectionExplainBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-amber-500/50 bg-amber-500/10 text-amber-300 font-black"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span class="text-[10px] uppercase tracking-wider">Explicação · Traçado Congelado</span></div></div><h1 class="projection-question">QUE RITMO É ESSE?</h1><div class="flex justify-end mr-12 sm:mr-14">
+        <div id="timerDisc" class="timer-disc" role="timer" aria-label="Tempo restante">
+          <svg class="timer-ring-svg" viewBox="0 0 88 88" aria-hidden="true">
+            <circle class="timer-ring-bg" cx="44" cy="44" r="38"></circle>
+            <circle id="timerProgressRing" class="timer-ring-progress" cx="44" cy="44" r="38"></circle>
+          </svg>
+          <span id="roundTimer" class="timer-digits">25</span>
+        </div>
+      </div></div>
+    <div id="ecgStage" class="ecg-monitor projection-ecg">
+      <div id="monitorFcBadge" class="hidden monitor-fc-badge">
+        <span class="pulse-dot"></span>
+        <span class="fc-label">FC</span>
+        <b id="monitorFcValue" class="fc-value">--</b>
+        <span class="fc-unit">bpm</span>
+      </div>
+      <canvas id="roundEcgCanvas"></canvas>
+    </div>
     <div id="projectionOptions" class="projection-options"></div>
     <div class="projection-footer" id="projectionFooter"><div class="flex items-center gap-2"><button id="btnPause" class="muted-btn text-xs">⏸ Pausar / Retomar</button><button id="btnReveal" class="muted-btn text-xs">👁 Revelar</button><button id="btnNextFooter" class="muted-btn text-xs">Próximo →</button><button id="btnAddTime" class="muted-btn text-xs">+10 s</button><button id="btnOpenZoom" class="muted-btn text-xs">🔍 Zoom</button><button id="btnThemeProjection" class="muted-btn text-xs">☀️/🌙</button></div><div class="text-[10px] text-slate-500">Arraste sobre o traçado para ampliar · Espaço pausa · Esc fecha zoom</div></div>
   </section>
@@ -960,7 +1116,7 @@
     </form>
   </section>
   <section id="studentLobby" class="hidden fixed inset-0 z-10 grid place-items-center p-6 text-center"><div class="panel p-8 max-w-md w-full"><div id="studentAvatarDisplay" class="text-6xl mb-3">🩺</div><span class="text-xs font-black text-emerald-300">● CONECTADO</span><h1 class="text-3xl font-black mt-3">Aguarde, <span id="studentNameDisplay"></span></h1><div class="mt-6 text-xs text-slate-400">PONTOS <b id="studentScoreLobby" class="text-2xl text-lime-300 block">0</b><span id="studentRankLobby" class="text-sm text-cyan-300">Posição: —</span></div></div></section>
-  <section id="studentGame" class="student-fullscreen hidden"><div class="student-topline"><span>RODADA <b id="studentRound">1</b> · ★ <b id="studentScore">0</b> · <b id="studentRank">#—</b></span><span class="timer" id="studentTimer">25</span></div><div id="studentChoices" class="student-answer-grid"></div><div id="studentWaitMessage" class="hidden absolute inset-0 z-20 grid place-items-center text-center"><div><div class="text-5xl mb-4">🧑‍🏫</div><p class="text-2xl font-black">Professor explicando…</p></div></div></section>
+  <section id="studentGame" class="student-fullscreen hidden"><div class="student-topline"><div>RODADA <b id="studentRound">1</b><span class="sep">·</span>★ <b id="studentScore">0</b> pts</div><span class="timer" id="studentTimer">25</span></div><div id="studentChoices" class="student-answer-grid"></div><div id="studentWaitMessage" class="hidden absolute inset-0 z-20 grid place-items-center text-center"><div><div class="text-5xl mb-4">🧑‍🏫</div><p class="text-2xl font-black">Professor explicando…</p></div></div></section>
   <section id="studentReveal" class="hidden fixed inset-0 z-30 grid place-items-center p-6 text-center"><div class="max-w-lg"><div id="studentRevealIcon" class="text-8xl mb-3">🎉</div><p id="studentRevealTitle" class="text-4xl sm:text-6xl font-black"></p><div id="pointsAnimation" class="text-5xl font-black mt-4 text-white">+0</div><p id="studentRevealName" class="text-2xl font-black mt-6"></p><p id="studentRevealFeature" class="text-sm opacity-80 mt-2"></p><p id="studentStreak" class="text-xl font-black mt-4"></p><p id="studentRevealRank" class="text-lg font-bold mt-4"></p><button id="studentRevealContinue" class="mt-6 px-6 py-3 rounded-xl bg-white/20 font-bold">Continuar aguardando</button></div></section>
   <section id="hostPodium" class="hidden fixed inset-0 z-[25] grid place-items-center p-8 text-center"><div><div class="text-7xl mb-3">🏆</div><p class="section-label">Fim da partida</p><h1 class="text-5xl font-black text-lime-300 mb-8">PÓDIO DA ARENA</h1><div id="podiumPlaces" class="grid sm:grid-cols-3 gap-6 items-end"></div><button id="podiumBack" class="primary mt-8">NOVA SESSÃO</button></div></section>
   <div id="toast" class="toast"></div>
@@ -1103,27 +1259,126 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
     function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
     function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
-    function startRoundForRhythm(id){const rhythm=rhythmById(id);if(!rhythm)return;state.roundNumber++;state.currentRhythm=rhythm;state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));state.answersReceived.clear();state.isRevealed=false;state.roundLocked=false;state.isPaused=false;state.isExplaining=false;state.pauseReasons.clear();state.studentLastChoice=null;state.studentRank=0;state.sampleOffset=0;state.roundStartTime=Date.now();$('revealPanel').classList.add('hidden');updateExplainStateUI(false);if($('btnPause'))$('btnPause').textContent='⏸ Pausar';$('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';$('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');$('answerCount').textContent='0';$('roundTimer').textContent=String(state.roundDuration);$('timerDisc').classList.remove('urgent');document.querySelector('.projection-question').textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
+    function startRoundForRhythm(id){
+      const baseRhythm=rhythmById(id);
+      if(!baseRhythm)return;
+
+      // Sorteia a FC dentro da faixa do ritmo
+      let minRate=60, maxRate=100;
+      if(baseRhythm.id==='sinus'){
+        minRate=45;
+        maxRate=140;
+      }else if(baseRhythm.rateRange&&baseRhythm.rateRange.length===2){
+        minRate=baseRhythm.rateRange[0];
+        maxRate=baseRhythm.rateRange[1];
+      }else if(baseRhythm.defaultRate!=null){
+        minRate=baseRhythm.defaultRate;
+        maxRate=baseRhythm.defaultRate;
+      }
+      const chosenRate=minRate===maxRate?minRate:Math.floor(Math.random()*(maxRate-minRate+1))+minRate;
+
+      // Ajuste o nome conforme a FC quando fizer sentido:
+      // sinusal 60–100, bradicardia sinusal <60, taquicardia sinusal >100
+      let rhythm=baseRhythm;
+      if(['sinus','sinus-brady','sinus-tachy'].includes(baseRhythm.id)){
+        if(chosenRate<60){
+          rhythm=rhythmById('sinus-brady')||rhythm;
+        }else if(chosenRate>100){
+          rhythm=rhythmById('sinus-tachy')||rhythm;
+        }else{
+          rhythm=rhythmById('sinus')||rhythm;
+        }
+      }
+
+      state.chosenRate=chosenRate;
+      state.currentRhythm=rhythm;
+      state.roundNumber++;
+      state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));
+      state.answersReceived.clear();
+      state.isRevealed=false;
+      state.roundLocked=false;
+      state.isPaused=false;
+      state.isExplaining=false;
+      state.pauseReasons.clear();
+      state.studentLastChoice=null;
+      state.studentRank=0;
+      state.sampleOffset=0;
+      state.roundStartTime=Date.now();
+      $('revealPanel').classList.add('hidden');
+      updateExplainStateUI(false);
+      if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
+      $('roundNumber').textContent=String(state.roundNumber);
+      $('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';
+      $('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');
+      $('answerCount').textContent='0';
+      $('roundTimer').textContent=String(state.roundDuration);
+      $('timerDisc').classList.remove('urgent');
+      document.querySelector('.projection-question').textContent=(rhythm.id==='aesp'?'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?':'QUE RITMO É ESSE?');
       const isNoPause=(state.config.explanationPause==='off');
       if($('btnPause'))$('btnPause').classList.toggle('hidden',isNoPause);
       if($('btnOpenZoom'))$('btnOpenZoom').classList.toggle('hidden',isNoPause);
-      const fcBadge=$('projectionFcBadge');
-      if(fcBadge){
-        if(state.config.showBpmDuringQuestion){
-          fcBadge.classList.remove('hidden');
-          let bpmText=rhythm.id==='asystole'?'0':(rhythm.defaultRate?String(rhythm.defaultRate):'—');
-          if($('projectionFcValue'))$('projectionFcValue').textContent=bpmText;
-        }else{
-          fcBadge.classList.add('hidden');
-        }
-      }
-      updateAnswerProgress();initRealEcg(rhythm.id);setProjectionVisible(true);state.roundDeadline=Date.now()+state.roundDuration*1000;
+
+      clearInterval(state.fcIntervalHandle);
+      updateFcBadge();
+      state.fcIntervalHandle=setInterval(updateFcBadge,2000);
+
+      updateAnswerProgress();
+      initRealEcg(rhythm.id,chosenRate);
+      setProjectionVisible(true);
+      state.roundDeadline=Date.now()+state.roundDuration*1000;
       const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
-      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition});startTimer()}
+      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition});
+      startTimer();
+    }
     function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
     function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.isPaused||state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
-    function updateTimerDisplay(){ $('roundTimer').textContent=String(state.timeLeft);$('timerDisc').classList.toggle('urgent',state.timeLeft<=5);$('studentTimer').textContent=String(state.timeLeft)}
+    function updateTimerDisplay(){
+      const t=Math.max(0,state.timeLeft);
+      if($('roundTimer'))$('roundTimer').textContent=String(t);
+      if($('studentTimer'))$('studentTimer').textContent=String(t);
+      const tDisc=$('timerDisc');
+      if(tDisc)tDisc.classList.toggle('urgent',t<=5&&t>0);
+      const ring=$('timerProgressRing');
+      if(ring){
+        const total=state.roundDuration||25;
+        const fraction=total>0?Math.max(0,Math.min(1,t/total)):0;
+        const circumference=238.76;
+        ring.style.strokeDashoffset=String(circumference*(1-fraction));
+        if(t<=5){
+          ring.style.stroke='#ef4444';
+        }else if(t<=10){
+          ring.style.stroke='var(--amber)';
+        }else{
+          ring.style.stroke='var(--lime)';
+        }
+      }
+    }
+    function updateFcBadge(){
+      const show=!!state.config.showBpmDuringQuestion;
+      const badge=$('monitorFcBadge');
+      const projBadge=$('projectionFcBadge');
+      if(badge)badge.classList.toggle('hidden',!show);
+      if(projBadge)projBadge.classList.toggle('hidden',!show);
+      if(!show)return;
+      let bpmText='--';
+      if(state.currentRhythm?.id==='asystole'){
+        bpmText='0';
+      }else if(state.currentRhythm?.id==='vf'){
+        bpmText='---';
+      }else if(ecgEngine){
+        const measured=ecgEngine.measuredBpm();
+        if(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0){
+          bpmText=String(measured);
+        }else if(state.chosenRate){
+          bpmText=String(state.chosenRate);
+        }else if(state.currentRhythm?.defaultRate){
+          bpmText=String(state.currentRhythm.defaultRate);
+        }
+      }
+      if($('monitorFcValue'))$('monitorFcValue').textContent=bpmText;
+      if($('projectionFcValue'))$('projectionFcValue').textContent=bpmText;
+    }
     function updateAnswerProgress(){$('answerCount').textContent=String(state.answersReceived.size);$('totalStudents').textContent=String(state.participants.size);$('answerProgress').style.width=state.participants.size?Math.min(100,state.answersReceived.size/state.participants.size*100)+'%':'0%'}
     function handleRoundEnd(){
       if(state.isRevealed)return;
@@ -1203,7 +1458,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('revealName').textContent=correct.name;
       $('revealFeature').textContent=CLINICAL[correct.id]?.points||'';
       $('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'';
-      $('revealRate').textContent='· '+(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`);
+      $('revealRate').textContent='· '+(correct.id==='asystole'?'FC 0 bpm':(state.chosenRate?`FC ${state.chosenRate} bpm`:(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`)));
       $('revealPanel').classList.remove('hidden');
       $('projectionOptions').querySelectorAll('.answer-tile').forEach(tile=>{
         const c=state.currentChoices.find(x=>x.label===tile.lastElementChild?.textContent);
@@ -1220,7 +1475,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const payload={
           type:'ROUND_REVEAL',
           correctId:correct.id,
-          name:correct.name,
+          name:correct.name+(state.chosenRate?` · FC ${state.chosenRate} bpm`:''),
           feature:CLINICAL[correct.id]?.points||'',
           pointsEarned:r?.points||0,
           totalScore:p.score,
@@ -1287,10 +1542,14 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function showPodium(){clearInterval(state.timerHandle);cancelAnimationFrame(ecgFrame);setProjectionVisible(false);$('revealPanel')?.classList.add('hidden');$('hostPodium').classList.remove('hidden');const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);if(state.config.rankingFrequency==='never'){$('podiumPlaces').innerHTML='<div class="panel p-6 col-span-3 text-center"><div class="text-5xl mb-3">🏁</div><div class="font-black text-2xl">Treinamento Concluído!</div><p class="text-slate-400 mt-2">Parabéns a todos os participantes pela interpretação dos traçados.</p></div>'}else{$('podiumPlaces').innerHTML=[1,0,2].map((rank,index)=>{const p=list[rank];return `<div class="panel p-6 ${rank===0?'border-amber-400 -translate-y-3':''}"><div class="text-5xl">${p?avatarEmoji(p.avatar):['🥈','🥇','🥉'][index]}</div><div class="font-black text-2xl mt-2">${rank===0?'1º':rank===1?'2º':'3º'}</div><p class="font-bold mt-2">${p?escapeHTML(p.name):'—'}</p><p class="text-lime-300 font-black">${p?p.score:0} pts</p></div>`}).join('')}fanfare()}
 
     // REAL ECG WAVEFORM RENDERER (Autêntico do simulador)
-    function initRealEcg(rhythmId){
+    function initRealEcg(rhythmId,chosenRate){
       const rhythm=ECG_CORE.rhythmMap.get(rhythmId);
       if(!rhythm)return;
-      ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,ECG_CORE.defaults(rhythm),Math.random()*1e9|0);
+      const defs=ECG_CORE.defaults(rhythm);
+      if(chosenRate!==undefined&&chosenRate!==null&&rhythm.rateKey){
+        defs[rhythm.rateKey]=chosenRate;
+      }
+      ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,defs,Math.random()*1e9|0);
       ecgEngine.setSignal(1,true);
       
       // Pré-processar ~10 s de sinal (motor a 250 Hz = 2500 amostras) antes de exibir a pergunta
@@ -1485,9 +1744,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
     function handleStudentMessage(msg){if(!msg?.type)return;if(msg.type==='ROUND_QUESTION')showStudentQuestion(msg);else if(msg.type==='ROUND_PAUSE'){state.isPaused=msg.paused;$('studentWaitMessage').classList.toggle('hidden',!msg.paused);if(msg.paused){clearInterval(window.studentTimer)}}else if(msg.type==='ROUND_TIME')$('studentTimer').textContent=String(msg.seconds);else if(msg.type==='ROUND_REVEAL')showStudentReveal(msg);else if(msg.type==='KICK'&&msg.studentId===state.studentId)switchView('viewStudentJoin')}
-    function showStudentQuestion(msg){switchView('studentGame');state.studentLastChoice=null;state.roundLocked=false;state.roundNumber=msg.round;state.timeLeft=msg.seconds;state.studentRank=state.studentPosition;$('studentRound').textContent=String(msg.round);$('studentScore').textContent=String(state.studentScore);
+    function showStudentQuestion(msg){switchView('studentGame');state.studentLastChoice=null;state.roundLocked=false;state.roundNumber=msg.round;state.timeLeft=msg.seconds;$('studentRound').textContent=String(msg.round);$('studentScore').textContent=String(state.studentScore);
       const showPosition=(msg.showPosition!==false);state.showPosition=showPosition;
-      if(showPosition&&state.studentPosition){$('studentRank').textContent='#'+state.studentPosition;$('studentRank').classList.remove('hidden')}else{$('studentRank').textContent='';$('studentRank').classList.add('hidden')}$('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
+      $('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused||state.roundLocked)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
     function showStudentReveal(msg){clearInterval(window.studentTimer);state.studentScore=msg.totalScore;state.studentPosition=msg.rank;state.studentStreak=msg.streak;$('studentWaitMessage')?.classList.add('hidden');$('studentReveal').classList.remove('hidden');const answered=state.studentLastChoice!==null;const correct=answered&&state.studentLastChoice===msg.correctId;const timedOut=!!msg.timeExpired;const bg=timedOut?'#963b20':correct?'#087646':'#a32d3a';$('studentReveal').style.background=bg;$('studentRevealIcon').textContent=timedOut?'⏱️':correct?'🎉':'💡';$('studentRevealTitle').textContent=timedOut?'TEMPO ESGOTADO':correct?'VOCÊ ACERTOU!':'QUASE!';animatePoints(msg.pointsEarned||0);$('studentRevealName').textContent=msg.name;$('studentRevealFeature').textContent=msg.feature;$('studentStreak').textContent=msg.streak>1?'🔥 '+msg.streak+' acertos seguidos':'';const showPos=(msg.showPosition!==false&&state.showPosition!==false);
       if(showPos&&msg.rank){$('studentRevealRank').textContent=`#${msg.rank||'—'} na classificação ${msg.rankDelta>0?'⬆️ subiu '+msg.rankDelta:msg.rankDelta<0?'⬇️ desceu '+Math.abs(msg.rankDelta):''}`;$('studentRevealRank').classList.remove('hidden');$('studentRank').textContent='#'+msg.rank;$('studentRank').classList.remove('hidden')}else{$('studentRevealRank').textContent='';$('studentRevealRank').classList.add('hidden');$('studentRank').textContent='';$('studentRank').classList.add('hidden')}
       $('studentScore').textContent=String(state.studentScore);$('studentScoreLobby').textContent=String(state.studentScore);
