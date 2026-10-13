@@ -770,6 +770,440 @@
     }
 
     /* CONTROLES DO PROFESSOR: BARRA FLUTUANTE COM BOTÕES DE 44PX E ÍCONES */
+    
+    /* ========================================================
+       FORMAS PADRONIZADAS: TODAS BRANCAS COM CONTORNO ESCURO
+       (Inclusive na alternativa amarela)
+       ======================================================== */
+    .shape {
+      color: #ffffff !important;
+      -webkit-text-stroke: 2.2px #0f172a;
+      text-shadow:
+        -1.5px -1.5px 0 #0f172a,
+         1.5px -1.5px 0 #0f172a,
+        -1.5px  1.5px 0 #0f172a,
+         1.5px  1.5px 0 #0f172a,
+         0 2px 4px rgba(0, 0, 0, 0.4);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .answer-yellow .shape {
+      color: #ffffff !important;
+      -webkit-text-stroke: 2.2px #0f172a;
+    }
+
+    /* TILES DAS ALTERNATIVAS NA PROJEÇÃO */
+    .projection-options .answer-tile {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border-radius: 18px;
+      text-align: left;
+      font-size: clamp(16px, 1.35vw, 22px);
+      font-weight: 800;
+      line-height: 1.2;
+      position: relative;
+      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .25s ease, opacity .25s ease, filter .25s ease;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    .projection-options .shape {
+      font-size: clamp(38px, 3.4vw, 56px);
+      line-height: 1;
+    }
+    .answer-tile-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+    .answer-tile-content .answer-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* REVELAÇÃO: CORRETA CRESCE, BRILHA E MOSTRA ✓ */
+    .projection-options .answer-tile.is-correct {
+      transform: scale(1.05) translateY(-4px);
+      z-index: 15;
+      box-shadow: 0 0 0 4px #ffffff, 0 0 35px rgba(52, 211, 153, 0.95), 0 16px 36px rgba(0,0,0,0.5);
+      filter: brightness(1.12);
+      border: 2px solid #34d399;
+      animation: correctGlowPulse 1.6s infinite ease-in-out;
+    }
+    @keyframes correctGlowPulse {
+      0%, 100% { box-shadow: 0 0 0 4px #ffffff, 0 0 32px rgba(52, 211, 153, 0.9), 0 16px 36px rgba(0,0,0,0.5); }
+      50% { box-shadow: 0 0 0 5px #ffffff, 0 0 48px rgba(52, 211, 153, 1), 0 20px 42px rgba(0,0,0,0.6); }
+    }
+
+    /* REVELAÇÃO: DEMAIS ALTERNATIVAS ESMAECEM */
+    .projection-options .answer-tile.is-dimmed {
+      opacity: 0.38 !important;
+      filter: grayscale(0.45) contrast(0.85);
+      transform: scale(0.97);
+    }
+
+    /* BADGES DE REVELAÇÃO DENTRO DAS ALTERNATIVAS */
+    .answer-reveal-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .answer-check-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #059669;
+      font-size: 24px;
+      font-weight: 1000;
+      display: inline-grid;
+      place-items: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      animation: checkmarkPop .35s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    @keyframes checkmarkPop {
+      0% { transform: scale(0); }
+      80% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .answer-vote-pill {
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: clamp(13px, 1.05vw, 16px);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      background: rgba(15, 23, 42, 0.88);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .is-correct .answer-vote-pill {
+      background: rgba(4, 120, 87, 0.95);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+    }
+
+    /* ========================================================
+       PAINEL DE REVELAÇÃO: SUBSTITUI A ÁREA DO TRAÇADO (#ecgStage)
+       NÃO COBRE AS ALTERNATIVAS · FONTES ≥ 22PX
+       ======================================================== */
+    .projection-reveal-panel {
+      position: absolute;
+      inset: 0;
+      z-index: 25;
+      background: rgba(8, 14, 26, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: var(--text);
+      padding: 20px 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      animation: revealFadeIn .25s ease-out;
+    }
+    .theme-light .projection-reveal-panel {
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: inset 0 0 0 1px #ebd0cc;
+    }
+    @keyframes revealFadeIn {
+      from { opacity: 0; transform: scale(.985); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .reveal-inner-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      gap: 14px;
+    }
+    .reveal-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .reveal-title-wrap {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .reveal-badge-tag {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .theme-light .reveal-badge-tag {
+      background: rgba(16, 185, 129, 0.12);
+      color: #047857;
+      border-color: #10b981;
+    }
+    .reveal-rhythm-name {
+      font-size: clamp(26px, 2.4vw, 40px);
+      font-weight: 1000;
+      line-height: 1.1;
+      color: var(--lime);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .reveal-rate-pill {
+      font-size: clamp(16px, 1.2vw, 22px);
+      font-weight: 800;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .reveal-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .reveal-stat-badge {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background: var(--field);
+      border: 1px solid var(--line);
+    }
+    .reveal-stat-badge .stat-lbl {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .reveal-stat-badge .stat-val {
+      font-size: 20px;
+      font-weight: 1000;
+      color: var(--lime);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .btn-reveal-next {
+      height: 44px;
+      padding: 0 22px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+      cursor: pointer;
+      transition: transform .15s, filter .15s;
+    }
+    .btn-reveal-next:hover {
+      transform: translateY(-1px) scale(1.02);
+      filter: brightness(1.1);
+    }
+    .btn-reveal-next:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .reveal-cards-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+    @media (max-width: 1024px) {
+      .reveal-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .reveal-card {
+      display: flex;
+      flex-direction: column;
+      padding: 18px 22px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1.5px solid var(--line-strong);
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .reveal-card-feature {
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(15, 23, 42, 0.65);
+    }
+    .theme-light .reveal-card-feature {
+      background: #ffffff;
+      border-color: #cbd5e1;
+    }
+    .reveal-card-conduct {
+      border-color: rgba(245, 158, 11, 0.45);
+      background: rgba(45, 26, 10, 0.35);
+    }
+    .theme-light .reveal-card-conduct {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+    .reveal-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+    .reveal-card-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+    .reveal-card-title {
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 0;
+      color: var(--muted);
+    }
+    .reveal-card-feature .reveal-card-title {
+      color: #34d399;
+    }
+    .theme-light .reveal-card-feature .reveal-card-title {
+      color: #047857;
+    }
+    .reveal-card-conduct .reveal-card-title {
+      color: #fbbf24;
+    }
+    .theme-light .reveal-card-conduct .reveal-card-title {
+      color: #b45309;
+    }
+
+    /* FONTES ESTRITAMENTE >= 22px */
+    .reveal-body-text {
+      font-size: clamp(22px, 1.45vw, 28px);
+      line-height: 1.42;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+    .reveal-conduct-text {
+      font-size: clamp(22px, 1.45vw, 28px);
+      line-height: 1.42;
+      font-weight: 700;
+      color: #fde047;
+      margin: 0;
+    }
+    .theme-light .reveal-conduct-text {
+      color: #92400e;
+    }
+
+    .reveal-ranking-row {
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .reveal-ranking-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 75px;
+      overflow-y: auto;
+    }
+
+    @media (max-height: 820px) {
+      .projection-reveal-panel {
+        padding: 12px 18px;
+      }
+      .reveal-inner-container {
+        gap: 10px;
+      }
+      .reveal-top-bar {
+        padding-bottom: 8px;
+      }
+      .reveal-card {
+        padding: 12px 16px;
+      }
+      .reveal-body-text, .reveal-conduct-text {
+        font-size: 22px !important;
+        line-height: 1.35;
+      }
+    }
+
+    /* ========================================================
+       BOTÃO PRÓXIMO GRANDE E FIXO NA TELA DE PROJEÇÃO
+       ======================================================== */
+    .projection-btn-next-fixed {
+      position: fixed;
+      bottom: 14px;
+      right: 28px;
+      z-index: 50;
+      height: 52px;
+      min-width: 170px;
+      padding: 0 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
+      user-select: none;
+      animation: pulseButtonNext 2s infinite;
+    }
+    @keyframes pulseButtonNext {
+      0%, 100% { box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.2); }
+      50% { box-shadow: 0 12px 32px rgba(16, 185, 129, 0.75), 0 0 0 2px rgba(255, 255, 255, 0.4); }
+    }
+    .projection-btn-next-fixed:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 14px 36px rgba(16, 185, 129, 0.75);
+    }
+    .projection-btn-next-fixed:active {
+      transform: translateY(1px) scale(0.97);
+    }
+    @media (max-height: 820px) {
+      .projection-btn-next-fixed {
+        bottom: 8px;
+        right: 16px;
+        height: 44px;
+        min-width: 140px;
+        font-size: 16px;
+        padding: 0 20px;
+      }
+    }
+
     .projection-teacher-bar {
       position: fixed;
       bottom: 14px;
@@ -1891,6 +2325,62 @@
         <span class="freeze-strip-desc">Modo Explicação</span>
         <span class="freeze-strip-hint">(Espaço para retomar)</span>
       </div>
+    
+      <!-- PAINEL DE REVELAÇÃO: Substitui a área do traçado na revelação (Fonte ≥ 22px) SEM cobrir as alternativas -->
+      <div id="revealPanel" class="hidden projection-reveal-panel" role="region" aria-label="Gabarito da Rodada">
+        <div class="reveal-inner-container">
+          <!-- Cabeçalho do Gabarito -->
+          <div class="reveal-top-bar">
+            <div class="reveal-title-wrap">
+              <span class="reveal-badge-tag">GABARITO OFICIAL</span>
+              <h2 id="revealName" class="reveal-rhythm-name"></h2>
+              <span id="revealRate" class="reveal-rate-pill"></span>
+            </div>
+            <div class="reveal-top-actions">
+              <div id="revealStatsBadge" class="reveal-stat-badge">
+                <span class="stat-lbl">ACERTO:</span>
+                <b id="revealAccuracyPct" class="stat-val">0%</b>
+              </div>
+              <button id="btnNext" class="btn-reveal-next" type="button" aria-label="Avançar para a próxima rodada (Atalho: N)">
+                Próximo ▶
+              </button>
+            </div>
+          </div>
+
+          <!-- Cards Clínicos: Explicação (Critérios de ECG) + Conduta Imediata com fontes ≥ 22px -->
+          <div class="reveal-cards-grid">
+            <!-- Card 1: Diagnóstico e Critérios (Explicação - Fonte ≥ 22px) -->
+            <div class="reveal-card reveal-card-feature">
+              <div class="reveal-card-header">
+                <span class="reveal-card-icon" aria-hidden="true">📋</span>
+                <h3 class="reveal-card-title">Critérios Diagnósticos no ECG</h3>
+              </div>
+              <div class="reveal-card-body">
+                <p id="revealFeature" class="reveal-body-text"></p>
+              </div>
+            </div>
+
+            <!-- Card 2: Conduta Imediata & Manejo (Fonte ≥ 22px) -->
+            <div class="reveal-card reveal-card-conduct">
+              <div class="reveal-card-header">
+                <span class="reveal-card-icon" aria-hidden="true">⚡</span>
+                <h3 class="reveal-card-title">Conduta Imediata & Manejo</h3>
+              </div>
+              <div class="reveal-card-body">
+                <p id="revealConduct" class="reveal-conduct-text"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranking ao vivo da rodada (quando habilitado nas regras) -->
+          <div id="revealRankingSection" class="reveal-ranking-row hidden">
+            <div class="reveal-ranking-header">
+              <span class="section-label">Top Classificação ao Vivo</span>
+            </div>
+            <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ALTERNATIVAS DO JOGO -->
@@ -1921,11 +2411,16 @@
         ☀️/🌙
       </button>
     </nav>
+    <!-- BOTÃO PRÓXIMO GRANDE E FIXO NA TELA -->
+    <button id="btnNextFixed" class="hidden projection-btn-next-fixed" type="button" aria-label="Avançar para a próxima rodada (Atalho: N)">
+      Próximo ▶
+    </button>
+
   </section>
 
   <!-- Teacher explanation controls -->
   <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnZoomReveal" class="primary px-3 py-2 text-xs font-black shadow-lg">👁 Revelar resposta ▶</button><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
-  <div id="revealPanel" class="hidden fixed z-[35] left-1/2 -translate-x-1/2 bottom-[74px] sm:bottom-[78px] w-[min(1080px,96vw)] panel p-5 sm:p-6 border-emerald-500/40 shadow-2xl"><div class="flex flex-wrap items-center justify-between gap-4"><div class="flex-1 min-w-[240px]"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] uppercase tracking-[.16em] font-black text-emerald-300">Gabarito</span><span id="revealRate" class="text-[10px] text-slate-400"></span></div><h2 id="revealName" class="text-2xl font-black text-lime-300"></h2><p id="revealFeature" class="text-sm text-slate-200 mt-2"></p><p id="revealConduct" class="text-xs text-slate-400 mt-2"></p></div><div id="revealRankingSection" class="min-w-[260px] flex-1"><div class="flex items-center justify-between mb-2"><p class="section-label">Ranking ao vivo</p></div><div id="teacherLeaderboard" class="space-y-1 max-h-40 overflow-auto"></div></div><div class="w-full sm:w-auto flex items-center justify-center shrink-0"><button id="btnNext" class="primary w-full sm:w-auto px-8 py-4 text-lg font-black flex items-center justify-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer">Próximo ▶</button></div></div></div>
+  
 
   <!-- MODAL DE PRÉ-VISUALIZAÇÃO DA PARTIDA -->
   <div id="previewModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
@@ -2134,7 +2629,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     const CHANNEL_PREFIX='ecg-rhythm-room-';
 
     function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
-    function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('globalHeader').classList.remove('hidden');const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
+    function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');$('globalHeader').classList.remove('hidden');const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
     function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
     function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
@@ -2719,12 +3214,13 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.studentRank=0;
       state.sampleOffset=0;
       state.roundStartTime=Date.now();
-      $('revealPanel').classList.add('hidden');
+      $('revealPanel')?.classList.add('hidden');
+      $('btnNextFixed')?.classList.add('hidden');
       updateExplainStateUI(false);
       if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
       $('roundNumber').textContent=String(state.roundNumber);
       $('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';
-      $('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span>${c.label}</span></div>`).join('');
+      $('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><div class="answer-tile-content"><span class="shape">${c.shape}</span><span class="answer-label">${escapeHTML(c.label)}</span></div></div>`).join('');
       $('answerCount').textContent='0';
       $('roundTimer').textContent=String(state.roundDuration);
       $('timerDisc').classList.remove('urgent');
@@ -2870,19 +3366,55 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       });
       updateLeaderboard();
       const resultById=new Map(results.map(r=>[r.p.id,r]));
-      $('revealName').textContent=correct.name;
-      $('revealFeature').textContent=CLINICAL[correct.id]?.points||'';
-      $('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'';
-      $('revealRate').textContent='· '+(correct.id==='asystole'?'FC 0 bpm':(state.chosenRate?`FC ${state.chosenRate} bpm`:(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`)));
-      $('revealPanel').classList.remove('hidden');
-      $('projectionOptions').querySelectorAll('.answer-tile').forEach(tile=>{
-        const c=state.currentChoices.find(x=>x.label===tile.lastElementChild?.textContent);
-        if(c?.id===correct.id)tile.classList.add('ring-4','ring-white');
-        else tile.classList.add('opacity-35','grayscale');
-      });
+      if($('revealName'))$('revealName').textContent=correct.name;
+      if($('revealFeature'))$('revealFeature').textContent=CLINICAL[correct.id]?.points||'Critérios em análise.';
+      if($('revealConduct'))$('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'Manter monitorização e suporte avançado.';
+      if($('revealRate'))$('revealRate').textContent='· '+(correct.id==='asystole'?'FC 0 bpm':(state.chosenRate?`FC ${state.chosenRate} bpm`:(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`)));
+
+      // Exibe o painel de revelação sobre o traçado (não cobre alternativas)
+      if($('revealPanel'))$('revealPanel').classList.remove('hidden');
+      if($('btnNextFixed'))$('btnNextFixed').classList.remove('hidden');
+
+      // Votos e porcentagens
+      const totalVotes=state.answersReceived.size;
       const votes={};
       state.currentChoices.forEach(c=>votes[c.id]=0);
       state.answersReceived.forEach(a=>{if(votes[a.choiceId]!==undefined)votes[a.choiceId]++});
+      const correctVotes=votes[correct.id]||0;
+      const accuracyPct=totalVotes>0?Math.round((correctVotes/totalVotes)*100):0;
+      if($('revealAccuracyPct'))$('revealAccuracyPct').textContent=`${accuracyPct}% (${correctVotes}/${totalVotes})`;
+
+      // A alternativa correta cresce, brilha e mostra ✓; as outras esmaecem e cada uma mostra o nº/% de votos
+      const tiles=$('projectionOptions')?.querySelectorAll('.answer-tile');
+      if(tiles){
+        tiles.forEach((tile,idx)=>{
+          const c=state.currentChoices[idx];
+          if(!c)return;
+          const isCorrect=(c.id===correct.id);
+          const voteCount=votes[c.id]||0;
+          const votePct=totalVotes>0?Math.round((voteCount/totalVotes)*100):0;
+          const voteText=`${voteCount} ${voteCount===1?'voto':'votos'} (${votePct}%)`;
+
+          tile.classList.remove('is-correct','is-dimmed');
+          if(isCorrect){
+            tile.classList.add('is-correct');
+          }else{
+            tile.classList.add('is-dimmed');
+          }
+
+          tile.innerHTML=`
+            <div class="answer-tile-content">
+              <span class="shape">${c.shape}</span>
+              <span class="answer-label">${escapeHTML(c.label)}</span>
+            </div>
+            <div class="answer-reveal-meta">
+              ${isCorrect?'<span class="answer-check-mark" aria-label="Alternativa correta">✓</span>':''}
+              <span class="answer-vote-pill">${voteText}</span>
+            </div>
+          `;
+        });
+      }
+
       for(const [id,p] of state.participants){
         const r=resultById.get(id);
         const rank=r?.rank||0;
@@ -2903,7 +3435,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         };
         sendParticipant(p,payload);
       }
-      fanfare()}
+      fanfare();
+    }
     function loadStoredConfig(){
       try{
         const raw=localStorage.getItem('arena_config');
@@ -2959,6 +3492,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       cancelAnimationFrame(ecgFrame);
       setProjectionVisible(false);
       $('revealPanel')?.classList.add('hidden');
+      $('btnNextFixed')?.classList.add('hidden');
       $('hostPodium')?.classList.remove('hidden');
 
       const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
@@ -3562,6 +4096,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     const handleNext = () => { if (!state.isRevealed) revealRound(); else startNextRound(); };
     if ($('btnNext')) $('btnNext').onclick = handleNext;
     if ($('btnNextFooter')) $('btnNextFooter').onclick = handleNext;
+    if ($('btnNextFixed')) $('btnNextFixed').onclick = handleNext;
     if ($('btnAddTime')) $('btnAddTime').onclick = addTime;
     if ($('btnOpenZoom')) $('btnOpenZoom').onclick = () => { if (!state.isPaused) togglePause('zoom'); openZoom(null); };
     if ($('btnThemeToggle')) $('btnThemeToggle').onclick = toggleTheme;
