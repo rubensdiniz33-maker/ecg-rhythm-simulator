@@ -332,97 +332,244 @@
       background: var(--ecg-bg);
     }
 
+    /* ========================================================
+       TELA DE PROJEÇÃO PREMIUM (#projection)
+       Otimizada para 1920x1080 e 1366x768
+       ======================================================== */
     .projection-layout {
       height: 100dvh;
       width: 100vw;
       position: fixed;
       inset: 0;
       z-index: 5;
-      padding: 14px 24px 12px;
+      padding: 16px 28px 78px 28px;
       display: grid;
-      grid-template-rows: 60px minmax(0,1fr) auto auto;
-      gap: 10px;
+      grid-template-rows: 72px minmax(0, 1fr) auto;
+      gap: 12px;
       background: var(--bg);
       color: var(--text);
       overflow: hidden;
+      box-sizing: border-box;
     }
+
+    @media (max-height: 820px), (max-width: 1400px) {
+      .projection-layout {
+        padding: 10px 18px 70px 18px;
+        grid-template-rows: 60px minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+    }
+
+    /* Cabeçalho limpo, equilibrado e imponente */
     .projection-header {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 12px;
-    }
-    .projection-ecg {
-      min-height: 0;
-      border-radius: 20px;
-      position: relative;
+      gap: 16px;
+      width: 100%;
+      overflow: visible;
       user-select: none;
     }
-    .projection-question {
-      font-size: clamp(28px, 3vw, 50px);
-      font-weight: 1000;
-      letter-spacing: .04em;
-      text-align: center;
-      white-space: nowrap;
-      color: var(--text-title);
-    }
-    .projection-options {
-      display: grid;
-      grid-template-columns: repeat(4,1fr);
-      gap: 12px;
-      min-height: clamp(105px, 18vh, 185px);
-    }
-    .projection-options .answer-tile {
+
+    /* Bloco da Esquerda: Rodada e Respondidos */
+    .projection-header-left {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 12px 18px;
-      text-align: left;
-      font-size: clamp(16px, 1.6vw, 27px);
-    }
-    .projection-options .shape {
-      font-size: clamp(46px, 5vw, 82px);
-      line-height: 1;
-    }
-    .projection-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      min-height: 36px;
-      opacity: 1;
-      transition: opacity .25s;
-    }
-    .projection-layout:hover .projection-footer,
-    .projection-footer:focus-within,
-    .projection-layout.controls-visible .projection-footer {
-      opacity: 1;
+      gap: 14px;
+      justify-content: flex-start;
     }
 
-    .progress-track {
-      height: 5px;
-      background: var(--line);
-      border-radius: 20px;
-      overflow: hidden;
-      width: min(240px, 22vw);
+    .projection-round-badge {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--panel);
+      border: 1.5px solid var(--line-strong);
+      border-radius: 14px;
+      padding: 6px 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      flex-shrink: 0;
     }
-    .progress-fill {
+    .round-prefix {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .round-numbers {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+    .round-current {
+      font-size: 24px;
+      font-weight: 1000;
+      color: var(--text-title);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .round-total {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    @media (max-height: 820px) {
+      .projection-round-badge { padding: 4px 10px; border-radius: 10px; }
+      .round-prefix { font-size: 9px; }
+      .round-current { font-size: 19px; }
+      .round-total { font-size: 11px; }
+    }
+
+    .header-v-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--line);
+      flex-shrink: 0;
+    }
+
+    /* Barra de respondidos com número grande */
+    .projection-answers-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 150px;
+    }
+    .answers-metric-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .answers-big-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+    .answers-count-big {
+      font-size: 28px;
+      font-weight: 1000;
+      color: var(--lime);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1;
+    }
+    .answers-total-sub {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .answers-label-text {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .answers-track-bar {
+      height: 7px;
+      width: 100%;
+      border-radius: 9999px;
+      background: var(--line);
+      overflow: hidden;
+    }
+    .answers-track-bar .progress-fill {
       height: 100%;
       width: 0%;
       background: var(--mint);
-      transition: width .25s;
+      transition: width 0.25s ease;
+    }
+
+    @media (max-height: 820px) {
+      .projection-answers-card { min-width: 120px; }
+      .answers-count-big { font-size: 22px; }
+      .answers-total-sub { font-size: 11px; }
+      .answers-track-bar { height: 5px; }
+    }
+
+    /* Badge opcional de FC discreto */
+    .projection-fc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .fc-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse 1.4s infinite;
+    }
+    .fc-pill-lbl {
+      font-size: 9px;
+      font-weight: 800;
+      color: #6ee7b7;
+      letter-spacing: 0.06em;
+    }
+    .fc-pill-val {
+      font-size: 16px;
+      font-weight: 1000;
+      color: #a7f3d0;
+    }
+    .fc-pill-unit {
+      font-size: 10px;
+      color: #6ee7b7;
+    }
+
+    /* Centro: Pergunta grande, centralizada e limpa */
+    .projection-header-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 8px;
+    }
+    .projection-question {
+      font-size: clamp(24px, 2.3vw, 44px);
+      font-weight: 1000;
+      letter-spacing: 0.02em;
+      text-align: center;
+      white-space: nowrap;
+      color: var(--text-title);
+      margin: 0;
+      line-height: 1;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+    }
+    @media (max-height: 820px) {
+      .projection-question {
+        font-size: clamp(19px, 2.1vw, 29px);
+      }
+    }
+
+    /* Direita: Relógio grande no canto direito sem ser cortado */
+    .projection-header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 4px;
+      overflow: visible;
     }
 
     .timer-disc {
-      width: 78px;
-      height: 78px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       position: relative;
       display: grid;
       place-items: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
       background: var(--panel);
-      border: 2px solid var(--line);
+      border: 3px solid var(--line-strong);
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       user-select: none;
       flex-shrink: 0;
@@ -455,44 +602,288 @@
       transition: stroke-dashoffset 0.12s linear, stroke 0.25s ease;
     }
     .timer-digits {
-      font-size: 32px;
+      font-size: 38px;
       font-weight: 1000;
       line-height: 1;
       font-variant-numeric: tabular-nums;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       color: var(--text-title);
       position: relative;
       z-index: 2;
       transition: color 0.2s ease;
     }
+
     @keyframes timerUrgentPulse {
       0% {
         transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0));
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
       }
       50% {
-        transform: scale(1.15);
-        box-shadow: 0 0 28px 8px rgba(239, 68, 68, 0.95);
+        transform: scale(1.12);
+        filter: drop-shadow(0 0 16px rgba(239, 68, 68, 0.85));
+        box-shadow: 0 0 32px 10px rgba(239, 68, 68, 0.85);
       }
       100% {
         transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0));
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
       }
     }
     .timer-disc.urgent {
-      animation: timerUrgentPulse 0.6s infinite ease-in-out;
-      border-color: #ef4444;
+      animation: timerUrgentPulse 0.55s infinite ease-in-out;
+      border-color: #ef4444 !important;
     }
     .timer-disc.urgent .timer-digits {
-      color: #ef4444;
-      text-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+      color: #ef4444 !important;
+      text-shadow: 0 0 16px rgba(239, 68, 68, 0.8);
     }
     .timer-disc.urgent .timer-ring-progress {
-      stroke: #ef4444;
-      filter: drop-shadow(0 0 6px #ef4444);
+      stroke: #ef4444 !important;
+      filter: drop-shadow(0 0 8px #ef4444);
     }
-    @media (max-width: 768px) {
-      .timer-disc { width: 66px; height: 66px; }
-      .timer-digits { font-size: 25px; }
+
+    @media (max-height: 820px) {
+      .timer-disc { width: 74px; height: 74px; border-width: 2.5px; }
+      .timer-digits { font-size: 30px; }
+    }
+
+    /* MONITOR DE ECG (#ecgStage) */
+    .projection-ecg {
+      min-height: 0;
+      border-radius: 20px;
+      position: relative;
+      user-select: none;
+      box-shadow: 0 0 50px var(--monitor-glow);
+      overflow: hidden;
+    }
+
+    /* Faixa discreta de pausa embaixo do monitor */
+    .projection-freeze-strip {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55), 0 0 16px rgba(245, 158, 11, 0.2);
+      z-index: 10;
+      pointer-events: none;
+      animation: freezeStripPulse 2s infinite ease-in-out;
+      white-space: nowrap;
+    }
+    .theme-light .projection-freeze-strip {
+      background: rgba(254, 243, 199, 0.95);
+      border-color: #f59e0b;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.22);
+    }
+    .freeze-strip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+      animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .freeze-strip-title {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fde68a;
+    }
+    .theme-light .freeze-strip-title {
+      color: #92400e;
+    }
+    .freeze-strip-sep {
+      color: rgba(245, 158, 11, 0.6);
+      font-weight: 800;
+    }
+    .freeze-strip-desc {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fcd34d;
+    }
+    .theme-light .freeze-strip-desc {
+      color: #b45309;
+    }
+    .freeze-strip-hint {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-left: 2px;
+    }
+    .theme-light .freeze-strip-hint {
+      color: #78350f;
+    }
+    @keyframes freezeStripPulse {
+      0%, 100% { opacity: 0.95; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
+    }
+
+    /* Alternativas do jogo (4 botões em grade de 4 colunas) */
+    .projection-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      min-height: 120px;
+      max-height: 165px;
+    }
+    .projection-options .answer-tile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border-radius: 16px;
+      text-align: left;
+      font-size: clamp(16px, 1.4vw, 24px);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .projection-options .shape {
+      font-size: clamp(40px, 4vw, 68px);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    @media (max-height: 820px) {
+      .projection-options {
+        gap: 8px;
+        min-height: 96px;
+        max-height: 125px;
+      }
+      .projection-options .answer-tile {
+        padding: 8px 12px;
+        gap: 10px;
+        font-size: 16px;
+      }
+      .projection-options .shape {
+        font-size: 36px;
+      }
+    }
+
+    /* CONTROLES DO PROFESSOR: BARRA FLUTUANTE COM BOTÕES DE 44PX E ÍCONES */
+    .projection-teacher-bar {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      user-select: none;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .theme-light .projection-teacher-bar {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: #cbd5e1;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+    @media (max-height: 820px) {
+      .projection-teacher-bar {
+        bottom: 8px;
+        padding: 4px 8px;
+        gap: 6px;
+      }
+    }
+
+    .teacher-ctrl-btn {
+      height: 44px;
+      min-width: 44px;
+      padding: 0 14px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text);
+      background: var(--field);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+    .teacher-ctrl-btn:hover {
+      background: var(--btn-hover, rgba(255, 255, 255, 0.14));
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+    .teacher-ctrl-btn:active {
+      transform: translateY(1px) scale(0.97);
+    }
+    .teacher-ctrl-btn.icon-btn {
+      padding: 0;
+      width: 44px;
+      min-width: 44px;
+      font-size: 17px;
+    }
+    .teacher-btn-pause {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+    }
+    .teacher-btn-pause:hover {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: rgba(245, 158, 11, 0.55);
+    }
+    .theme-light .teacher-btn-pause {
+      background: rgba(245, 158, 11, 0.15);
+      color: #b45309;
+    }
+    .teacher-btn-reveal {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .teacher-btn-reveal:hover {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: rgba(16, 185, 129, 0.55);
+    }
+    .theme-light .teacher-btn-reveal {
+      background: rgba(16, 185, 129, 0.15);
+      color: #047857;
+    }
+    .teacher-btn-next {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.35);
+      color: #60a5fa;
+    }
+    .teacher-btn-next:hover {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: rgba(59, 130, 246, 0.55);
+    }
+    .theme-light .teacher-btn-next {
+      background: rgba(59, 130, 246, 0.15);
+      color: #1d4ed8;
+    }
+    .teacher-bar-divider {
+      width: 1px;
+      height: 26px;
+      background: var(--line);
+      margin: 0 2px;
+      flex-shrink: 0;
     }
 
     .monitor-fc-badge {
@@ -1427,7 +1818,51 @@
 
   <!-- GAME PROJECTION: fullscreen viewport, pure ECG question and answer options -->
   <section id="projection" class="projection-layout hidden" aria-label="Projeção do jogo">
-    <div class="projection-header"><div class="flex items-center gap-3"><div id="roundBadge" class="text-xs font-black text-slate-400">RODADA <b id="roundNumber" class="text-white text-base">1</b><span id="roundTotal"></span></div><div><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span><b id="answerCount">0</b>/<b id="totalStudents">0</b> responderam</span></div><div class="progress-track"><div id="answerProgress" class="progress-fill"></div></div></div><div id="projectionFcBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-emerald-500/50"><span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">FC</span><b id="projectionFcValue" class="text-base font-black font-mono text-lime-300">--</b><span class="text-[10px] text-slate-400 font-semibold">bpm</span></div><div id="projectionExplainBadge" class="hidden flex items-center gap-1.5 px-3 py-1 rounded-xl shadow-md panel border-amber-500/50 bg-amber-500/10 text-amber-300 font-black"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span class="text-[10px] uppercase tracking-wider">Explicação · Traçado Congelado</span></div></div><h1 class="projection-question">QUE RITMO É ESSE?</h1><div class="flex justify-end mr-12 sm:mr-14">
+    <!-- CABEÇALHO LIMPO E GRANDE -->
+    <header class="projection-header">
+      <!-- Esquerda: Rodada em destaque e Barra de respondidos com número grande -->
+      <div class="projection-header-left">
+        <!-- Rodada em destaque -->
+        <div id="roundBadge" class="projection-round-badge">
+          <span class="round-prefix">RODADA</span>
+          <div class="round-numbers">
+            <span id="roundNumber" class="round-current">1</span>
+            <span id="roundTotal" class="round-total"></span>
+          </div>
+        </div>
+
+        <div class="header-v-divider" aria-hidden="true"></div>
+
+        <!-- Barra de respondidos com número grande -->
+        <div class="projection-answers-card">
+          <div class="answers-metric-row">
+            <div class="answers-big-wrap">
+              <b id="answerCount" class="answers-count-big">0</b>
+              <span class="answers-total-sub">/<b id="totalStudents">0</b></span>
+            </div>
+            <span class="answers-label-text">respostas</span>
+          </div>
+          <div class="progress-track answers-track-bar">
+            <div id="answerProgress" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Badge de FC discreto quando habilitado nas configurações -->
+        <div id="projectionFcBadge" class="hidden projection-fc-pill">
+          <span class="fc-pill-dot"></span>
+          <span class="fc-pill-lbl">FC</span>
+          <b id="projectionFcValue" class="fc-pill-val">--</b>
+          <span class="fc-pill-unit">bpm</span>
+        </div>
+      </div>
+
+      <!-- Centro: Pergunta grande, limpa e centralizada -->
+      <div class="projection-header-center">
+        <h1 class="projection-question">QUE RITMO É ESSE?</h1>
+      </div>
+
+      <!-- Direita: Relógio grande no canto direito sem ser cortado -->
+      <div class="projection-header-right">
         <div id="timerDisc" class="timer-disc" role="timer" aria-label="Tempo restante">
           <svg class="timer-ring-svg" viewBox="0 0 88 88" aria-hidden="true">
             <circle class="timer-ring-bg" cx="44" cy="44" r="38"></circle>
@@ -1435,7 +1870,10 @@
           </svg>
           <span id="roundTimer" class="timer-digits">25</span>
         </div>
-      </div></div>
+      </div>
+    </header>
+
+    <!-- MONITOR DE ECG (Auto-ganho ~35% QRS, grade 14-16px, 3-4px linha) -->
     <div id="ecgStage" class="ecg-monitor projection-ecg">
       <div id="monitorFcBadge" class="hidden monitor-fc-badge">
         <span class="pulse-dot"></span>
@@ -1444,14 +1882,50 @@
         <span class="fc-unit">bpm</span>
       </div>
       <canvas id="roundEcgCanvas"></canvas>
+
+      <!-- Pausa: Faixa discreta embaixo do monitor, sem espremer o título -->
+      <div id="projectionExplainBadge" class="hidden projection-freeze-strip" role="status" aria-live="polite">
+        <span class="freeze-strip-dot"></span>
+        <span class="freeze-strip-title">Traçado Congelado</span>
+        <span class="freeze-strip-sep">·</span>
+        <span class="freeze-strip-desc">Modo Explicação</span>
+        <span class="freeze-strip-hint">(Espaço para retomar)</span>
+      </div>
     </div>
+
+    <!-- ALTERNATIVAS DO JOGO -->
     <div id="projectionOptions" class="projection-options"></div>
-    <div class="projection-footer" id="projectionFooter"><div class="flex items-center gap-2"><button id="btnPause" class="muted-btn text-xs">⏸ Pausar / Retomar</button><button id="btnReveal" class="muted-btn text-xs">👁 Revelar</button><button id="btnNextFooter" class="muted-btn text-xs">Próximo →</button><button id="btnAddTime" class="muted-btn text-xs">+10 s</button><button id="btnOpenZoom" type="button" class="muted-btn text-xs">🔍 Zoom</button><button id="btnToggleSoundProjection" type="button" class="muted-btn text-xs" title="Alternar som">🔊</button><button id="btnThemeProjection" type="button" class="muted-btn text-xs">☀️/🌙</button></div><div class="text-[10px] text-slate-500">Arraste sobre o traçado para ampliar · Espaço pausa · Esc fecha zoom</div></div>
+
+    <!-- CONTROLES DO PROFESSOR EM BARRA FLUTUANTE COM BOTÕES DE 44PX E ÍCONES -->
+    <nav class="projection-teacher-bar" id="projectionFooter" aria-label="Controles do professor">
+      <button id="btnPause" type="button" class="teacher-ctrl-btn teacher-btn-pause" title="Pausar / Retomar traçado e tempo (Atalho: Espaço)">
+        ⏸ Pausar
+      </button>
+      <button id="btnReveal" type="button" class="teacher-ctrl-btn teacher-btn-reveal" title="Revelar resposta e gabarito imediato">
+        👁 Revelar
+      </button>
+      <button id="btnNextFooter" type="button" class="teacher-ctrl-btn teacher-btn-next" title="Avançar para a próxima rodada (Atalho: N)">
+        Próximo →
+      </button>
+      <div class="teacher-bar-divider" aria-hidden="true"></div>
+      <button id="btnAddTime" type="button" class="teacher-ctrl-btn icon-btn" title="Adicionar +10 segundos ao cronômetro">
+        +10s
+      </button>
+      <button id="btnOpenZoom" type="button" class="teacher-ctrl-btn icon-btn" title="Abrir zoom com compasso e régua (Atalho: arrastar no monitor)">
+        🔍
+      </button>
+      <button id="btnToggleSoundProjection" type="button" class="teacher-ctrl-btn icon-btn" title="Alternar som">
+        🔊
+      </button>
+      <button id="btnThemeProjection" type="button" class="teacher-ctrl-btn icon-btn" title="Alternar tema claro / escuro">
+        ☀️/🌙
+      </button>
+    </nav>
   </section>
 
   <!-- Teacher explanation controls -->
   <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnZoomReveal" class="primary px-3 py-2 text-xs font-black shadow-lg">👁 Revelar resposta ▶</button><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
-  <div id="revealPanel" class="hidden fixed z-20 left-1/2 -translate-x-1/2 bottom-4 w-[min(1080px,96vw)] panel p-5 sm:p-6 border-emerald-500/40 shadow-2xl"><div class="flex flex-wrap items-center justify-between gap-4"><div class="flex-1 min-w-[240px]"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] uppercase tracking-[.16em] font-black text-emerald-300">Gabarito</span><span id="revealRate" class="text-[10px] text-slate-400"></span></div><h2 id="revealName" class="text-2xl font-black text-lime-300"></h2><p id="revealFeature" class="text-sm text-slate-200 mt-2"></p><p id="revealConduct" class="text-xs text-slate-400 mt-2"></p></div><div id="revealRankingSection" class="min-w-[260px] flex-1"><div class="flex items-center justify-between mb-2"><p class="section-label">Ranking ao vivo</p></div><div id="teacherLeaderboard" class="space-y-1 max-h-40 overflow-auto"></div></div><div class="w-full sm:w-auto flex items-center justify-center shrink-0"><button id="btnNext" class="primary w-full sm:w-auto px-8 py-4 text-lg font-black flex items-center justify-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer">Próximo ▶</button></div></div></div>
+  <div id="revealPanel" class="hidden fixed z-[35] left-1/2 -translate-x-1/2 bottom-[74px] sm:bottom-[78px] w-[min(1080px,96vw)] panel p-5 sm:p-6 border-emerald-500/40 shadow-2xl"><div class="flex flex-wrap items-center justify-between gap-4"><div class="flex-1 min-w-[240px]"><div class="flex items-center gap-2 mb-2"><span class="text-[10px] uppercase tracking-[.16em] font-black text-emerald-300">Gabarito</span><span id="revealRate" class="text-[10px] text-slate-400"></span></div><h2 id="revealName" class="text-2xl font-black text-lime-300"></h2><p id="revealFeature" class="text-sm text-slate-200 mt-2"></p><p id="revealConduct" class="text-xs text-slate-400 mt-2"></p></div><div id="revealRankingSection" class="min-w-[260px] flex-1"><div class="flex items-center justify-between mb-2"><p class="section-label">Ranking ao vivo</p></div><div id="teacherLeaderboard" class="space-y-1 max-h-40 overflow-auto"></div></div><div class="w-full sm:w-auto flex items-center justify-center shrink-0"><button id="btnNext" class="primary w-full sm:w-auto px-8 py-4 text-lg font-black flex items-center justify-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition cursor-pointer">Próximo ▶</button></div></div></div>
 
   <!-- MODAL DE PRÉ-VISUALIZAÇÃO DA PARTIDA -->
   <div id="previewModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
@@ -2594,14 +3068,14 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,defs,Math.random()*1e9|0);
       ecgEngine.setSignal(1,true);
       
-      // Pré-processar ~10 s de sinal (motor a 250 Hz = 2500 amostras) antes de exibir a pergunta
-      const targetSeconds=Math.max(10,Math.ceil((window.innerWidth||1920)/250)+1);
+      // Pré-processar ~12 s de sinal (motor a 250 Hz = 3000 amostras) para garantir monitor 100% preenchido sem faixas vazias
+      const targetSeconds=12;
       const preSteps=Math.round(targetSeconds/0.04);
       const chunks=[];
       let totalSamples=0;
       for(let i=0;i<preSteps;i++){
         const s=ecgEngine.advance(0.04);
-        if(s.length>0){chunks.push(s);totalSamples+=s.length}
+        if(s.length>0){chunks.push(s);totalSamples+=s.length;}
       }
       const initialSamples=new Float32Array(totalSamples);
       let offset=0;
@@ -2609,6 +3083,22 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         initialSamples.set(chunk,offset);
         offset+=chunk.length;
       }
+
+      // Auto-ganho do traçado: mede a amplitude peak-to-peak do ritmo para padronizar ~35% da altura
+      let minS=Infinity, maxS=-Infinity;
+      for(let i=0;i<initialSamples.length;i++){
+        const v=initialSamples[i];
+        if(v<minS)minS=v;
+        if(v>maxS)maxS=v;
+      }
+      const p2p=maxS-minS;
+      state.ecgGain={
+        min: minS,
+        max: maxS,
+        p2p: p2p,
+        midVal: (maxS+minS)/2
+      };
+
       state.currentSamples=initialSamples;
       state.sampleOffset=totalSamples;
       frameLast=0;
@@ -2638,7 +3128,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function ecgPalette(){
       return state.theme==='light'
         ? { bg: '#fff3f1', small: '#f7c8c6', large: '#ec8c89', trace: '#111111' }
-        : { bg: '#020806', small: 'rgba(22,185,129,.08)', large: 'rgba(22,185,129,.23)', trace: '#54e7a8' };
+        : { bg: '#020806', small: 'rgba(22,185,129,.10)', large: 'rgba(22,185,129,.28)', trace: '#54e7a8' };
     }
     function drawEcgFrame(){
       const canvas=$('roundEcgCanvas');
@@ -2646,34 +3136,76 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const rect=canvas.getBoundingClientRect();
       if(!rect.width||!rect.height)return;
       const dpr=Math.min(2,devicePixelRatio||1),w=Math.floor(rect.width),h=Math.floor(rect.height);
-      if(canvas.width!==w*dpr||canvas.height!==h*dpr){canvas.width=w*dpr;canvas.height=h*dpr}
+      if(canvas.width!==w*dpr||canvas.height!==h*dpr){canvas.width=w*dpr;canvas.height=h*dpr;}
       const ctx=canvas.getContext('2d');
       ctx.setTransform(dpr,0,0,dpr,0,0);
       const colors=ecgPalette();
       ctx.fillStyle=colors.bg;
       ctx.fillRect(0,0,w,h);
-      for(const [step,color,width] of [[10,colors.small,1],[50,colors.large,1.2]]){
-        ctx.strokeStyle=color;ctx.lineWidth=width;
-        for(let x=0;x<w;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
-        for(let y=0;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
-      }
+
+      // Grade maior e precisa (1 mm ≈ 14–16 px)
+      // Em telas 1080p (w >= 1600): 15 px/mm (5 mm = 75 px)
+      // Em telas 768p (w < 1600): 14 px/mm (5 mm = 70 px)
+      const mm=(w>=1600)?15:14;
+      const stepSmall=mm;
+      const stepLarge=mm*5;
+
+      // Grade fina (1 mm)
+      ctx.strokeStyle=colors.small;
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      for(let x=0;x<=w;x+=stepSmall){ctx.moveTo(x,0);ctx.lineTo(x,h);}
+      for(let y=0;y<=h;y+=stepSmall){ctx.moveTo(0,y);ctx.lineTo(w,y);}
+      ctx.stroke();
+
+      // Grade grossa (5 mm)
+      ctx.strokeStyle=colors.large;
+      ctx.lineWidth=1.4;
+      ctx.beginPath();
+      for(let x=0;x<=w;x+=stepLarge){ctx.moveTo(x,0);ctx.lineTo(x,h);}
+      for(let y=0;y<=h;y+=stepLarge){ctx.moveTo(0,y);ctx.lineTo(w,y);}
+      ctx.stroke();
+
       const data=state.currentSamples;
-      // Janela de tempo fixa: 25 mm/s com grade de 10 px/mm = 250 px/s
-      // Como o motor roda a 250 Hz, 1 amostra = 1 pixel (sem esticar)
-      const start=data.length-w;
-      const scale=Math.min(h*.42,100);
-      const baseline=h*.52;
+      const dataLen=data.length;
+      if(dataLen<2)return;
+
+      // Auto-ganho do traçado: o QRS deve ocupar ~35% da altura do monitor
+      const targetQrsHeight=h*0.35;
+      const effectiveP2P=(state.ecgGain&&state.ecgGain.p2p>=0.25)?state.ecgGain.p2p:1.30;
+      const midVal=(state.ecgGain&&state.ecgGain.p2p>=0.25)?state.ecgGain.midVal:0;
+      const scale=targetQrsHeight/effectiveP2P;
+      const baseline=(h*0.50)+(midVal*scale);
+
+      // Velocidade do papel padrão: 25 mm/s com grade de mm px/mm
+      // O motor roda a 250 Hz (250 amostras/s) => amostras por pixel = 250 / (25 * mm) = 10 / mm
+      // Janela temporal visível mostra ~5–6 batimentos em ritmo sinusal
+      const samplesPerPx=10/mm;
+      const lastIdx=dataLen-1;
+
       ctx.beginPath();
       ctx.strokeStyle=colors.trace;
-      ctx.lineWidth=state.theme==='light'?2.6:2.8;
-      ctx.shadowColor=state.theme==='light'?'transparent':'#54e7a8';
-      ctx.shadowBlur=state.theme==='light'?0:8;
+      ctx.lineWidth=state.theme==='light'?3.2:3.5;
+      ctx.lineCap='round';
+      ctx.lineJoin='round';
+      ctx.shadowColor=state.theme==='light'?'transparent':'rgba(84,231,168,.45)';
+      ctx.shadowBlur=state.theme==='light'?0:5;
+
       let started=false;
       for(let x=0;x<w;x++){
-        const idx=start+x;
-        if(idx<0)continue;
-        const y=baseline-data[idx]*scale;
-        if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y);
+        const samplePos=lastIdx-(w-1-x)*samplesPerPx;
+        let val;
+        if(samplePos<=0){
+          val=data[0];
+        }else if(samplePos>=lastIdx){
+          val=data[lastIdx];
+        }else{
+          const i0=Math.floor(samplePos);
+          const frac=samplePos-i0;
+          val=data[i0]*(1-frac)+data[i0+1]*frac;
+        }
+        const y=baseline-val*scale;
+        if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
       }
       ctx.stroke();
       ctx.shadowBlur=0;
