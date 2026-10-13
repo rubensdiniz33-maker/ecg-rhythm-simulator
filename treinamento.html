@@ -1420,7 +1420,7 @@
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-3"><div class="flex items-center gap-3"><span class="status-dot"></span><span id="hostNetBadge" class="text-sm font-bold">Abrindo sala...</span></div><div class="flex gap-2"><button id="btnThemeToggle" class="muted-btn text-xs">☀️ Claro</button><button id="btnFullscreen" class="muted-btn text-xs">⛶ Projeção</button><button id="btnLeaveHost" class="muted-btn text-xs text-rose-300">Encerrar</button></div></div>
+      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-3"><div class="flex items-center gap-3"><span class="status-dot"></span><span id="hostNetBadge" class="text-sm font-bold">Abrindo sala...</span></div><div class="flex gap-2"><button id="btnToggleSound" type="button" class="muted-btn text-xs" title="Alternar som">🔊 Som</button><button id="btnThemeToggle" type="button" class="muted-btn text-xs">☀️ Claro</button><button id="btnFullscreen" type="button" class="muted-btn text-xs">⛶ Projeção</button><button id="btnLeaveHost" type="button" class="muted-btn text-xs text-rose-300">Encerrar</button></div></div>
       <div id="hostLobby" class="grid lg:grid-cols-[350px_1fr] gap-5 my-auto"><div class="panel p-6 text-center"><p class="section-label mb-3">Escaneie para entrar</p><div id="qrCodeContainer" class="mx-auto w-[280px] h-[280px] bg-white p-3 rounded-2xl flex items-center justify-center"></div><p class="text-xs text-slate-400 mt-4">PIN DA SALA</p><div id="hostPinDisplay" class="font-black tracking-[.22em] text-5xl mt-1 font-mono" style="color:var(--lime)">------</div><div class="flex justify-center gap-2 mt-4"><button id="btnCopyPin" class="muted-btn text-xs">Copiar PIN</button><button id="btnCopyLink" class="muted-btn text-xs">Copiar link</button></div><p class="text-[10px] text-slate-500 mt-2 break-all" id="hostDirectUrl"></p></div><div class="panel p-6 flex flex-col min-h-[440px]"><div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4"><div><h2 class="text-xl font-black">Participantes ao vivo</h2><p class="text-xs text-slate-400 mt-1">Acompanhe as entradas e o ranking atualizado.</p></div><span id="participantCount" class="px-3 py-1 rounded-full bg-slate-800 text-lime-300 text-sm font-black">0</span></div><div id="participantsEmpty" class="m-auto text-center py-12"><div class="text-5xl mb-4">📡</div><p class="font-bold">Aguardando a turma</p></div><div id="participantsList" class="hidden grid sm:grid-cols-2 xl:grid-cols-3 gap-3 scroll-list"></div><div class="mt-auto pt-5 border-t border-slate-800 flex items-center justify-between gap-3"><p id="hostGameSummary" class="text-xs text-slate-400"></p><button id="btnStartGame" class="primary">INICIAR PARTIDA ▶</button></div></div></div>
     </section>
   </main>
@@ -1446,7 +1446,7 @@
       <canvas id="roundEcgCanvas"></canvas>
     </div>
     <div id="projectionOptions" class="projection-options"></div>
-    <div class="projection-footer" id="projectionFooter"><div class="flex items-center gap-2"><button id="btnPause" class="muted-btn text-xs">⏸ Pausar / Retomar</button><button id="btnReveal" class="muted-btn text-xs">👁 Revelar</button><button id="btnNextFooter" class="muted-btn text-xs">Próximo →</button><button id="btnAddTime" class="muted-btn text-xs">+10 s</button><button id="btnOpenZoom" class="muted-btn text-xs">🔍 Zoom</button><button id="btnThemeProjection" class="muted-btn text-xs">☀️/🌙</button></div><div class="text-[10px] text-slate-500">Arraste sobre o traçado para ampliar · Espaço pausa · Esc fecha zoom</div></div>
+    <div class="projection-footer" id="projectionFooter"><div class="flex items-center gap-2"><button id="btnPause" class="muted-btn text-xs">⏸ Pausar / Retomar</button><button id="btnReveal" class="muted-btn text-xs">👁 Revelar</button><button id="btnNextFooter" class="muted-btn text-xs">Próximo →</button><button id="btnAddTime" class="muted-btn text-xs">+10 s</button><button id="btnOpenZoom" type="button" class="muted-btn text-xs">🔍 Zoom</button><button id="btnToggleSoundProjection" type="button" class="muted-btn text-xs" title="Alternar som">🔊</button><button id="btnThemeProjection" type="button" class="muted-btn text-xs">☀️/🌙</button></div><div class="text-[10px] text-slate-500">Arraste sobre o traçado para ampliar · Espaço pausa · Esc fecha zoom</div></div>
   </section>
 
   <!-- Teacher explanation controls -->
@@ -1566,9 +1566,9 @@
     </form>
   </section>
   <section id="studentLobby" class="hidden fixed inset-0 z-10 grid place-items-center p-6 text-center"><div class="panel p-8 max-w-md w-full"><div id="studentAvatarDisplay" class="text-6xl mb-3">🩺</div><span class="text-xs font-black text-emerald-300">● CONECTADO</span><h1 class="text-3xl font-black mt-3">Aguarde, <span id="studentNameDisplay"></span></h1><div class="mt-6 text-xs text-slate-400">PONTOS <b id="studentScoreLobby" class="text-2xl text-lime-300 block">0</b><span id="studentRankLobby" class="text-sm text-cyan-300">Posição: —</span></div></div></section>
-  <section id="studentGame" class="student-fullscreen hidden"><div class="student-topline"><div>RODADA <b id="studentRound">1</b><span class="sep">·</span>★ <b id="studentScore">0</b> pts</div><span class="timer" id="studentTimer">25</span></div><div id="studentChoices" class="student-answer-grid"></div><div id="studentWaitMessage" class="hidden absolute inset-0 z-20 grid place-items-center text-center"><div><div class="text-5xl mb-4">🧑‍🏫</div><p class="text-2xl font-black">Professor explicando…</p></div></div></section>
+  <section id="studentGame" class="student-fullscreen hidden"><div class="student-topline"><div>RODADA <b id="studentRound">1</b><span class="sep">·</span>★ <b id="studentScore">0</b> pts<span id="studentRank" class="hidden ml-2 text-cyan-300 font-bold"></span></div><span class="timer" id="studentTimer">25</span></div><div id="studentChoices" class="student-answer-grid"></div><div id="studentWaitMessage" class="hidden absolute inset-0 z-20 grid place-items-center text-center"><div><div class="text-5xl mb-4">🧑‍🏫</div><p class="text-2xl font-black">Professor explicando…</p></div></div></section>
   <section id="studentReveal" class="hidden fixed inset-0 z-30 grid place-items-center p-6 text-center"><div class="max-w-lg"><div id="studentRevealIcon" class="text-8xl mb-3">🎉</div><p id="studentRevealTitle" class="text-4xl sm:text-6xl font-black"></p><div id="pointsAnimation" class="text-5xl font-black mt-4 text-white">+0</div><p id="studentRevealName" class="text-2xl font-black mt-6"></p><p id="studentRevealFeature" class="text-sm opacity-80 mt-2"></p><p id="studentStreak" class="text-xl font-black mt-4"></p><p id="studentRevealRank" class="text-lg font-bold mt-4"></p><button id="studentRevealContinue" class="mt-6 px-6 py-3 rounded-xl bg-white/20 font-bold">Continuar aguardando</button></div></section>
-  <section id="hostPodium" class="hidden fixed inset-0 z-[25] grid place-items-center p-8 text-center"><div><div class="text-7xl mb-3">🏆</div><p class="section-label">Fim da partida</p><h1 class="text-5xl font-black text-lime-300 mb-8">PÓDIO DA ARENA</h1><div id="podiumPlaces" class="grid sm:grid-cols-3 gap-6 items-end"></div><button id="podiumBack" class="primary mt-8">NOVA SESSÃO</button></div></section>
+  <section id="hostPodium" class="hidden fixed inset-0 z-[25] grid place-items-center p-8 text-center"><div><div class="text-7xl mb-3">🏆</div><p class="section-label">Fim da partida</p><h1 class="text-5xl font-black text-lime-300 mb-8">PÓDIO DA ARENA</h1><div id="podiumPlaces" class="grid sm:grid-cols-3 gap-6 items-end"></div><div class="flex items-center justify-center gap-4 mt-8 flex-wrap"><button id="btnPodiumRestart" type="button" class="primary">Nova sessão</button><button id="podiumBack" type="button" class="muted-btn">Início</button></div></div></section>
   <div id="toast" class="toast"></div>
 
   <script>
@@ -2609,6 +2609,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function setupZoomSelection(){
       const stage = $('ecgStage');
+      if (!stage) return;
       let start = null, rectEl = null;
       stage.addEventListener('pointerdown', e => {
         if (!state.projection || e.button !== 0) return;
@@ -2665,7 +2666,25 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const showPosition=(msg.showPosition!==false);state.showPosition=showPosition;
       $('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused||state.roundLocked)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
     function showStudentReveal(msg){clearInterval(window.studentTimer);state.studentScore=msg.totalScore;state.studentPosition=msg.rank;state.studentStreak=msg.streak;$('studentWaitMessage')?.classList.add('hidden');$('studentReveal').classList.remove('hidden');const answered=state.studentLastChoice!==null;const correct=answered&&state.studentLastChoice===msg.correctId;const timedOut=!!msg.timeExpired;const bg=timedOut?'#963b20':correct?'#087646':'#a32d3a';$('studentReveal').style.background=bg;$('studentRevealIcon').textContent=timedOut?'⏱️':correct?'🎉':'💡';$('studentRevealTitle').textContent=timedOut?'TEMPO ESGOTADO':correct?'VOCÊ ACERTOU!':'QUASE!';animatePoints(msg.pointsEarned||0);$('studentRevealName').textContent=msg.name;$('studentRevealFeature').textContent=msg.feature;$('studentStreak').textContent=msg.streak>1?'🔥 '+msg.streak+' acertos seguidos':'';const showPos=(msg.showPosition!==false&&state.showPosition!==false);
-      if(showPos&&msg.rank){$('studentRevealRank').textContent=`#${msg.rank||'—'} na classificação ${msg.rankDelta>0?'⬆️ subiu '+msg.rankDelta:msg.rankDelta<0?'⬇️ desceu '+Math.abs(msg.rankDelta):''}`;$('studentRevealRank').classList.remove('hidden');$('studentRank').textContent='#'+msg.rank;$('studentRank').classList.remove('hidden')}else{$('studentRevealRank').textContent='';$('studentRevealRank').classList.add('hidden');$('studentRank').textContent='';$('studentRank').classList.add('hidden')}
+      if (showPos && msg.rank) {
+        if ($('studentRevealRank')) {
+          $('studentRevealRank').textContent = `#${msg.rank || '—'} na classificação ${msg.rankDelta > 0 ? '⬆️ subiu ' + msg.rankDelta : msg.rankDelta < 0 ? '⬇️ desceu ' + Math.abs(msg.rankDelta) : ''}`;
+          $('studentRevealRank').classList.remove('hidden');
+        }
+        if ($('studentRank')) {
+          $('studentRank').textContent = '#' + msg.rank;
+          $('studentRank').classList.remove('hidden');
+        }
+      } else {
+        if ($('studentRevealRank')) {
+          $('studentRevealRank').textContent = '';
+          $('studentRevealRank').classList.add('hidden');
+        }
+        if ($('studentRank')) {
+          $('studentRank').textContent = '';
+          $('studentRank').classList.add('hidden');
+        }
+      }
       $('studentScore').textContent=String(state.studentScore);$('studentScoreLobby').textContent=String(state.studentScore);
       if($('studentRankLobby')){$('studentRankLobby').textContent=showPos?('Posição: '+(msg.rank?'#'+msg.rank:'—')):'';$('studentRankLobby').style.display=showPos?'':'none'}if(correct)fanfare();else beep(220,.12,'sawtooth')}
     function animatePoints(points){const el=$('pointsAnimation');el.textContent='+0';const start=performance.now(),duration=600;function frame(now){const p=Math.min(1,(now-start)/duration);el.textContent='+'+Math.round(points*p);if(p<1)requestAnimationFrame(frame)}requestAnimationFrame(frame)}
@@ -2785,7 +2804,77 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       updateHostLobbySummary();
       initHost();
     };
-    $('btnGoToJoin').onclick=()=>showJoin('');$('joinForm').onsubmit=submitJoin;$('joinBack').onclick=()=>switchView('viewHome');$('btnStartGame').onclick=()=>{buildRoundQueue();startNextRound()};$('btnPause').onclick=()=>togglePause();$('btnReveal').onclick=revealRound;const handleNext=()=>{if(!state.isRevealed)revealRound();else startNextRound()};if($('btnNext'))$('btnNext').onclick=handleNext;if($('btnNextFooter'))$('btnNextFooter').onclick=handleNext;$('btnAddTime').onclick=addTime; $('btnOpenZoom').onclick=()=>{ if(!state.isPaused) togglePause('zoom'); openZoom(null); };$('btnThemeToggle').onclick=toggleTheme;$('btnThemeProjection').onclick=toggleTheme;$('btnFullscreen').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};$('btnLeaveHost').onclick=()=>{if(confirm('Encerrar esta sala?')){state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')}};$('btnCopyPin').onclick=()=>navigator.clipboard?.writeText(state.pin).then(()=>showToast('PIN copiado'));$('btnCopyLink').onclick=()=>navigator.clipboard?.writeText(location.origin+location.pathname+'?pin='+state.pin).then(()=>showToast('Link copiado'));if($('explanationPauseSelect'))$('explanationPauseSelect').onchange=saveStoredConfig;if($('rankingFrequencySelect'))$('rankingFrequencySelect').onchange=saveStoredConfig;if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').onchange=saveStoredConfig;if($('showFcSelect'))$('showFcSelect').onchange=saveStoredConfig;$('btnCloseZoom').onclick=()=>$('explainOverlay').classList.add('hidden');if($('btnZoomReveal'))$('btnZoomReveal').onclick=()=>{ $('explainOverlay').classList.add('hidden'); revealRound(); };$('btnRuler').onclick=()=>{state.rulerOn=!state.rulerOn;openZoom(state.zoomRect)};$('btnPodiumRestart').onclick=()=>switchView('viewHostSetup');$('podiumBack').onclick=()=>switchView('viewHome');$('studentRevealContinue').onclick=()=>$('studentReveal').classList.add('hidden');$('btnToggleSound')?.addEventListener('click',()=>soundOn=!soundOn);setupZoomSelection();document.addEventListener('keydown',e=>{if(e.key==='Escape')$('explainOverlay').classList.add('hidden');if(e.code==='Space'&&state.role==='host'&&state.projection){e.preventDefault();togglePause()}if((e.key==='n'||e.key==='N')&&state.role==='host'&&state.isRevealed)startNextRound()});document.addEventListener('mousemove',()=>{if(state.projection){$('projection').classList.add('controls-visible');clearTimeout(window.hideControls);window.hideControls=setTimeout(()=>$('projection').classList.remove('controls-visible'),2400)}});$('projection').addEventListener('dblclick',()=>togglePause());loadStoredConfig();
+    function toggleSound() {
+      soundOn = !soundOn;
+      if ($('btnToggleSound')) $('btnToggleSound').textContent = soundOn ? '🔊 Som' : '🔇 Mudo';
+      if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').textContent = soundOn ? '🔊' : '🔇';
+      showToast(soundOn ? 'Som ativado' : 'Som desativado');
+    }
+
+    if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
+    if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
+    if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
+    if ($('btnStartGame')) $('btnStartGame').onclick = () => { buildRoundQueue(); startNextRound(); };
+    if ($('btnPause')) $('btnPause').onclick = () => togglePause();
+    if ($('btnReveal')) $('btnReveal').onclick = revealRound;
+    const handleNext = () => { if (!state.isRevealed) revealRound(); else startNextRound(); };
+    if ($('btnNext')) $('btnNext').onclick = handleNext;
+    if ($('btnNextFooter')) $('btnNextFooter').onclick = handleNext;
+    if ($('btnAddTime')) $('btnAddTime').onclick = addTime;
+    if ($('btnOpenZoom')) $('btnOpenZoom').onclick = () => { if (!state.isPaused) togglePause('zoom'); openZoom(null); };
+    if ($('btnThemeToggle')) $('btnThemeToggle').onclick = toggleTheme;
+    if ($('btnThemeProjection')) $('btnThemeProjection').onclick = toggleTheme;
+    if ($('btnFullscreen')) $('btnFullscreen').onclick = () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    };
+    if ($('btnLeaveHost')) $('btnLeaveHost').onclick = () => {
+      if (confirm('Encerrar esta sala?')) {
+        state.peer?.destroy();
+        state.channel?.close();
+        state.syncChannel?.close();
+        cancelAnimationFrame(ecgFrame);
+        switchView('viewHome');
+      }
+    };
+    if ($('btnCopyPin')) $('btnCopyPin').onclick = () => navigator.clipboard?.writeText(state.pin).then(() => showToast('PIN copiado'));
+    if ($('btnCopyLink')) $('btnCopyLink').onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname + '?pin=' + state.pin).then(() => showToast('Link copiado'));
+    if ($('explanationPauseSelect')) $('explanationPauseSelect').onchange = saveStoredConfig;
+    if ($('rankingFrequencySelect')) $('rankingFrequencySelect').onchange = saveStoredConfig;
+    if ($('studentShowsPositionCheck')) $('studentShowsPositionCheck').onchange = saveStoredConfig;
+    if ($('showFcSelect')) $('showFcSelect').onchange = saveStoredConfig;
+    if ($('btnCloseZoom')) $('btnCloseZoom').onclick = () => $('explainOverlay')?.classList.add('hidden');
+    if ($('btnZoomReveal')) $('btnZoomReveal').onclick = () => { $('explainOverlay')?.classList.add('hidden'); revealRound(); };
+    if ($('btnRuler')) $('btnRuler').onclick = () => { state.rulerOn = !state.rulerOn; openZoom(state.zoomRect); };
+    if ($('btnPodiumRestart')) $('btnPodiumRestart').onclick = () => switchView('viewHostSetup');
+    if ($('podiumBack')) $('podiumBack').onclick = () => switchView('viewHome');
+    if ($('studentRevealContinue')) $('studentRevealContinue').onclick = () => $('studentReveal')?.classList.add('hidden');
+    if ($('btnToggleSound')) $('btnToggleSound').onclick = toggleSound;
+    if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').onclick = toggleSound;
+
+    setupZoomSelection();
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') $('explainOverlay')?.classList.add('hidden');
+      if (e.code === 'Space' && state.role === 'host' && state.projection) {
+        e.preventDefault();
+        togglePause();
+      }
+      if ((e.key === 'n' || e.key === 'N') && state.role === 'host' && state.isRevealed) {
+        startNextRound();
+      }
+    });
+
+    document.addEventListener('mousemove', () => {
+      if (state.projection && $('projection')) {
+        $('projection').classList.add('controls-visible');
+        clearTimeout(window.hideControls);
+        window.hideControls = setTimeout(() => $('projection')?.classList.remove('controls-visible'), 2400);
+      }
+    });
+
+    if ($('projection')) $('projection').addEventListener('dblclick', () => togglePause());
+    loadStoredConfig();
     window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)studentSend({type:'LEAVE',studentId:state.studentId})});
     function getInitialTheme(){
       try{
