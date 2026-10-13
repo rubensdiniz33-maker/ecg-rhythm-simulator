@@ -2169,8 +2169,32 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function initHost(){state.role='host';state.pin=randomPin();state.participants.clear();state.roundNumber=0;state.lastRoundId=null;$('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);const url=location.origin+location.pathname+'?pin='+state.pin;$('hostDirectUrl').textContent=url;const qr=$('qrCodeContainer');qr.innerHTML='';if(window.QRCode)new QRCode(qr,{text:url,width:250,height:250,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});updateParticipants();switchView('viewHost');try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}setupPeer(state.pin)}
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=state.participants.get(conn.peer);if(p)removeParticipant(p.id)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
     function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();beep(520,.07);if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
-    function sendParticipant(p,msg){if(p?.conn?.open)try{p.conn.send(msg)}catch(e){}}
-    function sendToAll(msg){state.channel?.postMessage(msg);state.participants.forEach(p=>sendParticipant(p,msg))}
+    function sendParticipant(p, msg) {
+      let sentPeer = false;
+      if (p?.conn?.open) {
+        try {
+          p.conn.send(msg);
+          sentPeer = true;
+        } catch (e) {}
+      }
+      if (!sentPeer && state.channel) {
+        try {
+          const studentId = p?.id || (typeof p === 'string' ? p : null);
+          const payload = (msg && typeof msg === 'object')
+            ? Object.assign({}, msg, studentId ? { targetStudentId: studentId } : {})
+            : msg;
+          state.channel.postMessage(payload);
+        } catch (e) {}
+      }
+    }
+    function sendToAll(msg) {
+      state.channel?.postMessage(msg);
+      state.participants.forEach(p => {
+        if (p?.conn?.open) {
+          try { p.conn.send(msg); } catch (e) {}
+        }
+      });
+    }
     function removeParticipant(id){if(state.participants.delete(id)){state.answersReceived.delete(id);updateParticipants();updateAnswerProgress();updateLeaderboard()}}
     function updateParticipants(){const n=state.participants.size;$('participantCount').textContent=String(n);$('participantsEmpty').classList.toggle('hidden',n>0);$('participantsList').classList.toggle('hidden',n===0);$('participantsList').innerHTML='';state.participants.forEach(p=>{const item=document.createElement('div');item.className='panel p-3 flex items-center gap-3';item.innerHTML=`<span class="text-3xl">${avatarEmoji(p.avatar)}</span><span class="font-bold text-sm flex-1 truncate">${escapeHTML(p.name)}</span><span class="text-xs text-lime-300">${p.score}</span>`;$('participantsList').append(item)});$('totalStudents').textContent=String(n)}
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
@@ -2456,8 +2480,109 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
       $('teacherLeaderboard').innerHTML=list.slice(0,5).map((p,i)=>`<div class="flex items-center gap-2 rounded-lg bg-slate-950 px-2 py-1.5"><span>${avatarEmoji(p.avatar)}</span><span class="text-[10px] text-amber-300 font-black">#${i+1}</span><span class="truncate flex-1 text-xs font-bold">${escapeHTML(p.name)}</span><span class="text-xs font-black text-lime-300">${p.score}</span></div>`).join('')||'<p class="text-xs text-slate-500">Aguardando participantes.</p>';
     }
-    function showPodium(){clearInterval(state.timerHandle);cancelAnimationFrame(ecgFrame);setProjectionVisible(false);$('revealPanel')?.classList.add('hidden');$('hostPodium').classList.remove('hidden');const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);if(state.config.rankingFrequency==='never'){$('podiumPlaces').innerHTML='<div class="panel p-6 col-span-3 text-center"><div class="text-5xl mb-3">🏁</div><div class="font-black text-2xl">Treinamento Concluído!</div><p class="text-slate-400 mt-2">Parabéns a todos os participantes pela interpretação dos traçados.</p></div>'}else{$('podiumPlaces').innerHTML=[1,0,2].map((rank,index)=>{const p=list[rank];return `<div class="panel p-6 ${rank===0?'border-amber-400 -translate-y-3':''}"><div class="text-5xl">${p?avatarEmoji(p.avatar):['🥈','🥇','🥉'][index]}</div><div class="font-black text-2xl mt-2">${rank===0?'1º':rank===1?'2º':'3º'}</div><p class="font-bold mt-2">${p?escapeHTML(p.name):'—'}</p><p class="text-lime-300 font-black">${p?p.score:0} pts</p></div>`}).join('')}fanfare()}
+    function showPodium() {
+      clearInterval(state.timerHandle);
+      cancelAnimationFrame(ecgFrame);
+      setProjectionVisible(false);
+      $('revealPanel')?.classList.add('hidden');
+      $('hostPodium')?.classList.remove('hidden');
 
+      const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
+      const container = $('podiumPlaces');
+      if (!container) {
+        fanfare();
+        return;
+      }
+
+      if (state.config?.rankingFrequency === 'never') {
+        container.className = 'grid place-items-center w-full max-w-2xl mx-auto';
+        container.innerHTML = `
+          <div class="panel p-6 w-full text-center">
+            <div class="text-5xl mb-3">🏁</div>
+            <div class="font-black text-2xl">Treinamento Concluído!</div>
+            <p class="text-slate-400 mt-2">Parabéns a todos os participantes pela interpretação dos traçados.</p>
+          </div>`;
+      } else if (list.length === 0) {
+        container.className = 'grid place-items-center w-full max-w-2xl mx-auto';
+        container.innerHTML = `
+          <div class="panel p-6 w-full text-center">
+            <div class="text-5xl mb-3">🏁</div>
+            <div class="font-black text-2xl">Treinamento Concluído!</div>
+            <p class="text-slate-400 mt-2">Nenhum participante conectado nesta partida.</p>
+          </div>`;
+      } else if (list.length === 1) {
+        const p = list[0];
+        container.className = 'flex justify-center w-full max-w-md mx-auto';
+        container.innerHTML = `
+          <div class="panel p-8 border-amber-400 w-full text-center shadow-2xl">
+            <div class="text-6xl mb-2">${avatarEmoji(p.avatar)}</div>
+            <div class="text-2xl font-black text-amber-400">🥇 1º LUGAR</div>
+            <p class="text-xl font-bold mt-2">${escapeHTML(p.name)}</p>
+            <p class="text-lime-300 text-2xl font-black mt-2">${p.score} pts</p>
+          </div>`;
+      } else if (list.length === 2) {
+        const p1 = list[0];
+        const p2 = list[1];
+        container.className = 'flex flex-wrap items-end justify-center gap-6 w-full max-w-2xl mx-auto';
+        container.innerHTML = `
+          <div class="panel p-6 w-64 text-center order-2 sm:order-1">
+            <div class="text-5xl">${avatarEmoji(p2.avatar)}</div>
+            <div class="font-black text-xl text-slate-300 mt-2">🥈 2º LUGAR</div>
+            <p class="font-bold mt-2 truncate">${escapeHTML(p2.name)}</p>
+            <p class="text-lime-300 font-black mt-1">${p2.score} pts</p>
+          </div>
+          <div class="panel p-8 border-amber-400 -translate-y-4 w-72 text-center order-1 sm:order-2 shadow-2xl">
+            <div class="text-6xl">${avatarEmoji(p1.avatar)}</div>
+            <div class="font-black text-2xl text-amber-400 mt-2">🥇 1º LUGAR</div>
+            <p class="text-xl font-bold mt-2 truncate">${escapeHTML(p1.name)}</p>
+            <p class="text-lime-300 text-2xl font-black mt-1">${p1.score} pts</p>
+          </div>`;
+      } else {
+        const p1 = list[0];
+        const p2 = list[1];
+        const p3 = list[2];
+        container.className = 'grid sm:grid-cols-3 gap-6 items-end w-full max-w-4xl mx-auto';
+        let html = `
+          <div class="panel p-6 text-center order-2 sm:order-1">
+            <div class="text-5xl">${avatarEmoji(p2.avatar)}</div>
+            <div class="font-black text-xl text-slate-300 mt-2">🥈 2º LUGAR</div>
+            <p class="font-bold mt-2 truncate">${escapeHTML(p2.name)}</p>
+            <p class="text-lime-300 font-black mt-1">${p2.score} pts</p>
+          </div>
+          <div class="panel p-8 border-amber-400 -translate-y-4 text-center order-1 sm:order-2 shadow-2xl">
+            <div class="text-6xl">${avatarEmoji(p1.avatar)}</div>
+            <div class="font-black text-2xl text-amber-400 mt-2">🥇 1º LUGAR</div>
+            <p class="text-xl font-bold mt-2 truncate">${escapeHTML(p1.name)}</p>
+            <p class="text-lime-300 text-2xl font-black mt-1">${p1.score} pts</p>
+          </div>
+          <div class="panel p-6 text-center order-3">
+            <div class="text-5xl">${avatarEmoji(p3.avatar)}</div>
+            <div class="font-black text-xl text-amber-600 mt-2">🥉 3º LUGAR</div>
+            <p class="font-bold mt-2 truncate">${escapeHTML(p3.name)}</p>
+            <p class="text-lime-300 font-black mt-1">${p3.score} pts</p>
+          </div>`;
+
+        if (list.length > 3) {
+          const others = list.slice(3).map((p, idx) => `
+            <div class="flex items-center justify-between py-1.5 border-b border-slate-800 last:border-b-0 text-sm">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono text-slate-400">${idx + 4}º</span>
+                <span>${avatarEmoji(p.avatar)}</span>
+                <span class="font-medium">${escapeHTML(p.name)}</span>
+              </div>
+              <span class="text-lime-300 font-mono font-bold">${p.score} pts</span>
+            </div>
+          `).join('');
+          html += `
+            <div class="col-span-full panel p-4 text-left mt-2 max-w-xl mx-auto w-full">
+              <p class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Demais Classificados</p>
+              <div class="space-y-1">${others}</div>
+            </div>`;
+        }
+        container.innerHTML = html;
+      }
+      fanfare();
+    }
     // REAL ECG WAVEFORM RENDERER (Autêntico do simulador)
     function initRealEcg(rhythmId,chosenRate){
       const rhythm=ECG_CORE.rhythmMap.get(rhythmId);
@@ -2661,19 +2786,60 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
     function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
-    function handleStudentMessage(msg){if(!msg?.type)return;if(msg.type==='ROUND_QUESTION')showStudentQuestion(msg);else if(msg.type==='ROUND_PAUSE'){state.isPaused=msg.paused;$('studentWaitMessage').classList.toggle('hidden',!msg.paused);if(msg.paused){clearInterval(window.studentTimer)}}else if(msg.type==='ROUND_TIME')$('studentTimer').textContent=String(msg.seconds);else if(msg.type==='ROUND_REVEAL')showStudentReveal(msg);else if(msg.type==='KICK'&&msg.studentId===state.studentId)switchView('viewStudentJoin')}
+    function handleStudentMessage(msg) {
+      if (!msg?.type) return;
+      if (msg.targetStudentId && state.studentId && msg.targetStudentId !== state.studentId) return;
+      if (msg.studentId && msg.type === 'ROUND_REVEAL' && state.studentId && msg.studentId !== state.studentId) return;
+      if (msg.type === 'ROUND_QUESTION') showStudentQuestion(msg);
+      else if (msg.type === 'ROUND_PAUSE') {
+        state.isPaused = msg.paused;
+        $('studentWaitMessage')?.classList.toggle('hidden', !msg.paused);
+        if (msg.paused) { clearInterval(window.studentTimer); }
+      }
+      else if (msg.type === 'ROUND_TIME') {
+        if ($('studentTimer')) $('studentTimer').textContent = String(msg.seconds);
+      }
+      else if (msg.type === 'ROUND_REVEAL') showStudentReveal(msg);
+      else if (msg.type === 'KICK' && msg.studentId === state.studentId) switchView('viewStudentJoin');
+    }
     function showStudentQuestion(msg){switchView('studentGame');state.studentLastChoice=null;state.roundLocked=false;state.roundNumber=msg.round;state.timeLeft=msg.seconds;$('studentRound').textContent=String(msg.round);$('studentScore').textContent=String(state.studentScore);
       const showPosition=(msg.showPosition!==false);state.showPosition=showPosition;
       $('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused||state.roundLocked)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
-    function showStudentReveal(msg){clearInterval(window.studentTimer);state.studentScore=msg.totalScore;state.studentPosition=msg.rank;state.studentStreak=msg.streak;$('studentWaitMessage')?.classList.add('hidden');$('studentReveal').classList.remove('hidden');const answered=state.studentLastChoice!==null;const correct=answered&&state.studentLastChoice===msg.correctId;const timedOut=!!msg.timeExpired;const bg=timedOut?'#963b20':correct?'#087646':'#a32d3a';$('studentReveal').style.background=bg;$('studentRevealIcon').textContent=timedOut?'⏱️':correct?'🎉':'💡';$('studentRevealTitle').textContent=timedOut?'TEMPO ESGOTADO':correct?'VOCÊ ACERTOU!':'QUASE!';animatePoints(msg.pointsEarned||0);$('studentRevealName').textContent=msg.name;$('studentRevealFeature').textContent=msg.feature;$('studentStreak').textContent=msg.streak>1?'🔥 '+msg.streak+' acertos seguidos':'';const showPos=(msg.showPosition!==false&&state.showPosition!==false);
-      if (showPos && msg.rank) {
+    function showStudentReveal(msg) {
+      clearInterval(window.studentTimer);
+
+      // Atualização segura de estado (garantida sempre)
+      if (msg) {
+        if (typeof msg.totalScore === 'number') state.studentScore = msg.totalScore;
+        if (msg.rank !== undefined && msg.rank !== null) state.studentPosition = msg.rank;
+        if (typeof msg.streak === 'number') state.studentStreak = msg.streak;
+      }
+
+      // 1. Placar: atualiza sempre na tela de jogo e no lobby
+      const scoreStr = String(state.studentScore ?? 0);
+      if ($('studentScore')) $('studentScore').textContent = scoreStr;
+      if ($('studentScoreLobby')) $('studentScoreLobby').textContent = scoreStr;
+
+      // 2. Ranking: atualiza sempre conforme permissão
+      const showPos = Boolean(msg?.showPosition !== false && state.showPosition !== false);
+      const currentRank = msg?.rank || state.studentPosition;
+      if (showPos && currentRank) {
         if ($('studentRevealRank')) {
-          $('studentRevealRank').textContent = `#${msg.rank || '—'} na classificação ${msg.rankDelta > 0 ? '⬆️ subiu ' + msg.rankDelta : msg.rankDelta < 0 ? '⬇️ desceu ' + Math.abs(msg.rankDelta) : ''}`;
+          const deltaText = (msg?.rankDelta > 0)
+            ? ` ⬆️ subiu ${msg.rankDelta}`
+            : (msg?.rankDelta < 0)
+              ? ` ⬇️ desceu ${Math.abs(msg.rankDelta)}`
+              : '';
+          $('studentRevealRank').textContent = `#${currentRank} na classificação${deltaText}`;
           $('studentRevealRank').classList.remove('hidden');
         }
         if ($('studentRank')) {
-          $('studentRank').textContent = '#' + msg.rank;
+          $('studentRank').textContent = '#' + currentRank;
           $('studentRank').classList.remove('hidden');
+        }
+        if ($('studentRankLobby')) {
+          $('studentRankLobby').textContent = `Posição: #${currentRank}`;
+          $('studentRankLobby').style.display = '';
         }
       } else {
         if ($('studentRevealRank')) {
@@ -2684,11 +2850,55 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           $('studentRank').textContent = '';
           $('studentRank').classList.add('hidden');
         }
+        if ($('studentRankLobby')) {
+          $('studentRankLobby').textContent = '';
+          $('studentRankLobby').style.display = 'none';
+        }
       }
-      $('studentScore').textContent=String(state.studentScore);$('studentScoreLobby').textContent=String(state.studentScore);
-      if($('studentRankLobby')){$('studentRankLobby').textContent=showPos?('Posição: '+(msg.rank?'#'+msg.rank:'—')):'';$('studentRankLobby').style.display=showPos?'':'none'}if(correct)fanfare();else beep(220,.12,'sawtooth')}
-    function animatePoints(points){const el=$('pointsAnimation');el.textContent='+0';const start=performance.now(),duration=600;function frame(now){const p=Math.min(1,(now-start)/duration);el.textContent='+'+Math.round(points*p);if(p<1)requestAnimationFrame(frame)}requestAnimationFrame(frame)}
 
+      // 3. Som: dispara sempre
+      const answered = state.studentLastChoice !== null && state.studentLastChoice !== undefined;
+      const correct = Boolean(answered && msg && state.studentLastChoice === msg.correctId);
+      try {
+        if (correct) fanfare();
+        else beep(220, 0.12, 'sawtooth');
+      } catch (audioErr) {
+        console.warn('Erro de áudio:', audioErr);
+      }
+
+      // 4. Interface visual do aluno (com validação prévia de cada elemento)
+      try {
+        if ($('studentWaitMessage')) $('studentWaitMessage').classList.add('hidden');
+        const revealEl = $('studentReveal');
+        if (revealEl) {
+          revealEl.classList.remove('hidden');
+          const timedOut = Boolean(msg?.timeExpired);
+          const bg = timedOut ? '#963b20' : correct ? '#087646' : '#a32d3a';
+          revealEl.style.background = bg;
+        }
+        const timedOut = Boolean(msg?.timeExpired);
+        if ($('studentRevealIcon')) $('studentRevealIcon').textContent = timedOut ? '⏱️' : correct ? '🎉' : '💡';
+        if ($('studentRevealTitle')) $('studentRevealTitle').textContent = timedOut ? 'TEMPO ESGOTADO' : correct ? 'VOCÊ ACERTOU!' : 'QUASE!';
+        if ($('studentRevealName')) $('studentRevealName').textContent = msg?.name || '';
+        if ($('studentRevealFeature')) $('studentRevealFeature').textContent = msg?.feature || '';
+        if ($('studentStreak')) $('studentStreak').textContent = (msg?.streak > 1) ? `🔥 ${msg.streak} acertos seguidos` : '';
+        animatePoints(msg?.pointsEarned || 0);
+      } catch (uiErr) {
+        console.error('Erro na UI de revelação do aluno:', uiErr);
+      }
+    }
+    function animatePoints(points) {
+      const el = $('pointsAnimation');
+      if (!el) return;
+      el.textContent = '+0';
+      const start = performance.now(), duration = 600;
+      function frame(now) {
+        const p = Math.min(1, (now - start) / duration);
+        if (el) el.textContent = '+' + Math.round((points || 0) * p);
+        if (p < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
     // EVENT WIRING
     $('btnStartHost').onclick = () => {
       renderRhythmLibrary();
