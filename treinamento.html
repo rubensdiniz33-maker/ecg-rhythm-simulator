@@ -1433,110 +1433,47 @@
     }
 
     
-    /* Layout compacto 100dvh para entrada do aluno */
-    .student-join-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      width: 100vw;
-      height: 100dvh;
-      max-height: 100dvh;
+    /* ========================================================
+       TELAS DO ALUNO (MOBILE PREMIUM)
+       ======================================================== */
+
+    /* Barra de progresso do relógio na borda superior */
+    .student-progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      z-index: 50;
       overflow: hidden;
-      background: var(--bg);
-      background-image: var(--bg-gradient);
-      color: var(--text);
-      padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
     }
-    .student-join-form {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    .student-progress-bar {
       height: 100%;
-      max-width: 440px;
-      margin: 0 auto;
       width: 100%;
-      min-height: 0;
+      background: #10b981;
+      background-image: linear-gradient(90deg, #10b981, #f59e0b);
+      transform-origin: left;
+      transition: width 0.95s linear, background-color 0.3s ease;
     }
-    .student-join-header {
-      flex-shrink: 0;
-      padding-right: 48px;
+    .student-progress-bar.is-urgent {
+      background: #f43f5e;
+      background-image: linear-gradient(90deg, #f59e0b, #ef4444);
+      animation: pulse-urgent 0.5s infinite alternate;
     }
-    .student-join-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 12px;
-      min-height: 0;
-    }
-    .student-join-footer {
-      flex-shrink: 0;
-      padding-top: 8px;
-      padding-bottom: max(6px, env(safe-area-inset-bottom));
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .avatar-compact-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(2, 40px);
-      gap: 5px;
-      width: 100%;
-    }
-    .avatar-compact-grid .avatar-option {
-      width: 100%;
-      height: 40px;
-      border-radius: 10px;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      border: 1px solid var(--btn-border);
-      background: var(--btn);
-      color: var(--text);
-      transition: transform .12s ease, border-color .12s ease, background .12s ease;
-      user-select: none;
-      -webkit-user-select: none;
-      cursor: pointer;
-    }
-    .avatar-compact-grid .avatar-option:hover {
-      transform: scale(1.05);
-      border-color: var(--btn-hover-border);
-    }
-    .avatar-compact-grid .avatar-option.selected {
-      border: 2px solid var(--lime);
-      background: var(--panel-subtle);
-      box-shadow: 0 0 12px var(--primary-shadow);
-      transform: scale(1.04);
-    }
-    @media(max-width: 375px) {
-      .student-join-body { gap: 9px; }
-      .avatar-compact-grid {
-        grid-template-rows: repeat(2, 36px);
-        gap: 4px;
-      }
-      .avatar-compact-grid .avatar-option {
-        height: 36px;
-        font-size: 18px;
-        border-radius: 8px;
-      }
+    @keyframes pulse-urgent {
+      from { opacity: 0.85; }
+      to { opacity: 1; }
     }
 
-    .hidden { display: none !important; }
-    .scroll-list { max-height: 48vh; overflow: auto; scrollbar-color: var(--line-strong) transparent; }
-
+    /* Topo do aluno */
     .student-fullscreen {
       position: fixed;
       inset: 0;
       z-index: 15;
       background: var(--bg);
       color: var(--text);
-      padding: max(6px, env(safe-area-inset-top)) 8px max(6px, env(safe-area-inset-bottom));
+      padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       height: 100dvh;
@@ -1548,23 +1485,64 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 6px;
-      padding-right: 48px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      height: 32px;
+      padding: 0 8px;
+      padding-right: 68px; /* Folga ampla para o botão de tema flutuante (42px) não sobrepor */
+      height: 52px;
+      min-height: 52px;
       flex-shrink: 0;
+      box-sizing: border-box;
     }
-    .student-topline .sep {
-      opacity: 0.4;
-      margin: 0 4px;
+    .student-round-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background: var(--panel);
+      border: 1px solid var(--line-strong);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
-    .student-topline .timer {
-      font-variant-numeric: tabular-nums;
-      font-size: 18px;
-      font-weight: 1000;
+    .student-score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background: var(--panel);
+      border: 1px solid var(--line-strong);
+      color: var(--lime);
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .student-rank-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 9999px;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      color: #38bdf8;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .student-timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background: var(--panel);
+      border: 1px solid var(--line-strong);
       color: var(--amber);
+      font-variant-numeric: tabular-nums;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
 
     .student-answer-grid {
@@ -1621,6 +1599,232 @@
     .student-answer-grid.answered .answer-status {
       opacity: 1;
       transform: none;
+    }
+
+    /* Cadastro centralizado (sem espaço morto) */
+    .student-join-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow-y: auto;
+      background: var(--bg);
+      background-image: var(--bg-gradient);
+      color: var(--text);
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    .student-join-wrapper {
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .student-join-card {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      width: 100%;
+      background: var(--panel);
+      border: 1.5px solid var(--line-strong);
+      border-radius: 24px;
+      padding: 22px 20px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+      box-sizing: border-box;
+    }
+    .student-join-header {
+      flex-shrink: 0;
+    }
+    .student-join-body {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .student-join-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .avatar-compact-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(2, 40px);
+      gap: 5px;
+      width: 100%;
+    }
+    .avatar-compact-grid .avatar-option {
+      width: 100%;
+      height: 40px;
+      border-radius: 10px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid var(--btn-border);
+      background: var(--btn);
+      color: var(--text);
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+    }
+    .avatar-compact-grid .avatar-option:hover {
+      transform: scale(1.05);
+      border-color: var(--btn-hover-border);
+    }
+    .avatar-compact-grid .avatar-option.selected {
+      border: 2px solid var(--lime);
+      background: var(--panel-subtle);
+      box-shadow: 0 0 12px var(--primary-shadow);
+      transform: scale(1.04);
+    }
+
+    /* Tela de Resultado do Aluno */
+    .student-reveal-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      overflow-y: auto;
+      color: #ffffff;
+      transition: background 0.4s ease;
+    }
+    .student-reveal-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      border-radius: 28px;
+      padding: 22px 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      box-sizing: border-box;
+      animation: reveal-card-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes reveal-card-pop {
+      from { opacity: 0; transform: scale(0.92) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .student-points-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 18px;
+      padding: 8px 24px;
+    }
+    .student-points-value {
+      font-size: 38px;
+      font-weight: 1000;
+      line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .student-points-value.points-pop {
+      animation: points-bounce 0.6s ease forwards;
+    }
+    @keyframes points-bounce {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    .student-points-total {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 4px;
+    }
+
+    /* Comparação de alternativas na revelação */
+    .student-comparison-container {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+    .student-choice-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 8px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      min-height: 90px;
+      box-sizing: border-box;
+    }
+    .student-choice-card.is-correct-card {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1.5px solid rgba(52, 211, 153, 0.55);
+    }
+    .student-choice-card.is-wrong-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .choice-tag {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.8;
+    }
+    .choice-shape-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      flex-shrink: 0;
+    }
+    .choice-shape-box .shape {
+      font-size: 28px;
+      line-height: 1;
+    }
+    .choice-label-text {
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-align: center;
+      max-width: 140px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .student-rhythm-info {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 10px 14px;
+      box-sizing: border-box;
+    }
+    .student-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      line-height: 1.2;
     }
 
     .explain-overlay {
@@ -2493,50 +2697,145 @@
 
   <!-- Student input and game screens -->
   <section id="viewStudentJoin" class="student-join-screen hidden" aria-label="Cadastro de participante">
-    <form id="joinForm" class="student-join-form">
-      <div class="student-join-header flex items-center justify-between gap-3 pt-1 pb-1">
-        <div class="flex items-center gap-2">
-          <span class="brand-mark w-7 h-7 text-sm rounded-lg flex-none">⌁</span>
-          <h1 class="text-base sm:text-lg font-black tracking-tight leading-tight text-white">Entre na sala</h1>
-        </div>
-        <div id="pinDetected" class="hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-black border border-emerald-500/40 bg-emerald-500/15 text-emerald-300">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Sala <b id="pinDetectedValue" class="tracking-wider"></b>
-        </div>
-      </div>
+    <div class="student-join-wrapper">
+      <form id="joinForm" class="student-join-card">
+        <!-- Logo e Saudação no Topo -->
+        <div class="student-join-header text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white text-2xl font-black shadow-lg shadow-emerald-500/25 mb-2 mx-auto">
+            ⌁
+          </div>
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white leading-tight">
+            Arena ECG
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400 font-medium mt-1">
+            Entre na sala ao vivo para responder os ritmos
+          </p>
 
-      <div class="student-join-body">
-        <label id="pinField" class="block">
-          <span class="text-xs font-bold text-slate-400 block mb-1">Código da sala · 6 dígitos</span>
-          <input id="pinInput" class="field text-center font-black tracking-[.25em] text-lg py-2.5" inputmode="numeric" maxlength="6" placeholder="123456">
-        </label>
-
-        <label class="block">
-          <span class="text-xs font-bold text-slate-400 block mb-1">Nome de usuário</span>
-          <input id="userNameInput" class="field py-2.5 text-base font-bold" maxlength="20" placeholder="Como quer ser chamado?" autocomplete="nickname" required>
-        </label>
-
-        <div class="avatar-section">
-          <span class="text-xs font-bold text-slate-400 block mb-1.5">Escolha seu ícone</span>
-          <div id="avatarPicker" class="avatar-compact-grid"></div>
+          <div id="pinDetected" class="hidden inline-flex items-center gap-1.5 px-3 py-1 mt-2.5 rounded-full text-xs font-mono font-black border border-emerald-500/40 bg-emerald-500/15 text-emerald-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Sala conectada: <b id="pinDetectedValue" class="tracking-wider text-white"></b>
+          </div>
         </div>
 
-        <div id="joinError" class="hidden text-xs text-rose-300 bg-rose-950/60 border border-rose-800/80 px-3 py-1.5 rounded-lg text-center font-bold"></div>
-      </div>
+        <div class="student-join-body">
+          <label id="pinField" class="block">
+            <span class="text-xs font-bold text-slate-300 block mb-1">Código da sala · 6 dígitos</span>
+            <input id="pinInput" class="field text-center font-black tracking-[.25em] text-lg py-2.5" inputmode="numeric" maxlength="6" placeholder="123456">
+          </label>
 
-      <div class="student-join-footer">
-        <button id="joinButton" class="primary w-full h-12 text-base font-black tracking-wide rounded-xl shadow-lg" type="submit">
-          ENTRAR NA SALA →
-        </button>
-        <button id="joinBack" type="button" class="w-full text-xs text-slate-400 hover:text-white py-1 transition-colors text-center font-semibold">
-          ← Voltar
-        </button>
-      </div>
-    </form>
+          <label class="block">
+            <span class="text-xs font-bold text-slate-300 block mb-1">Nome de usuário</span>
+            <input id="userNameInput" class="field py-2.5 text-base font-bold" maxlength="20" placeholder="Como quer ser chamado?" autocomplete="nickname" required>
+          </label>
+
+          <div class="avatar-section">
+            <span class="text-xs font-bold text-slate-300 block mb-1.5">Escolha seu ícone</span>
+            <div id="avatarPicker" class="avatar-compact-grid"></div>
+          </div>
+
+          <div id="joinError" class="hidden text-xs text-rose-300 bg-rose-950/60 border border-rose-800/80 px-3 py-1.5 rounded-lg text-center font-bold"></div>
+        </div>
+
+        <div class="student-join-footer">
+          <button id="joinButton" class="primary w-full h-12 text-base font-black tracking-wide rounded-xl shadow-lg" type="submit">
+            ENTRAR NA SALA →
+          </button>
+          <button id="joinBack" type="button" class="w-full text-xs text-slate-400 hover:text-white py-1.5 transition-colors text-center font-semibold">
+            ← Voltar ao início
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
-  <section id="studentLobby" class="hidden fixed inset-0 z-10 grid place-items-center p-6 text-center"><div class="panel p-8 max-w-md w-full"><div id="studentAvatarDisplay" class="text-6xl mb-3">🩺</div><span class="text-xs font-black text-emerald-300">● CONECTADO</span><h1 class="text-3xl font-black mt-3">Aguarde, <span id="studentNameDisplay"></span></h1><div class="mt-6 text-xs text-slate-400">PONTOS <b id="studentScoreLobby" class="text-2xl text-lime-300 block">0</b><span id="studentRankLobby" class="text-sm text-cyan-300">Posição: —</span></div></div></section>
-  <section id="studentGame" class="student-fullscreen hidden"><div class="student-topline"><div>RODADA <b id="studentRound">1</b><span class="sep">·</span>★ <b id="studentScore">0</b> pts<span id="studentRank" class="hidden ml-2 text-cyan-300 font-bold"></span></div><span class="timer" id="studentTimer">25</span></div><div id="studentChoices" class="student-answer-grid"></div><div id="studentWaitMessage" class="hidden absolute inset-0 z-20 grid place-items-center text-center"><div><div class="text-5xl mb-4">🧑‍🏫</div><p class="text-2xl font-black">Professor explicando…</p></div></div></section>
-  <section id="studentReveal" class="hidden fixed inset-0 z-30 grid place-items-center p-6 text-center"><div class="max-w-lg"><div id="studentRevealIcon" class="text-8xl mb-3">🎉</div><p id="studentRevealTitle" class="text-4xl sm:text-6xl font-black"></p><div id="pointsAnimation" class="text-5xl font-black mt-4 text-white">+0</div><p id="studentRevealName" class="text-2xl font-black mt-6"></p><p id="studentRevealFeature" class="text-sm opacity-80 mt-2"></p><p id="studentStreak" class="text-xl font-black mt-4"></p><p id="studentRevealRank" class="text-lg font-bold mt-4"></p><button id="studentRevealContinue" class="mt-6 px-6 py-3 rounded-xl bg-white/20 font-bold">Continuar aguardando</button></div></section>
+
+  <section id="studentLobby" class="hidden fixed inset-0 z-10 grid place-items-center p-6 text-center">
+    <div class="panel p-8 max-w-md w-full">
+      <div id="studentAvatarDisplay" class="text-6xl mb-3">🩺</div>
+      <span class="text-xs font-black text-emerald-300">● CONECTADO</span>
+      <h1 class="text-3xl font-black mt-3">Aguarde, <span id="studentNameDisplay"></span></h1>
+      <div class="mt-6 text-xs text-slate-400">
+        PONTOS <b id="studentScoreLobby" class="text-2xl text-lime-300 block">0</b>
+        <span id="studentRankLobby" class="text-sm text-cyan-300">Posição: —</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="studentGame" class="student-fullscreen hidden">
+    <!-- Barra de progresso fina na borda superior absoluta -->
+    <div class="student-progress-track" aria-hidden="true">
+      <div id="studentProgressBar" class="student-progress-bar" style="width: 100%;"></div>
+    </div>
+
+    <!-- Topo maior: rodada e pontos legíveis; o botão de tema não sobrepõe nada -->
+    <header class="student-topline">
+      <div class="student-topline-left flex items-center gap-2">
+        <span class="student-round-pill">
+          RODADA <b id="studentRound">1</b>
+        </span>
+        <span class="student-score-pill">
+          ★ <b id="studentScore">0</b> <span class="text-[11px] opacity-75 font-semibold">pts</span>
+        </span>
+        <span id="studentRank" class="hidden student-rank-pill">#1</span>
+      </div>
+
+      <div class="student-topline-right flex items-center gap-1.5">
+        <div class="student-timer-pill">
+          <span class="text-xs opacity-75">⏱️</span>
+          <span class="timer-num" id="studentTimer">25</span><span class="text-[10px] opacity-60">s</span>
+        </div>
+      </div>
+    </header>
+
+    <div id="studentChoices" class="student-answer-grid"></div>
+
+    <div id="studentWaitMessage" class="hidden absolute inset-0 z-20 grid place-items-center text-center">
+      <div class="p-6 rounded-2xl bg-slate-900/90 backdrop-blur border border-white/10 text-white max-w-xs mx-auto shadow-2xl">
+        <div class="text-5xl mb-3">🧑‍🏫</div>
+        <p class="text-xl font-black">Professor explicando…</p>
+        <p class="text-xs text-white/70 mt-1">Aguarde a retomada da questão</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="studentReveal" class="student-reveal-screen hidden">
+    <div class="student-reveal-card max-w-md w-full flex flex-col items-center">
+      <!-- Ícone + Título de feedback -->
+      <div id="studentRevealIcon" class="text-6xl sm:text-7xl mb-2 transition-transform duration-300">🎉</div>
+      <h2 id="studentRevealTitle" class="text-3xl sm:text-4xl font-black tracking-tight text-white mb-1">VOCÊ ACERTOU!</h2>
+      <p id="studentRevealSubtitle" class="text-xs sm:text-sm text-white/80 font-medium mb-3">Excelente identificação!</p>
+
+      <!-- Pontos animados com destaque -->
+      <div class="student-points-badge mb-3">
+        <div id="pointsAnimation" class="student-points-value">+0</div>
+        <div id="studentTotalPointsLabel" class="student-points-total">Total: 0 pts</div>
+      </div>
+
+      <!-- Comparação das alternativas: marcada vs gabarito (cor + forma) -->
+      <div id="studentChoicesComparison" class="student-comparison-container w-full mb-3"></div>
+
+      <!-- Nome do ritmo e critérios de identificação -->
+      <div class="student-rhythm-info w-full mb-3 text-left">
+        <div id="studentRevealName" class="text-base sm:text-lg font-black text-white leading-tight"></div>
+        <div id="studentRevealFeature" class="text-xs text-white/75 mt-1 leading-snug"></div>
+      </div>
+
+      <!-- Sequência 🔥 e Subida/Descida no Ranking -->
+      <div class="flex flex-wrap items-center justify-center gap-2 w-full mb-2">
+        <div id="studentStreakBadge" class="hidden student-meta-pill bg-amber-500/20 text-amber-300 border border-amber-400/40 font-black">
+          <span id="studentStreak"></span>
+        </div>
+        <div id="studentRankBadge" class="hidden student-meta-pill font-bold">
+          <span id="studentRevealRank"></span>
+        </div>
+      </div>
+
+      <!-- Indicador amigável de espera (sem o botão 'Continuar aguardando') -->
+      <div class="student-waiting-indicator flex items-center justify-center gap-2 mt-2 pt-2 border-t border-white/10 w-full text-xs text-white/70 font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Aguardando o professor avançar para a próxima rodada...</span>
+      </div>
+    </div>
+  </section>
   <section id="hostPodium" class="hidden fixed inset-0 z-[25] grid place-items-center p-8 text-center"><div><div class="text-7xl mb-3">🏆</div><p class="section-label">Fim da partida</p><h1 class="text-5xl font-black text-lime-300 mb-8">PÓDIO DA ARENA</h1><div id="podiumPlaces" class="grid sm:grid-cols-3 gap-6 items-end"></div><div class="flex items-center justify-center gap-4 mt-8 flex-wrap"><button id="btnPodiumRestart" type="button" class="primary">Nova sessão</button><button id="podiumBack" type="button" class="muted-btn">Início</button></div></div></section>
   <div id="toast" class="toast"></div>
 
@@ -3419,17 +3718,21 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const r=resultById.get(id);
         const rank=r?.rank||0;
         const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
+        const studentAns = state.answersReceived.get(id);
         const payload={
           type:'ROUND_REVEAL',
           correctId:correct.id,
           name:correct.name+(state.chosenRate?` · FC ${state.chosenRate} bpm`:''),
           feature:CLINICAL[correct.id]?.points||'',
+          conduct:CLINICAL[correct.id]?.conduct||'',
           pointsEarned:r?.points||0,
           totalScore:p.score,
           rank,
           rankDelta:r?.rankDelta||0,
           streak:p.streak,
           timeExpired:!state.answersReceived.has(id),
+          studentChoiceId:studentAns?.choiceId||null,
+          choices:state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})),
           votes,
           showPosition:studentSeesPosition
         };
@@ -3868,9 +4171,85 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       else if (msg.type === 'ROUND_REVEAL') showStudentReveal(msg);
       else if (msg.type === 'KICK' && msg.studentId === state.studentId) switchView('viewStudentJoin');
     }
-    function showStudentQuestion(msg){switchView('studentGame');state.studentLastChoice=null;state.roundLocked=false;state.roundNumber=msg.round;state.timeLeft=msg.seconds;$('studentRound').textContent=String(msg.round);$('studentScore').textContent=String(state.studentScore);
-      const showPosition=(msg.showPosition!==false);state.showPosition=showPosition;
-      $('studentTimer').textContent=String(msg.seconds);$('studentWaitMessage').classList.toggle('hidden',!msg.paused);const grid=$('studentChoices');grid.classList.remove('answered');grid.innerHTML=msg.choices.map(c=>`<button type="button" data-choice="${c.id}" class="answer-tile ${c.color}"><span class="shape">${c.shape}</span><span class="answer-status">Resposta enviada</span></button>`).join('');grid.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{if(state.studentLastChoice||state.isPaused||state.roundLocked)return;state.studentLastChoice=btn.dataset.choice;state.studentAnsweredAt=Date.now();state.roundLocked=true;grid.classList.add('answered');grid.querySelectorAll('button').forEach(x=>{x.disabled=true;x.classList.add('opacity-35')});btn.classList.remove('opacity-35');btn.classList.add('ring-4','ring-white');try{navigator.vibrate?.(40)}catch(e){}beep(760,.05);studentSend({type:'ANSWER',studentId:state.studentId,choiceId:btn.dataset.choice,round:msg.round})}));let sec=Number(msg.seconds)||25;clearInterval(window.studentTimer);window.studentTimer=setInterval(()=>{sec=Math.max(0,sec-1);$('studentTimer').textContent=String(sec);if(sec===0)clearInterval(window.studentTimer)},1000)}
+    function showStudentQuestion(msg) {
+      switchView('studentGame');
+      state.studentLastChoice = null;
+      state.roundLocked = false;
+      state.roundNumber = msg.round;
+      state.timeLeft = msg.seconds;
+      state.currentQuestionChoices = msg.choices || [];
+
+      if ($('studentRound')) $('studentRound').textContent = String(msg.round);
+      if ($('studentScore')) $('studentScore').textContent = String(state.studentScore ?? 0);
+
+      const showPosition = (msg.showPosition !== false);
+      state.showPosition = showPosition;
+      if ($('studentRank')) {
+        if (showPosition && state.studentPosition) {
+          $('studentRank').textContent = '#' + state.studentPosition;
+          $('studentRank').classList.remove('hidden');
+        } else {
+          $('studentRank').classList.add('hidden');
+        }
+      }
+
+      const totalSec = Number(msg.seconds) || 25;
+      let sec = totalSec;
+      if ($('studentTimer')) $('studentTimer').textContent = String(sec);
+
+      const progBar = $('studentProgressBar');
+      if (progBar) {
+        progBar.style.width = '100%';
+        progBar.classList.remove('is-urgent');
+      }
+
+      if ($('studentWaitMessage')) $('studentWaitMessage').classList.toggle('hidden', !msg.paused);
+
+      const grid = $('studentChoices');
+      grid.classList.remove('answered');
+      grid.innerHTML = (msg.choices || []).map(c => `
+        <button type="button" data-choice="${c.id}" class="answer-tile ${c.color}">
+          <span class="shape">${c.shape}</span>
+          <span class="answer-status">Resposta enviada</span>
+        </button>
+      `).join('');
+
+      grid.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+        if (state.studentLastChoice || state.isPaused || state.roundLocked) return;
+        state.studentLastChoice = btn.dataset.choice;
+        state.studentAnsweredAt = Date.now();
+        state.roundLocked = true;
+        grid.classList.add('answered');
+        grid.querySelectorAll('button').forEach(x => {
+          x.disabled = true;
+          x.classList.add('opacity-35');
+        });
+        btn.classList.remove('opacity-35');
+        btn.classList.add('ring-4', 'ring-white');
+        try { navigator.vibrate?.(40); } catch(e) {}
+        beep(760, 0.05);
+        studentSend({
+          type: 'ANSWER',
+          studentId: state.studentId,
+          choiceId: btn.dataset.choice,
+          round: msg.round
+        });
+      }));
+
+      clearInterval(window.studentTimer);
+      window.studentTimer = setInterval(() => {
+        sec = Math.max(0, sec - 1);
+        if ($('studentTimer')) $('studentTimer').textContent = String(sec);
+        if (progBar) {
+          const pct = Math.max(0, (sec / totalSec) * 100);
+          progBar.style.width = pct + '%';
+          if (sec <= 5) progBar.classList.add('is-urgent');
+          else progBar.classList.remove('is-urgent');
+        }
+        if (sec === 0) clearInterval(window.studentTimer);
+      }, 1000);
+    }
+
     function showStudentReveal(msg) {
       clearInterval(window.studentTimer);
 
@@ -3889,16 +4268,24 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       // 2. Ranking: atualiza sempre conforme permissão
       const showPos = Boolean(msg?.showPosition !== false && state.showPosition !== false);
       const currentRank = msg?.rank || state.studentPosition;
+      const rankDelta = (typeof msg?.rankDelta === 'number') ? msg.rankDelta : 0;
+      const rankBadge = $('studentRankBadge');
       if (showPos && currentRank) {
         if ($('studentRevealRank')) {
-          const deltaText = (msg?.rankDelta > 0)
-            ? ` ⬆️ subiu ${msg.rankDelta}`
-            : (msg?.rankDelta < 0)
-              ? ` ⬇️ desceu ${Math.abs(msg.rankDelta)}`
-              : '';
-          $('studentRevealRank').textContent = `#${currentRank} na classificação${deltaText}`;
+          if (rankDelta > 0) {
+            $('studentRevealRank').innerHTML = `⬆️ Subiu <b>${rankDelta}</b> ${rankDelta === 1 ? 'posição' : 'posições'} · #${currentRank}`;
+            if (rankBadge) rankBadge.className = 'student-meta-pill bg-emerald-500/25 text-emerald-100 border border-emerald-400/50 font-bold';
+          } else if (rankDelta < 0) {
+            const absDelta = Math.abs(rankDelta);
+            $('studentRevealRank').innerHTML = `⬇️ Desceu <b>${absDelta}</b> ${absDelta === 1 ? 'posição' : 'posições'} · #${currentRank}`;
+            if (rankBadge) rankBadge.className = 'student-meta-pill bg-slate-500/35 text-slate-100 border border-slate-400/40 font-bold';
+          } else {
+            $('studentRevealRank').innerHTML = `➡️ Manteve <b>#${currentRank}º</b> no ranking`;
+            if (rankBadge) rankBadge.className = 'student-meta-pill bg-blue-500/25 text-blue-100 border border-blue-400/40 font-bold';
+          }
           $('studentRevealRank').classList.remove('hidden');
         }
+        if (rankBadge) rankBadge.classList.remove('hidden');
         if ($('studentRank')) {
           $('studentRank').textContent = '#' + currentRank;
           $('studentRank').classList.remove('hidden');
@@ -3912,6 +4299,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           $('studentRevealRank').textContent = '';
           $('studentRevealRank').classList.add('hidden');
         }
+        if (rankBadge) rankBadge.classList.add('hidden');
         if ($('studentRank')) {
           $('studentRank').textContent = '';
           $('studentRank').classList.add('hidden');
@@ -3923,8 +4311,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
 
       // 3. Som: dispara sempre
-      const answered = state.studentLastChoice !== null && state.studentLastChoice !== undefined;
-      const correct = Boolean(answered && msg && state.studentLastChoice === msg.correctId);
+      const answered = (state.studentLastChoice !== null && state.studentLastChoice !== undefined) || Boolean(msg?.studentChoiceId);
+      const myChoiceId = state.studentLastChoice || msg?.studentChoiceId || null;
+      const correct = Boolean(answered && msg && myChoiceId === msg.correctId);
       try {
         if (correct) fanfare();
         else beep(220, 0.12, 'sawtooth');
@@ -3936,31 +4325,125 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       try {
         if ($('studentWaitMessage')) $('studentWaitMessage').classList.add('hidden');
         const revealEl = $('studentReveal');
+        const timedOut = Boolean(msg?.timeExpired || (!answered));
+
         if (revealEl) {
           revealEl.classList.remove('hidden');
-          const timedOut = Boolean(msg?.timeExpired);
-          const bg = timedOut ? '#963b20' : correct ? '#087646' : '#a32d3a';
-          revealEl.style.background = bg;
+          // Acerto: verde vibrante. Erro / Tempo esgotado: tom neutro e amigável (sem vermelho de alarme)
+          if (correct) {
+            revealEl.style.background = 'linear-gradient(155deg, #064e3b 0%, #047857 55%, #059669 100%)';
+          } else {
+            revealEl.style.background = 'linear-gradient(155deg, #1e293b 0%, #293548 50%, #334155 100%)';
+          }
         }
-        const timedOut = Boolean(msg?.timeExpired);
-        if ($('studentRevealIcon')) $('studentRevealIcon').textContent = timedOut ? '⏱️' : correct ? '🎉' : '💡';
-        if ($('studentRevealTitle')) $('studentRevealTitle').textContent = timedOut ? 'TEMPO ESGOTADO' : correct ? 'VOCÊ ACERTOU!' : 'QUASE!';
+
+        if ($('studentRevealIcon')) {
+          $('studentRevealIcon').textContent = correct ? '🎉' : timedOut ? '⏱️' : '💡';
+        }
+        if ($('studentRevealTitle')) {
+          $('studentRevealTitle').textContent = correct ? 'VOCÊ ACERTOU!' : timedOut ? 'TEMPO ESGOTADO!' : 'QUASE LÁ!';
+        }
+        if ($('studentRevealSubtitle')) {
+          $('studentRevealSubtitle').textContent = correct
+            ? 'Excelente leitura do traçado!'
+            : timedOut
+              ? 'O tempo da rodada acabou antes da confirmação.'
+              : 'Não foi dessa vez, continue focado para a próxima!';
+        }
         if ($('studentRevealName')) $('studentRevealName').textContent = msg?.name || '';
         if ($('studentRevealFeature')) $('studentRevealFeature').textContent = msg?.feature || '';
-        if ($('studentStreak')) $('studentStreak').textContent = (msg?.streak > 1) ? `🔥 ${msg.streak} acertos seguidos` : '';
+
+        // Sequência 🔥
+        const streak = msg?.streak || 0;
+        const streakBadge = $('studentStreakBadge');
+        if (streak > 1) {
+          if ($('studentStreak')) $('studentStreak').textContent = `🔥 ${streak} acertos seguidos!`;
+          if (streakBadge) streakBadge.classList.remove('hidden');
+        } else {
+          if (streakBadge) streakBadge.classList.add('hidden');
+        }
+
+        // Comparação visual: O que marcou vs Resposta certa (Cor + Forma)
+        const allChoices = msg?.choices || state.currentQuestionChoices || [];
+        const myChoiceObj = allChoices.find(c => c.id === myChoiceId);
+        const correctChoiceObj = allChoices.find(c => c.id === msg?.correctId) || (msg?.correctChoice ? msg.correctChoice : null);
+        const compContainer = $('studentChoicesComparison');
+        if (compContainer) {
+          if (correct && myChoiceObj) {
+            compContainer.innerHTML = `
+              <div class="student-choice-card is-correct-card w-full">
+                <span class="choice-tag text-emerald-200">SUA ESCOLHA (CORRETA)</span>
+                <div class="flex items-center justify-center gap-3 mt-1">
+                  <div class="choice-shape-box ${myChoiceObj.color}">
+                    <span class="shape">${myChoiceObj.shape}</span>
+                  </div>
+                  <div class="text-left">
+                    <div class="text-sm font-black text-white">${escapeHTML(myChoiceObj.label || msg?.name || 'Gabarito correto')}</div>
+                    <div class="text-xs text-emerald-200 font-bold mt-0.5">✓ Você marcou o ritmo certo!</div>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else {
+            compContainer.innerHTML = `
+              <div class="student-choice-card is-wrong-card">
+                <span class="choice-tag text-slate-300">VOCÊ MARCOU</span>
+                ${myChoiceObj ? `
+                  <div class="choice-shape-box ${myChoiceObj.color} my-1">
+                    <span class="shape">${myChoiceObj.shape}</span>
+                  </div>
+                  <span class="choice-label-text text-slate-200">${escapeHTML(myChoiceObj.label || 'Sua opção')}</span>
+                ` : `
+                  <div class="choice-shape-box bg-slate-800 border border-slate-700 my-1 text-2xl grid place-items-center">⏱️</div>
+                  <span class="choice-label-text text-slate-400">Sem resposta</span>
+                `}
+              </div>
+              <div class="student-choice-card is-correct-card">
+                <span class="choice-tag text-emerald-200">RESPOSTA CERTA</span>
+                ${correctChoiceObj ? `
+                  <div class="choice-shape-box ${correctChoiceObj.color} my-1">
+                    <span class="shape">${correctChoiceObj.shape}</span>
+                  </div>
+                  <span class="choice-label-text text-emerald-100 font-black">${escapeHTML(correctChoiceObj.label || msg?.name || 'Gabarito')}</span>
+                ` : `
+                  <div class="choice-shape-box answer-green my-1 text-2xl grid place-items-center">✓</div>
+                  <span class="choice-label-text text-emerald-100 font-black">${escapeHTML(msg?.name || 'Gabarito')}</span>
+                `}
+              </div>
+            `;
+          }
+        }
+
+        // Animação de pontos
         animatePoints(msg?.pointsEarned || 0);
+        if ($('studentTotalPointsLabel')) {
+          $('studentTotalPointsLabel').textContent = `Total: ${state.studentScore ?? 0} pts`;
+        }
       } catch (uiErr) {
         console.error('Erro na UI de revelação do aluno:', uiErr);
       }
     }
+
     function animatePoints(points) {
       const el = $('pointsAnimation');
       if (!el) return;
-      el.textContent = '+0';
-      const start = performance.now(), duration = 600;
+      el.classList.remove('points-pop');
+      void el.offsetWidth; // reflow para reiniciar animação
+      el.classList.add('points-pop');
+      const target = Math.max(0, Number(points) || 0);
+      if (target === 0) {
+        el.textContent = '+0 pts';
+        el.style.color = 'rgba(255,255,255,0.7)';
+        return;
+      }
+      el.style.color = '#ffffff';
+      el.textContent = '+0 pts';
+      const start = performance.now(), duration = 650;
       function frame(now) {
         const p = Math.min(1, (now - start) / duration);
-        if (el) el.textContent = '+' + Math.round((points || 0) * p);
+        const ease = 1 - Math.pow(1 - p, 3); // cubic ease-out
+        const val = Math.round(target * ease);
+        if (el) el.textContent = '+' + val + ' pts';
         if (p < 1) requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);
@@ -4125,7 +4608,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     if ($('btnRuler')) $('btnRuler').onclick = () => { state.rulerOn = !state.rulerOn; openZoom(state.zoomRect); };
     if ($('btnPodiumRestart')) $('btnPodiumRestart').onclick = () => switchView('viewHostSetup');
     if ($('podiumBack')) $('podiumBack').onclick = () => switchView('viewHome');
-    if ($('studentRevealContinue')) $('studentRevealContinue').onclick = () => $('studentReveal')?.classList.add('hidden');
+    
     if ($('btnToggleSound')) $('btnToggleSound').onclick = toggleSound;
     if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').onclick = toggleSound;
 
