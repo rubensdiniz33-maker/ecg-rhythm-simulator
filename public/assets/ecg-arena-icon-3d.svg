@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Outer Glow -->
+    <filter id="outer-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="28" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- 3D Bevel & Drop Shadow for the Squircle -->
+    <filter id="squircle-depth" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#000000" flood-opacity="0.8" />
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#22c55e" flood-opacity="0.3" />
+    </filter>
+
+    <!-- ECG Wave 3D Tube Glow -->
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.9" />
+      <feGaussianBlur stdDeviation="14" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Linear Gradients for 3D Bevel -->
+    <linearGradient id="rim-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80" stop-opacity="0.85" />
+      <stop offset="25%" stop-color="#22c55e" stop-opacity="0.5" />
+      <stop offset="60%" stop-color="#0f291e" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#05140e" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="body-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0d1f27" />
+      <stop offset="35%" stop-color="#08151c" />
+      <stop offset="100%" stop-color="#03090d" />
+    </linearGradient>
+
+    <!-- Inner Plate Radial Glow -->
+    <radialGradient id="inner-glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1b4d3e" stop-opacity="0.45" />
+      <stop offset="50%" stop-color="#0d2b24" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#030a0d" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- ECG Wave 3D Multi-color Gradient -->
+    <linearGradient id="ecg-stroke" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22c55e" />
+      <stop offset="35%" stop-color="#4ade80" />
+      <stop offset="48%" stop-color="#a7f3d0" />
+      <stop offset="52%" stop-color="#ffffff" />
+      <stop offset="56%" stop-color="#38bdf8" />
+      <stop offset="80%" stop-color="#4ade80" />
+      <stop offset="100%" stop-color="#22c55e" />
+    </linearGradient>
+
+    <linearGradient id="glass-specular" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18" />
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.03" />
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient Neon Aura Background -->
+  <rect x="70" y="70" width="372" height="372" rx="100" fill="#22c55e" opacity="0.3" filter="url(#outer-glow)" />
+
+  <!-- Main 3D Squircle Base -->
+  <g filter="url(#squircle-depth)">
+    <!-- Outer Rim Bevel -->
+    <rect x="44" y="44" width="424" height="424" rx="106" fill="url(#rim-gradient)" stroke="#22c55e" stroke-width="2" stroke-opacity="0.6" />
+    
+    <!-- Inner Dark Glass Face -->
+    <rect x="52" y="52" width="408" height="408" rx="98" fill="url(#body-gradient)" />
+    
+    <!-- Inner Ambient Illumination -->
+    <rect x="52" y="52" width="408" height="408" rx="98" fill="url(#inner-glow)" />
+    
+    <!-- Glass Specular Reflection Highlight -->
+    <rect x="52" y="52" width="408" height="408" rx="98" fill="url(#glass-specular)" />
+  </g>
+
+  <!-- High-tech Grid / Reticle Accents -->
+  <g opacity="0.15" stroke="#38bdf8" stroke-width="1.5">
+    <circle cx="256" cy="256" r="160" fill="none" stroke-dasharray="4 8" />
+    <line x1="96" y1="256" x2="416" y2="256" stroke="#4ade80" stroke-width="1" stroke-dasharray="2 6" />
+    <line x1="256" y1="96" x2="256" y2="416" stroke="#4ade80" stroke-width="1" stroke-dasharray="2 6" />
+  </g>
+
+  <!-- 3D Heartbeat / ECG Waveform (P-Q-R-S-T) -->
+  <!-- 1. Deep Cast Shadow on Baseplate -->
+  <path d="M 88 256 L 152 256 Q 168 256 176 242 Q 184 228 192 242 Q 200 256 216 256 L 226 256 L 236 276 L 256 128 L 276 364 L 286 256 L 302 256 Q 318 256 328 234 Q 338 212 348 234 Q 358 256 374 256 L 424 256"
+        fill="none" stroke="#000000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />
+
+  <!-- 2. Volumetric Outer Neon Bloom -->
+  <path d="M 88 256 L 152 256 Q 168 256 176 242 Q 184 228 192 242 Q 200 256 216 256 L 226 256 L 236 276 L 256 128 L 276 364 L 286 256 L 302 256 Q 318 256 328 234 Q 338 212 348 234 Q 358 256 374 256 L 424 256"
+        fill="none" stroke="#22c55e" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity="0.6" filter="url(#neon-glow)" />
+
+  <!-- 3. Primary Glowing Tube -->
+  <path d="M 88 256 L 152 256 Q 168 256 176 242 Q 184 228 192 242 Q 200 256 216 256 L 226 256 L 236 276 L 256 128 L 276 364 L 286 256 L 302 256 Q 318 256 328 234 Q 338 212 348 234 Q 358 256 374 256 L 424 256"
+        fill="none" stroke="url(#ecg-stroke)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- 4. Bright White-Hot Specular Core -->
+  <path d="M 88 256 L 152 256 Q 168 256 176 244 Q 184 232 192 244 Q 200 256 216 256 L 226 256 L 236 274 L 256 132 L 276 360 L 286 256 L 302 256 Q 318 256 328 236 Q 338 216 348 236 Q 358 256 374 256 L 424 256"
+        fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.95" />
+
+  <!-- Peak Neon Sparkle on R-Wave Spike -->
+  <circle cx="256" cy="128" r="9" fill="#ffffff" />
+  <circle cx="256" cy="128" r="18" fill="#4ade80" opacity="0.75" />
+</svg>
