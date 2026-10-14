@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#05090e" />
   <title>Arena ECG · Treino e Competição</title>
-  <link rel="icon" type="image/svg+xml" href="assets/ecg-arena-icon-3d.svg?v=2" />
+  <link rel="icon" type="image/svg+xml" href="assets/arena-ecg-favicon.svg?v=3" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -2806,6 +2806,44 @@
       .arena-lobby-foot { margin-top:26px; }
     }
     @media(prefers-reduced-motion:reduce) { .arena-action-card,.arena-action-arrow { transition:none; } }
+
+  
+    /* FIX: a tela inicial precisa respeitar .hidden ao navegar para outras telas */
+    #viewHome.arena-home-v2.hidden { display:none !important; }
+
+    /* Lobby em tela ampla, aproveitando praticamente toda a área útil */
+    body:has(#viewHome.arena-home-v2:not(.hidden)) .shell {
+      width:100%; max-width:none; min-height:100vh; min-height:100dvh;
+      padding:clamp(8px,1vw,16px);
+    }
+    body:has(#viewHome.arena-home-v2:not(.hidden)) #globalHeader {
+      margin-bottom:clamp(8px,1.2vh,14px) !important;
+    }
+    #viewHome.arena-home-v2:not(.hidden) {
+      width:100%; flex:1 0 auto; min-height:calc(100vh - 104px); min-height:calc(100dvh - 104px);
+      padding:clamp(28px,5vh,68px) clamp(18px,5vw,76px);
+      border-radius:clamp(16px,2vw,30px);
+    }
+    #viewHome.arena-home-v2:not(.hidden) .arena-home-actions {
+      width:min(100%,1120px); gap:clamp(14px,2vw,26px);
+    }
+    #viewHome.arena-home-v2:not(.hidden) .arena-action-card {
+      min-height:clamp(150px,22vh,230px); padding:clamp(22px,3vw,38px);
+      gap:clamp(16px,2vw,26px); border-radius:22px;
+    }
+    #viewHome.arena-home-v2:not(.hidden) .arena-action-icon {
+      width:clamp(54px,5vw,72px); height:clamp(54px,5vw,72px); flex-basis:clamp(54px,5vw,72px);
+      border-radius:18px;
+    }
+    #viewHome.arena-home-v2:not(.hidden) .arena-action-icon svg { width:32px;height:32px; }
+    #viewHome.arena-home-v2:not(.hidden) .arena-action-copy strong { font-size:clamp(19px,2.1vw,28px); }
+    #viewHome.arena-home-v2:not(.hidden) .arena-action-copy>span { font-size:clamp(12px,1.1vw,15px); }
+    #viewHome.arena-home-v2:not(.hidden) .arena-lobby-heading h1 { font-size:clamp(2.5rem,5vw,4.6rem); }
+    @media(max-width:640px) {
+      body:has(#viewHome.arena-home-v2:not(.hidden)) .shell { padding:8px; }
+      #viewHome.arena-home-v2:not(.hidden) { min-height:calc(100vh - 88px); min-height:calc(100dvh - 88px); padding:28px 16px; }
+      #viewHome.arena-home-v2:not(.hidden) .arena-action-card { min-height:112px; padding:18px; }
+    }
 
   </style>
 </head>
