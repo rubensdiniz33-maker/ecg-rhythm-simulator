@@ -2109,6 +2109,232 @@
         max-height: calc(100vh - 3rem);
       }
     }
+
+    /* =========================================
+       LOBBY DO PROFESSOR (TELÃO)
+       ========================================= */
+    .lobby-student-card {
+      background: var(--panel-subtle);
+      border: 1px solid var(--line-strong);
+      border-radius: 1.25rem;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+    .lobby-student-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      border-color: var(--lime);
+      box-shadow: 0 8px 24px rgba(197, 243, 106, 0.2);
+    }
+    .student-pop-in {
+      animation: studentPopIn 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    @keyframes studentPopIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(28px);
+      }
+      65% {
+        opacity: 1;
+        transform: scale(1.12) translateY(-4px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    .lobby-avatar-wrap {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--btn);
+      border: 2px solid var(--line-strong);
+      margin-bottom: 0.5rem;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .lobby-avatar-emoji {
+      font-size: 2.25rem;
+      line-height: 1;
+    }
+    .lobby-student-name {
+      font-weight: 900;
+      font-size: 0.95rem;
+      color: var(--text-title);
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 0.25rem;
+    }
+    .lobby-student-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #86efac;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 9999px;
+      padding: 0.15rem 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    /* =========================================
+       PÓDIO DA ARENA (TELÃO)
+       ========================================= */
+    .countdown-pulse {
+      animation: countdownPulse 0.85s ease-in-out infinite;
+    }
+    @keyframes countdownPulse {
+      0% { transform: scale(0.92); opacity: 0.8; }
+      50% { transform: scale(1.12); opacity: 1; text-shadow: 0 0 30px rgba(197, 243, 106, 0.7); }
+      100% { transform: scale(0.92); opacity: 0.8; }
+    }
+
+    .podium-stage-grid {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 58rem;
+      margin: 1.5rem auto;
+      padding: 0 0.5rem;
+    }
+    .podium-column {
+      flex: 1;
+      max-width: 18rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .podium-card {
+      width: 100%;
+      background: var(--panel-subtle);
+      border-radius: 1.5rem;
+      padding: 1.5rem 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      margin-bottom: -1rem;
+      z-index: 10;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px solid var(--line-strong);
+      opacity: 0;
+      transform: translateY(30px) scale(0.88);
+      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .podium-pillar {
+      width: 100%;
+      height: 0px;
+      border-radius: 1.25rem 1.25rem 0.5rem 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 3.5rem;
+      color: rgba(255, 255, 255, 0.25);
+      transition: height 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: inset 0 3px 6px rgba(255,255,255,0.1), 0 10px 25px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Gold 1st Place */
+    .podium-col-1 .podium-card {
+      border-color: #f59e0b;
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.35);
+      background: linear-gradient(180deg, rgba(30, 24, 10, 0.95), rgba(18, 14, 6, 0.98));
+    }
+    .podium-col-1 .podium-pillar {
+      background: linear-gradient(180deg, #d97706 0%, #b45309 60%, #78350f 100%);
+      border: 2px solid #fbbf24;
+      border-bottom: none;
+      color: rgba(254, 240, 138, 0.6);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    /* Silver 2nd Place */
+    .podium-col-2 .podium-card {
+      border-color: #94a3b8;
+      box-shadow: 0 0 25px rgba(148, 163, 184, 0.25);
+      background: linear-gradient(180deg, rgba(22, 28, 36, 0.95), rgba(12, 16, 22, 0.98));
+    }
+    .podium-col-2 .podium-pillar {
+      background: linear-gradient(180deg, #64748b 0%, #475569 60%, #334155 100%);
+      border: 2px solid #cbd5e1;
+      border-bottom: none;
+      color: rgba(241, 245, 249, 0.6);
+    }
+    /* Bronze 3rd Place */
+    .podium-col-3 .podium-card {
+      border-color: #d97706;
+      box-shadow: 0 0 20px rgba(217, 119, 6, 0.2);
+      background: linear-gradient(180deg, rgba(28, 20, 12, 0.95), rgba(16, 12, 8, 0.98));
+    }
+    .podium-col-3 .podium-pillar {
+      background: linear-gradient(180deg, #9a3412 0%, #7c2d12 60%, #431407 100%);
+      border: 2px solid #f97316;
+      border-bottom: none;
+      color: rgba(254, 215, 170, 0.5);
+    }
+
+    .revealed-podium-step .podium-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .revealed-podium-step.podium-col-1 .podium-pillar {
+      height: 220px;
+    }
+    .revealed-podium-step.podium-col-2 .podium-pillar {
+      height: 160px;
+    }
+    .revealed-podium-step.podium-col-3 .podium-pillar {
+      height: 110px;
+    }
+
+    /* Light Theme adjustments */
+    body.theme-light .lobby-student-card {
+      background: #ffffff;
+      border-color: #f1cfcc;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.08);
+    }
+    body.theme-light .lobby-student-card:hover {
+      border-color: #ec8c89;
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.15);
+    }
+    body.theme-light .lobby-avatar-wrap {
+      background: #fff3f1;
+      border-color: #f1cfcc;
+    }
+    body.theme-light .podium-card {
+      background: #ffffff;
+      border-color: #f1cfcc;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    body.theme-light .podium-col-1 .podium-card {
+      background: #fffdf5;
+      border-color: #f59e0b;
+    }
+    body.theme-light .podium-col-2 .podium-card {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    body.theme-light .podium-col-3 .podium-card {
+      background: #fffaf5;
+      border-color: #d97706;
+    }
 </style>
 </head>
 <body>
@@ -2449,8 +2675,93 @@
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-3"><div class="flex items-center gap-3"><span class="status-dot"></span><span id="hostNetBadge" class="text-sm font-bold">Abrindo sala...</span></div><div class="flex gap-2"><button id="btnToggleSound" type="button" class="muted-btn text-xs" title="Alternar som">🔊 Som</button><button id="btnThemeToggle" type="button" class="muted-btn text-xs">☀️ Claro</button><button id="btnFullscreen" type="button" class="muted-btn text-xs">⛶ Projeção</button><button id="btnLeaveHost" type="button" class="muted-btn text-xs text-rose-300">Encerrar</button></div></div>
-      <div id="hostLobby" class="grid lg:grid-cols-[350px_1fr] gap-5 my-auto"><div class="panel p-6 text-center"><p class="section-label mb-3">Escaneie para entrar</p><div id="qrCodeContainer" class="mx-auto w-[280px] h-[280px] bg-white p-3 rounded-2xl flex items-center justify-center"></div><p class="text-xs text-slate-400 mt-4">PIN DA SALA</p><div id="hostPinDisplay" class="font-black tracking-[.22em] text-5xl mt-1 font-mono" style="color:var(--lime)">------</div><div class="flex justify-center gap-2 mt-4"><button id="btnCopyPin" class="muted-btn text-xs">Copiar PIN</button><button id="btnCopyLink" class="muted-btn text-xs">Copiar link</button></div><p class="text-[10px] text-slate-500 mt-2 break-all" id="hostDirectUrl"></p></div><div class="panel p-6 flex flex-col min-h-[440px]"><div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4"><div><h2 class="text-xl font-black">Participantes ao vivo</h2><p class="text-xs text-slate-400 mt-1">Acompanhe as entradas e o ranking atualizado.</p></div><span id="participantCount" class="px-3 py-1 rounded-full bg-slate-800 text-lime-300 text-sm font-black">0</span></div><div id="participantsEmpty" class="m-auto text-center py-12"><div class="text-5xl mb-4">📡</div><p class="font-bold">Aguardando a turma</p></div><div id="participantsList" class="hidden grid sm:grid-cols-2 xl:grid-cols-3 gap-3 scroll-list"></div><div class="mt-auto pt-5 border-t border-slate-800 flex items-center justify-between gap-3"><p id="hostGameSummary" class="text-xs text-slate-400"></p><button id="btnStartGame" class="primary">INICIAR PARTIDA ▶</button></div></div></div>
+      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-3">
+        <div class="flex items-center gap-3">
+          <span class="status-dot"></span>
+          <span id="hostNetBadge" class="text-sm font-bold">Abrindo sala...</span>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnToggleSound" type="button" class="muted-btn text-xs" title="Alternar som">🔊 Som</button>
+          <button id="btnThemeToggle" type="button" class="muted-btn text-xs">☀️ Claro</button>
+          <button id="btnFullscreen" type="button" class="muted-btn text-xs">⛶ Projeção</button>
+          <button id="btnLeaveHost" type="button" class="muted-btn text-xs text-rose-300">Encerrar</button>
+        </div>
+      </div>
+
+      <div id="hostLobby" class="grid lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr] gap-6 my-auto items-stretch w-full max-w-7xl mx-auto">
+        <!-- Card de Conexão Telão (QR Code e PIN Gigantes) -->
+        <div class="panel p-6 sm:p-8 text-center flex flex-col justify-between items-center shadow-2xl relative border-2 border-lime-400/25">
+          <div class="w-full">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider mb-3" style="background:var(--btn); border:1px solid var(--btn-border); color:var(--lime);">
+              <span>📱</span> <span>Entrar na Arena</span>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black mb-3" style="color:var(--text-title);">Escaneie para entrar</h3>
+
+            <!-- QR Code Grande para Projeção -->
+            <div class="relative mx-auto my-2 p-3.5 bg-white rounded-3xl shadow-2xl flex items-center justify-center w-[290px] h-[290px] sm:w-[320px] sm:h-[320px]">
+              <div id="qrCodeContainer" class="w-full h-full flex items-center justify-center"></div>
+            </div>
+
+            <!-- PIN Gigante para Telão -->
+            <div class="mt-4 pt-4 border-t border-slate-800/80 w-full">
+              <p class="text-xs font-black uppercase tracking-widest text-slate-400">PIN DA SALA</p>
+              <div id="hostPinDisplay" class="font-black tracking-[.25em] text-5xl sm:text-6xl my-1 font-mono transition-transform hover:scale-105" style="color:var(--lime); text-shadow:0 0 25px rgba(197,243,106,0.35);">------</div>
+            </div>
+
+            <div class="flex justify-center gap-2 mt-3">
+              <button id="btnCopyPin" type="button" class="muted-btn text-xs font-bold py-2 px-3.5 flex items-center gap-1.5 cursor-pointer">📋 Copiar PIN</button>
+              <button id="btnCopyLink" type="button" class="muted-btn text-xs font-bold py-2 px-3.5 flex items-center gap-1.5 cursor-pointer">🔗 Copiar link</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 font-mono break-all opacity-80" id="hostDirectUrl"></p>
+          </div>
+        </div>
+
+        <!-- Grade de Participantes & Contador Enorme -->
+        <div class="panel p-6 sm:p-8 flex flex-col min-h-[520px] shadow-2xl justify-between border-2 border-slate-800/80">
+          <!-- Top Bar com Contador Enorme e Botão Iniciar -->
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+            <div class="flex items-center gap-4">
+              <div class="flex items-baseline gap-3">
+                <span id="participantCountBig" class="text-6xl sm:text-8xl font-mono font-black tracking-tight" style="color:var(--lime); text-shadow:0 0 25px rgba(197,243,106,0.35);">0</span>
+                <div class="flex flex-col">
+                  <span class="text-base sm:text-xl font-black uppercase tracking-wider" style="color:var(--text-title);">Alunos conectados</span>
+                  <span id="lobbyStatusText" class="text-xs font-bold flex items-center gap-1.5 mt-1 text-emerald-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    Aguardando a turma entrar...
+                  </span>
+                </div>
+              </div>
+              <!-- Mantém compatibilidade com script anterior -->
+              <span id="participantCount" class="hidden">0</span>
+            </div>
+
+            <button id="btnStartGame" type="button" class="primary px-8 py-4 text-base sm:text-lg font-black tracking-wider rounded-xl shadow-2xl hover:scale-105 active:scale-95 transition flex items-center gap-3 cursor-pointer">
+              <span>INICIAR PARTIDA</span>
+              <span class="text-xl">▶</span>
+            </button>
+          </div>
+
+          <!-- Grade Grande de Avatares com Animação -->
+          <div class="flex-1 my-5 flex flex-col justify-center">
+            <div id="participantsEmpty" class="m-auto text-center py-14 px-4">
+              <div class="text-7xl mb-4 animate-bounce">📡</div>
+              <p class="text-2xl font-black" style="color:var(--text-title);">Aguardando a turma conectar...</p>
+              <p class="text-sm text-slate-400 mt-2 max-w-md mx-auto">Aponte a câmera para o QR Code ao lado ou digite o PIN no celular para entrar na disputa!</p>
+            </div>
+            <div id="participantsList" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5 max-h-[460px] overflow-y-auto p-1.5 scroll-list"></div>
+          </div>
+
+          <!-- Rodapé do Lobby com Resumo das Configurações -->
+          <div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <p id="hostGameSummary" class="text-xs text-slate-400"></p>
+            <div class="text-xs text-slate-400 flex items-center gap-2">
+              <span>Arena ECG</span>
+              <span>•</span>
+              <span class="text-emerald-400 font-bold">Lobby ao vivo</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -2836,7 +3147,42 @@
       </div>
     </div>
   </section>
-  <section id="hostPodium" class="hidden fixed inset-0 z-[25] grid place-items-center p-8 text-center"><div><div class="text-7xl mb-3">🏆</div><p class="section-label">Fim da partida</p><h1 class="text-5xl font-black text-lime-300 mb-8">PÓDIO DA ARENA</h1><div id="podiumPlaces" class="grid sm:grid-cols-3 gap-6 items-end"></div><div class="flex items-center justify-center gap-4 mt-8 flex-wrap"><button id="btnPodiumRestart" type="button" class="primary">Nova sessão</button><button id="podiumBack" type="button" class="muted-btn">Início</button></div></div></section>
+  <section id="hostPodium" class="hidden fixed inset-0 z-[25] overflow-y-auto p-4 sm:p-8 text-center flex flex-col items-center justify-start" style="background:var(--bg); color:var(--text);">
+      <div class="w-full max-w-5xl my-auto py-6">
+        <!-- Top Title -->
+        <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🏆</div>
+        <p class="section-label uppercase tracking-widest text-xs font-black text-lime-400">FIM DA PARTIDA</p>
+        <h1 class="text-4xl sm:text-5xl font-black text-lime-300 mt-1 mb-6 drop-shadow-[0_2px_15px_rgba(197,243,106,0.3)]">PÓDIO DA ARENA</h1>
+
+        <!-- Contagem Regressiva do Pódio -->
+        <div id="podiumCountdownArea" class="hidden panel p-8 max-w-md mx-auto my-6 border-2 border-lime-400/30 shadow-2xl">
+          <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">PREPARANDO OS CAMPEÕES</p>
+          <div id="podiumCountdownNumber" class="text-7xl sm:text-8xl font-black font-mono text-lime-400 my-4 countdown-pulse">3</div>
+          <p class="text-sm text-slate-300 font-semibold">Calculando pontuações e velocidade...</p>
+          <button id="btnSkipPodiumCountdown" type="button" class="muted-btn text-xs font-bold py-2 px-4 mt-5 rounded-lg cursor-pointer">Pular contagem ⏩</button>
+        </div>
+
+        <!-- Palco do Pódio: Degraus animados 3º -> 2º -> 1º -->
+        <div id="podiumContentArea" class="w-full">
+          <!-- Degraus e Cards do Pódio -->
+          <div id="podiumPlaces" class="w-full my-4"></div>
+
+          <!-- Demais classificados (4º+) -->
+          <div id="podiumOthersContainer" class="hidden w-full max-w-xl mx-auto mt-6 panel p-4 text-left border border-slate-800 shadow-xl"></div>
+
+          <!-- Resumo da Turma (Acerto Médio, Mais Rápido, etc.) -->
+          <div id="podiumSummaryContainer" class="w-full max-w-4xl mx-auto mt-8 panel p-6 text-left border border-slate-800 shadow-2xl"></div>
+
+          <!-- Botões de Ação Final -->
+          <div class="flex items-center justify-center gap-4 mt-8 flex-wrap">
+            <button id="btnPodiumRestart" type="button" class="primary px-6 py-3 font-black text-sm tracking-wide rounded-xl shadow-xl hover:scale-105 active:scale-95 transition cursor-pointer">Nova sessão</button>
+            <button id="btnMoreConfetti" type="button" class="muted-btn px-5 py-3 font-bold text-xs rounded-xl flex items-center gap-2 cursor-pointer">🎉 Mais confete</button>
+            <button id="podiumBack" type="button" class="muted-btn px-5 py-3 font-bold text-xs rounded-xl cursor-pointer">Início</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-[30]"></canvas>
   <div id="toast" class="toast"></div>
 
   <script>
@@ -2912,6 +3258,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     };
     const $ = id => document.getElementById(id);
     var state = window.state = {
+      sessionStats:{totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null},
       role:null,pin:null,peer:null,channel:null,syncChannel:null,studentConn:null,
       participants:new Map(),studentId:null,studentName:null,studentAvatar:'stetho',
       studentScore:0,studentLastChoice:null,studentStreak:0,studentPosition:0,
@@ -2932,6 +3279,97 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
     function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
+    function playJoinChime() {
+      if (!soundOn) return;
+      try {
+        const c = getAudio();
+        if (!c) return;
+        [659, 880].forEach((f, i) => setTimeout(() => beep(f, 0.08, 'triangle'), i * 80));
+      } catch(e) {}
+    }
+
+    function playCountdownBeep(isFinal = false) {
+      if (!soundOn) return;
+      try {
+        if (isFinal) {
+          beep(880, 0.25, 'triangle');
+        } else {
+          beep(587, 0.12, 'sine');
+        }
+      } catch(e) {}
+    }
+
+    function launchConfetti(durationMs = 5000) {
+      let canvas = $('confettiCanvas');
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'confettiCanvas';
+        canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:99;';
+        document.body.appendChild(canvas);
+      }
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const width = canvas.width = window.innerWidth;
+      const height = canvas.height = window.innerHeight;
+
+      const colors = ['#c5f36a', '#54e7a8', '#54d2e7', '#f0b64b', '#f43f5e', '#a855f7', '#38bdf8', '#fbbf24'];
+      const particles = [];
+      const count = 180;
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * -height * 0.5,
+          w: Math.random() * 10 + 6,
+          h: Math.random() * 6 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 5,
+          vy: Math.random() * 4 + 3,
+          angle: Math.random() * Math.PI * 2,
+          vAngle: (Math.random() - 0.5) * 0.15,
+          tilt: Math.random() * 10,
+          vTilt: (Math.random() - 0.5) * 0.1
+        });
+      }
+
+      const startTime = Date.now();
+      let animId = null;
+
+      function frame() {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > durationMs) {
+          ctx.clearRect(0, 0, width, height);
+          if (animId) cancelAnimationFrame(animId);
+          return;
+        }
+
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.angle += p.vAngle;
+          p.tilt += p.vTilt;
+          p.vy += 0.08;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.cos(p.tilt));
+          ctx.restore();
+
+          if (p.y > height && elapsed < durationMs - 1500) {
+            p.y = -20;
+            p.x = Math.random() * width;
+          }
+        }
+        animId = requestAnimationFrame(frame);
+      }
+      animId = requestAnimationFrame(frame);
+    }
+
     function setTheme(theme, save = false){
       state.theme = theme;
       const isLight = theme === 'light';
@@ -3434,9 +3872,35 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
     function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
-    function initHost(){state.role='host';state.pin=randomPin();state.participants.clear();state.roundNumber=0;state.lastRoundId=null;$('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);const url=location.origin+location.pathname+'?pin='+state.pin;$('hostDirectUrl').textContent=url;const qr=$('qrCodeContainer');qr.innerHTML='';if(window.QRCode)new QRCode(qr,{text:url,width:250,height:250,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});updateParticipants();switchView('viewHost');try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}setupPeer(state.pin)}
+    function initHost(){
+      state.role='host';
+      state.pin=randomPin();
+      state.participants.clear();
+      state.roundNumber=0;
+      state.lastRoundId=null;
+      state.sessionStats = {
+        totalRounds: 0,
+        totalAnswers: 0,
+        totalCorrect: 0,
+        fastestAnswer: null,
+        highestStreak: null
+      };
+      $('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);
+      const url=location.origin+location.pathname+'?pin='+state.pin;
+      $('hostDirectUrl').textContent=url;
+      const qr=$('qrCodeContainer');
+      qr.innerHTML='';
+      if(window.QRCode)new QRCode(qr,{text:url,width:280,height:280,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+      const listEl = $('participantsList');
+      if(listEl) listEl.innerHTML = '';
+      updateParticipants();
+      switchView('viewHost');
+      try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}
+      try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}
+      setupPeer(state.pin);
+    }
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=state.participants.get(conn.peer);if(p)removeParticipant(p.id)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
-    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();beep(520,.07);if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
     function sendParticipant(p, msg) {
       let sentPeer = false;
       if (p?.conn?.open) {
@@ -3464,7 +3928,56 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       });
     }
     function removeParticipant(id){if(state.participants.delete(id)){state.answersReceived.delete(id);updateParticipants();updateAnswerProgress();updateLeaderboard()}}
-    function updateParticipants(){const n=state.participants.size;$('participantCount').textContent=String(n);$('participantsEmpty').classList.toggle('hidden',n>0);$('participantsList').classList.toggle('hidden',n===0);$('participantsList').innerHTML='';state.participants.forEach(p=>{const item=document.createElement('div');item.className='panel p-3 flex items-center gap-3';item.innerHTML=`<span class="text-3xl">${avatarEmoji(p.avatar)}</span><span class="font-bold text-sm flex-1 truncate">${escapeHTML(p.name)}</span><span class="text-xs text-lime-300">${p.score}</span>`;$('participantsList').append(item)});$('totalStudents').textContent=String(n)}
+    function updateParticipants(){
+      const n=state.participants.size;
+      if($('participantCount'))$('participantCount').textContent=String(n);
+      if($('participantCountBig'))$('participantCountBig').textContent=String(n);
+      if($('totalStudents'))$('totalStudents').textContent=String(n);
+      if($('participantsEmpty'))$('participantsEmpty').classList.toggle('hidden',n>0);
+      if($('participantsList'))$('participantsList').classList.toggle('hidden',n===0);
+
+      if($('lobbyStatusText')){
+        $('lobbyStatusText').innerHTML = n > 0
+          ? `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> <span class="text-emerald-300 font-bold">${n} ${n===1?'aluno conectado':'alunos conectados'} · Sala pronta!</span>`
+          : `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> <span>Aguardando a turma entrar...</span>`;
+      }
+
+      const listEl = $('participantsList');
+      if(listEl){
+        // Remove students who left
+        listEl.querySelectorAll('[data-student-id]').forEach(el => {
+          const sid = el.getAttribute('data-student-id');
+          if(!state.participants.has(sid)) el.remove();
+        });
+
+        // Add or update participants with smooth pop-in
+        state.participants.forEach(p => {
+          let item = listEl.querySelector(`[data-student-id="${p.id}"]`);
+          if(!item){
+            item = document.createElement('div');
+            item.setAttribute('data-student-id', p.id);
+            item.className = 'lobby-student-card student-pop-in';
+            item.innerHTML = `
+              <div class="lobby-avatar-wrap">
+                <span class="lobby-avatar-emoji">${avatarEmoji(p.avatar)}</span>
+              </div>
+              <span class="lobby-student-name" title="${escapeHTML(p.name)}">${escapeHTML(p.name)}</span>
+              <span class="lobby-student-badge">✓ Pronto</span>
+            `;
+            listEl.appendChild(item);
+          }
+        });
+      }
+
+      const btnStart = $('btnStartGame');
+      if(btnStart){
+        if(n > 0){
+          btnStart.classList.add('animate-pulse');
+        } else {
+          btnStart.classList.remove('animate-pulse');
+        }
+      }
+    }
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
     function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
     function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
@@ -3646,6 +4159,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const correct=state.currentRhythm;
       const now=Date.now();
       const results=[];
+      if(!state.sessionStats){
+        state.sessionStats = { totalRounds: 0, totalAnswers: 0, totalCorrect: 0, fastestAnswer: null, highestStreak: null };
+      }
+      state.sessionStats.totalRounds++;
       for(const [id,p] of state.participants){
         const answer=state.answersReceived.get(id);
         const isCorrect=!!answer&&answer.choiceId===correct.id;
@@ -3655,6 +4172,32 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         p.streak=isCorrect?p.streak+1:0;
         p.score+=points;
         results.push({p,points,isCorrect,elapsed});
+
+        if(answer){
+          state.sessionStats.totalAnswers++;
+          if(isCorrect){
+            state.sessionStats.totalCorrect++;
+            const elapsedSec = (elapsed / 1000).toFixed(1);
+            if(!state.sessionStats.fastestAnswer || elapsed < state.sessionStats.fastestAnswer.elapsedMs){
+              state.sessionStats.fastestAnswer = {
+                studentId: p.id,
+                studentName: p.name,
+                avatar: p.avatar,
+                elapsedMs: elapsed,
+                elapsedSec: elapsedSec,
+                rhythmName: correct.shortName || correct.name
+              };
+            }
+          }
+        }
+        if(p.streak > (state.sessionStats.highestStreak?.streak || 0)){
+          state.sessionStats.highestStreak = {
+            studentId: p.id,
+            studentName: p.name,
+            avatar: p.avatar,
+            streak: p.streak
+          };
+        }
       }
       results.sort((a,b)=>b.p.score-a.p.score);
       results.forEach((r,i)=>{
@@ -3799,100 +4342,316 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('hostPodium')?.classList.remove('hidden');
 
       const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
-      const container = $('podiumPlaces');
-      if (!container) {
+      const placesContainer = $('podiumPlaces');
+      if (!placesContainer) {
         fanfare();
         return;
       }
 
-      if (state.config?.rankingFrequency === 'never') {
-        container.className = 'grid place-items-center w-full max-w-2xl mx-auto';
-        container.innerHTML = `
-          <div class="panel p-6 w-full text-center">
-            <div class="text-5xl mb-3">🏁</div>
-            <div class="font-black text-2xl">Treinamento Concluído!</div>
-            <p class="text-slate-400 mt-2">Parabéns a todos os participantes pela interpretação dos traçados.</p>
+      // Clear previous timers if any
+      if (window.podiumTimers) {
+        window.podiumTimers.forEach(t => clearTimeout(t));
+      }
+      window.podiumTimers = [];
+
+      const countdownArea = $('podiumCountdownArea');
+      const contentArea = $('podiumContentArea');
+      const othersContainer = $('podiumOthersContainer');
+
+      if (othersContainer) {
+        othersContainer.classList.add('hidden');
+        othersContainer.innerHTML = '';
+      }
+
+      // Se ranking desligado ou 0 participantes conectados
+      if (state.config?.rankingFrequency === 'never' || list.length === 0) {
+        if (countdownArea) countdownArea.classList.add('hidden');
+        if (contentArea) contentArea.classList.remove('hidden');
+        placesContainer.className = 'grid place-items-center w-full max-w-2xl mx-auto';
+        placesContainer.innerHTML = `
+          <div class="panel p-8 w-full text-center border-2 border-slate-800 shadow-2xl">
+            <div class="text-6xl mb-3">🏁</div>
+            <div class="font-black text-2xl sm:text-3xl" style="color:var(--text-title);">Treinamento Concluído!</div>
+            <p class="text-slate-400 mt-2 text-sm sm:text-base">${list.length === 0 ? 'Nenhum participante conectado nesta partida.' : 'Parabéns a todos os participantes pela interpretação dos traçados.'}</p>
           </div>`;
-      } else if (list.length === 0) {
-        container.className = 'grid place-items-center w-full max-w-2xl mx-auto';
+        renderPodiumSummary();
+        fanfare();
+        return;
+      }
+
+      // Contagem regressiva antes da revelação
+      if (countdownArea) countdownArea.classList.remove('hidden');
+      if (contentArea) contentArea.classList.add('hidden');
+
+      let count = 3;
+      const countEl = $('podiumCountdownNumber');
+      if (countEl) countEl.textContent = String(count);
+      playCountdownBeep(false);
+
+      let countdownFinished = false;
+      function startPodiumReveal() {
+        if (countdownFinished) return;
+        countdownFinished = true;
+        if (countdownArea) countdownArea.classList.add('hidden');
+        if (contentArea) contentArea.classList.remove('hidden');
+        renderPodiumSequence(list);
+      }
+
+      if ($('btnSkipPodiumCountdown')) {
+        $('btnSkipPodiumCountdown').onclick = () => {
+          startPodiumReveal();
+        };
+      }
+
+      const interval = setInterval(() => {
+        if (countdownFinished) {
+          clearInterval(interval);
+          return;
+        }
+        count--;
+        if (count > 0) {
+          if (countEl) {
+            countEl.textContent = String(count);
+            countEl.classList.remove('countdown-pulse');
+            void countEl.offsetWidth;
+            countEl.classList.add('countdown-pulse');
+          }
+          playCountdownBeep(count === 1);
+        } else {
+          clearInterval(interval);
+          startPodiumReveal();
+        }
+      }, 850);
+      window.podiumTimers.push(interval);
+    }
+
+    function renderPodiumSequence(list) {
+      const container = $('podiumPlaces');
+      if (!container) return;
+
+      const othersContainer = $('podiumOthersContainer');
+      if (othersContainer) {
+        othersContainer.classList.add('hidden');
+        othersContainer.innerHTML = '';
+      }
+
+      if (list.length === 1) {
+        // 1 ALUNO: Apenas 1º Lugar (SEM LUGARES VAZIOS)
+        const p1 = list[0];
+        container.className = 'podium-stage-grid';
         container.innerHTML = `
-          <div class="panel p-6 w-full text-center">
-            <div class="text-5xl mb-3">🏁</div>
-            <div class="font-black text-2xl">Treinamento Concluído!</div>
-            <p class="text-slate-400 mt-2">Nenhum participante conectado nesta partida.</p>
-          </div>`;
-      } else if (list.length === 1) {
-        const p = list[0];
-        container.className = 'flex justify-center w-full max-w-md mx-auto';
-        container.innerHTML = `
-          <div class="panel p-8 border-amber-400 w-full text-center shadow-2xl">
-            <div class="text-6xl mb-2">${avatarEmoji(p.avatar)}</div>
-            <div class="text-2xl font-black text-amber-400">🥇 1º LUGAR</div>
-            <p class="text-xl font-bold mt-2">${escapeHTML(p.name)}</p>
-            <p class="text-lime-300 text-2xl font-black mt-2">${p.score} pts</p>
-          </div>`;
+          <div id="podiumCol1" class="podium-column podium-col-1">
+            <div class="podium-card">
+              <div class="text-6xl sm:text-7xl mb-1">${avatarEmoji(p1.avatar)}</div>
+              <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/30">👑 1º LUGAR</div>
+              <div class="text-2xl sm:text-3xl font-black text-white mt-2 truncate max-w-full">${escapeHTML(p1.name)}</div>
+              <div class="text-2xl sm:text-4xl font-mono font-black text-lime-300 mt-1">${p1.score} pts</div>
+            </div>
+            <div class="podium-pillar">1</div>
+          </div>
+        `;
+
+        const t1 = setTimeout(() => {
+          $('podiumCol1')?.classList.add('revealed-podium-step');
+          fanfare();
+          launchConfetti(5500);
+          renderPodiumSummary();
+        }, 150);
+        window.podiumTimers.push(t1);
+
       } else if (list.length === 2) {
+        // 2 ALUNOS: 2º Lugar e 1º Lugar (SEM LUGARES VAZIOS)
         const p1 = list[0];
         const p2 = list[1];
-        container.className = 'flex flex-wrap items-end justify-center gap-6 w-full max-w-2xl mx-auto';
+        container.className = 'podium-stage-grid';
         container.innerHTML = `
-          <div class="panel p-6 w-64 text-center order-2 sm:order-1">
-            <div class="text-5xl">${avatarEmoji(p2.avatar)}</div>
-            <div class="font-black text-xl text-slate-300 mt-2">🥈 2º LUGAR</div>
-            <p class="font-bold mt-2 truncate">${escapeHTML(p2.name)}</p>
-            <p class="text-lime-300 font-black mt-1">${p2.score} pts</p>
+          <div id="podiumCol2" class="podium-column podium-col-2">
+            <div class="podium-card">
+              <div class="text-5xl sm:text-6xl mb-1">${avatarEmoji(p2.avatar)}</div>
+              <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-300 bg-slate-400/10 px-3 py-1 rounded-full border border-slate-400/30">🥈 2º LUGAR</div>
+              <div class="text-xl sm:text-2xl font-black text-white mt-2 truncate max-w-full">${escapeHTML(p2.name)}</div>
+              <div class="text-xl sm:text-3xl font-mono font-black text-lime-300 mt-1">${p2.score} pts</div>
+            </div>
+            <div class="podium-pillar">2</div>
           </div>
-          <div class="panel p-8 border-amber-400 -translate-y-4 w-72 text-center order-1 sm:order-2 shadow-2xl">
-            <div class="text-6xl">${avatarEmoji(p1.avatar)}</div>
-            <div class="font-black text-2xl text-amber-400 mt-2">🥇 1º LUGAR</div>
-            <p class="text-xl font-bold mt-2 truncate">${escapeHTML(p1.name)}</p>
-            <p class="text-lime-300 text-2xl font-black mt-1">${p1.score} pts</p>
-          </div>`;
+          <div id="podiumCol1" class="podium-column podium-col-1">
+            <div class="podium-card">
+              <div class="text-6xl sm:text-7xl mb-1">${avatarEmoji(p1.avatar)}</div>
+              <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/30">👑 1º LUGAR</div>
+              <div class="text-2xl sm:text-3xl font-black text-white mt-2 truncate max-w-full">${escapeHTML(p1.name)}</div>
+              <div class="text-2xl sm:text-4xl font-mono font-black text-lime-300 mt-1">${p1.score} pts</div>
+            </div>
+            <div class="podium-pillar">1</div>
+          </div>
+        `;
+
+        // 2º sobe primeiro
+        const t2 = setTimeout(() => {
+          $('podiumCol2')?.classList.add('revealed-podium-step');
+          beep(554, 0.25, 'triangle');
+        }, 200);
+
+        // 1º sobe em seguida com fanfarra e confete
+        const t1 = setTimeout(() => {
+          $('podiumCol1')?.classList.add('revealed-podium-step');
+          fanfare();
+          launchConfetti(5500);
+          renderPodiumSummary();
+        }, 1400);
+
+        window.podiumTimers.push(t2, t1);
+
       } else {
+        // 3+ ALUNOS: Degraus 3º -> 2º -> 1º subindo em sequência
         const p1 = list[0];
         const p2 = list[1];
         const p3 = list[2];
-        container.className = 'grid sm:grid-cols-3 gap-6 items-end w-full max-w-4xl mx-auto';
-        let html = `
-          <div class="panel p-6 text-center order-2 sm:order-1">
-            <div class="text-5xl">${avatarEmoji(p2.avatar)}</div>
-            <div class="font-black text-xl text-slate-300 mt-2">🥈 2º LUGAR</div>
-            <p class="font-bold mt-2 truncate">${escapeHTML(p2.name)}</p>
-            <p class="text-lime-300 font-black mt-1">${p2.score} pts</p>
-          </div>
-          <div class="panel p-8 border-amber-400 -translate-y-4 text-center order-1 sm:order-2 shadow-2xl">
-            <div class="text-6xl">${avatarEmoji(p1.avatar)}</div>
-            <div class="font-black text-2xl text-amber-400 mt-2">🥇 1º LUGAR</div>
-            <p class="text-xl font-bold mt-2 truncate">${escapeHTML(p1.name)}</p>
-            <p class="text-lime-300 text-2xl font-black mt-1">${p1.score} pts</p>
-          </div>
-          <div class="panel p-6 text-center order-3">
-            <div class="text-5xl">${avatarEmoji(p3.avatar)}</div>
-            <div class="font-black text-xl text-amber-600 mt-2">🥉 3º LUGAR</div>
-            <p class="font-bold mt-2 truncate">${escapeHTML(p3.name)}</p>
-            <p class="text-lime-300 font-black mt-1">${p3.score} pts</p>
-          </div>`;
-
-        if (list.length > 3) {
-          const others = list.slice(3).map((p, idx) => `
-            <div class="flex items-center justify-between py-1.5 border-b border-slate-800 last:border-b-0 text-sm">
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-mono text-slate-400">${idx + 4}º</span>
-                <span>${avatarEmoji(p.avatar)}</span>
-                <span class="font-medium">${escapeHTML(p.name)}</span>
-              </div>
-              <span class="text-lime-300 font-mono font-bold">${p.score} pts</span>
+        container.className = 'podium-stage-grid';
+        container.innerHTML = `
+          <div id="podiumCol2" class="podium-column podium-col-2">
+            <div class="podium-card">
+              <div class="text-5xl sm:text-6xl mb-1">${avatarEmoji(p2.avatar)}</div>
+              <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-300 bg-slate-400/10 px-3 py-1 rounded-full border border-slate-400/30">🥈 2º LUGAR</div>
+              <div class="text-xl sm:text-2xl font-black text-white mt-2 truncate max-w-full">${escapeHTML(p2.name)}</div>
+              <div class="text-xl sm:text-3xl font-mono font-black text-lime-300 mt-1">${p2.score} pts</div>
             </div>
-          `).join('');
-          html += `
-            <div class="col-span-full panel p-4 text-left mt-2 max-w-xl mx-auto w-full">
-              <p class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Demais Classificados</p>
+            <div class="podium-pillar">2</div>
+          </div>
+          <div id="podiumCol1" class="podium-column podium-col-1">
+            <div class="podium-card">
+              <div class="text-6xl sm:text-7xl mb-1">${avatarEmoji(p1.avatar)}</div>
+              <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3.5 py-1 rounded-full border border-amber-400/30">👑 1º LUGAR</div>
+              <div class="text-2xl sm:text-3xl font-black text-white mt-2 truncate max-w-full">${escapeHTML(p1.name)}</div>
+              <div class="text-2xl sm:text-4xl font-mono font-black text-lime-300 mt-1">${p1.score} pts</div>
+            </div>
+            <div class="podium-pillar">1</div>
+          </div>
+          <div id="podiumCol3" class="podium-column podium-col-3">
+            <div class="podium-card">
+              <div class="text-5xl sm:text-6xl mb-1">${avatarEmoji(p3.avatar)}</div>
+              <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-amber-600 bg-amber-600/10 px-3 py-1 rounded-full border border-amber-600/30">🥉 3º LUGAR</div>
+              <div class="text-xl sm:text-2xl font-black text-white mt-2 truncate max-w-full">${escapeHTML(p3.name)}</div>
+              <div class="text-xl sm:text-3xl font-mono font-black text-lime-300 mt-1">${p3.score} pts</div>
+            </div>
+            <div class="podium-pillar">3</div>
+          </div>
+        `;
+
+        // 1. 3º Lugar sobe primeiro
+        const t3 = setTimeout(() => {
+          $('podiumCol3')?.classList.add('revealed-podium-step');
+          beep(440, 0.2, 'triangle');
+        }, 200);
+
+        // 2. 2º Lugar sobe em seguida
+        const t2 = setTimeout(() => {
+          $('podiumCol2')?.classList.add('revealed-podium-step');
+          beep(554, 0.25, 'triangle');
+        }, 1400);
+
+        // 3. 1º Lugar sobe no clímax com fanfarra e confete
+        const t1 = setTimeout(() => {
+          $('podiumCol1')?.classList.add('revealed-podium-step');
+          fanfare();
+          launchConfetti(5500);
+
+          // 4. Demais classificados (4º em diante)
+          if (list.length > 3 && othersContainer) {
+            const others = list.slice(3).map((p, idx) => `
+              <div class="flex items-center justify-between py-2 border-b border-slate-800 last:border-b-0 text-sm">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xs font-mono font-black text-slate-400 w-6">${idx + 4}º</span>
+                  <span class="text-xl">${avatarEmoji(p.avatar)}</span>
+                  <span class="font-bold text-white">${escapeHTML(p.name)}</span>
+                </div>
+                <span class="text-lime-300 font-mono font-black">${p.score} pts</span>
+              </div>
+            `).join('');
+
+            othersContainer.innerHTML = `
+              <p class="text-xs font-black text-slate-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📋</span> <span>Demais Classificados</span>
+              </p>
               <div class="space-y-1">${others}</div>
-            </div>`;
-        }
-        container.innerHTML = html;
+            `;
+            othersContainer.classList.remove('hidden');
+          }
+
+          // 5. Resumo da Turma
+          renderPodiumSummary();
+        }, 2800);
+
+        window.podiumTimers.push(t3, t2, t1);
       }
-      fanfare();
+    }
+
+    function renderPodiumSummary() {
+      const container = $('podiumSummaryContainer');
+      if (!container) return;
+
+      const totalRounds = state.sessionStats?.totalRounds || state.roundNumber || 0;
+      const totalAnswers = state.sessionStats?.totalAnswers || 0;
+      const totalCorrect = state.sessionStats?.totalCorrect || 0;
+      const accuracyPct = totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
+      const fastest = state.sessionStats?.fastestAnswer;
+      const streak = state.sessionStats?.highestStreak;
+      const totalStudents = state.participants.size;
+
+      container.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">📊</span>
+            <h3 class="text-base sm:text-lg font-black uppercase tracking-wide" style="color:var(--text-title);">Resumo da Sessão</h3>
+          </div>
+          <span class="text-xs font-bold text-slate-400">${totalRounds} ${totalRounds === 1 ? 'rodada realizada' : 'rodadas realizadas'}</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Acerto Médio da Turma -->
+          <div class="p-4 rounded-xl border border-slate-800" style="background:var(--btn);">
+            <div class="flex items-center gap-2 text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-1">
+              <span>🎯</span> <span>Acerto Médio</span>
+            </div>
+            <div class="text-3xl font-black font-mono text-lime-300">${accuracyPct}%</div>
+            <div class="text-[11px] text-slate-400 mt-1">${totalCorrect} de ${totalAnswers} respostas certas</div>
+          </div>
+
+          <!-- Mais Rápido da Sessão -->
+          <div class="p-4 rounded-xl border border-slate-800" style="background:var(--btn);">
+            <div class="flex items-center gap-2 text-xs font-extrabold text-amber-400 uppercase tracking-wider mb-1">
+              <span>⚡</span> <span>Mais Rápido</span>
+            </div>
+            <div class="text-base sm:text-lg font-black truncate" style="color:var(--text-title);">
+              ${fastest ? `${avatarEmoji(fastest.avatar)} ${escapeHTML(fastest.studentName)}` : '—'}
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1 truncate">
+              ${fastest ? `${fastest.elapsedSec}s · ${escapeHTML(fastest.rhythmName)}` : 'Sem respostas'}
+            </div>
+          </div>
+
+          <!-- Maior Sequência de Acertos -->
+          <div class="p-4 rounded-xl border border-slate-800" style="background:var(--btn);">
+            <div class="flex items-center gap-2 text-xs font-extrabold text-orange-400 uppercase tracking-wider mb-1">
+              <span>🔥</span> <span>Maior Sequência</span>
+            </div>
+            <div class="text-base sm:text-lg font-black truncate" style="color:var(--text-title);">
+              ${streak && streak.streak > 0 ? `${avatarEmoji(streak.avatar)} ${escapeHTML(streak.studentName)}` : '—'}
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">
+              ${streak && streak.streak > 0 ? `${streak.streak} acertos seguidos` : 'Sem sequência'}
+            </div>
+          </div>
+
+          <!-- Participantes -->
+          <div class="p-4 rounded-xl border border-slate-800" style="background:var(--btn);">
+            <div class="flex items-center gap-2 text-xs font-extrabold text-cyan-400 uppercase tracking-wider mb-1">
+              <span>👥</span> <span>Participantes</span>
+            </div>
+            <div class="text-3xl font-black font-mono text-cyan-300">${totalStudents}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Alunos na sala</div>
+          </div>
+        </div>
+      `;
     }
     // REAL ECG WAVEFORM RENDERER (Autêntico do simulador)
     function initRealEcg(rhythmId,chosenRate){
@@ -4607,6 +5366,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     if ($('btnZoomReveal')) $('btnZoomReveal').onclick = () => { $('explainOverlay')?.classList.add('hidden'); revealRound(); };
     if ($('btnRuler')) $('btnRuler').onclick = () => { state.rulerOn = !state.rulerOn; openZoom(state.zoomRect); };
     if ($('btnPodiumRestart')) $('btnPodiumRestart').onclick = () => switchView('viewHostSetup');
+    if ($('btnMoreConfetti')) $('btnMoreConfetti').onclick = () => launchConfetti(5000);
     if ($('podiumBack')) $('podiumBack').onclick = () => switchView('viewHome');
     
     if ($('btnToggleSound')) $('btnToggleSound').onclick = toggleSound;
