@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#05090e" />
   <title>Arena ECG · Treino e Competição</title>
-  <link rel="icon" type="image/svg+xml" href="assets/arena-ecg-favicon.svg?v=3" />
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="assets/arena-ecg-favicon.svg?v=4" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=4" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png?v=4" />
+  <link rel="shortcut icon" href="favicon.ico?v=4" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=4" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -2845,6 +2848,93 @@
       #viewHome.arena-home-v2:not(.hidden) .arena-action-card { min-height:112px; padding:18px; }
     }
 
+
+    /* Lobby inicial: identidade clínica de monitor e hierarquia de entrada. Mantém os IDs e ações existentes. */
+    #viewHome.arena-home-v2:not(.hidden) {
+      --home-mint:#65f0b4; --home-cyan:#6de4f7;
+      width:100%; flex:1 0 auto; min-height:calc(100vh - 104px); min-height:calc(100dvh - 104px);
+      display:flex; flex-direction:column; justify-content:center; align-items:stretch; gap:0;
+      padding:clamp(24px,4.5vh,60px) clamp(22px,5vw,78px); overflow:hidden; isolation:isolate;
+      border:1px solid rgba(101,240,180,.19); border-radius:clamp(18px,2vw,30px);
+      background:radial-gradient(ellipse at 82% 18%,rgba(14,105,100,.19),transparent 34%),radial-gradient(ellipse at 9% 88%,rgba(15,77,116,.18),transparent 38%),linear-gradient(145deg,#07111a 0%,#08141e 55%,#060d15 100%);
+      box-shadow:inset 0 1px rgba(255,255,255,.045),0 26px 80px rgba(0,0,0,.42);
+    }
+    #viewHome.arena-home-v2:not(.hidden)::before { content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.19;background-image:linear-gradient(rgba(109,228,247,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(109,228,247,.09) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(90deg,transparent,#000 20%,#000 82%,transparent); }
+    #viewHome.arena-home-v2:not(.hidden)::after { content:"";position:absolute;z-index:-1;right:-9%;top:50%;width:min(58vw,760px);aspect-ratio:1;transform:translateY(-50%);border:1px solid rgba(101,240,180,.08);border-radius:50%;box-shadow:0 0 0 48px rgba(101,240,180,.018),0 0 0 96px rgba(101,240,180,.012);pointer-events:none; }
+    .arena-lobby-topbar,.arena-lobby-brand,.arena-clinical-status,.arena-lobby-bottomline,.arena-lobby-bottomline>span,.arena-monitor-card-top,.arena-monitor-card-bottom,.arena-action-index,.arena-action-main,.arena-action-bottom,.arena-lobby-security { display:flex;align-items:center; }
+    .arena-lobby-topbar { justify-content:space-between;gap:18px; }
+    .arena-lobby-brand { gap:11px;color:#f1f8fb;font-size:13px;font-weight:900;letter-spacing:.2em; }
+    .arena-lobby-brand b { color:var(--home-mint); }
+    .arena-lobby-mark { display:grid;place-items:center;width:42px;height:32px;color:var(--home-mint);border:1px solid rgba(105,245,189,.28);border-radius:10px;background:linear-gradient(145deg,rgba(105,245,189,.12),rgba(105,245,189,.025));box-shadow:0 0 22px rgba(105,245,189,.07),inset 0 1px rgba(255,255,255,.07); }
+    .arena-lobby-mark svg { width:34px;height:22px; }
+    .arena-clinical-status { gap:9px;color:#8ba5b4;font-size:9px;font-weight:850;letter-spacing:.17em; }
+    .arena-lobby-pulse,.arena-monitor-live-dot,.arena-bottom-pulse { width:7px;height:7px;flex:none;border-radius:50%;background:var(--home-mint);box-shadow:0 0 12px rgba(101,240,180,.8); }
+    .arena-lobby-pulse { animation:arenaStatusPulse 2s ease-in-out infinite; }
+    .arena-lobby-layout { display:grid;grid-template-columns:minmax(0,1.04fr) minmax(370px,.96fr);align-items:center;gap:clamp(34px,6vw,100px);width:min(100%,1420px);margin:auto; padding:clamp(40px,8vh,102px) 0; }
+    .arena-lobby-intro { max-width:730px;min-width:0; }
+    .arena-lobby-eyebrow { display:flex;align-items:center;gap:11px;color:#9bb2c0;font-size:9px;font-weight:900;letter-spacing:.21em; }
+    .arena-lobby-eyebrow-line { width:28px;height:1px;background:var(--home-mint);box-shadow:0 0 12px rgba(101,240,180,.65); }
+    .arena-lobby-intro h1 { margin:20px 0 18px;color:#f4f8fb;font-size:clamp(2.65rem,5.4vw,5.35rem);line-height:.99;font-weight:900;letter-spacing:-.065em;text-wrap:balance; }
+    .arena-lobby-intro h1 span { color:var(--home-mint);text-shadow:0 0 34px rgba(101,240,180,.14); }
+    .arena-lobby-description { max-width:520px;margin:0;color:#a2b5c1;font-size:clamp(14px,1.25vw,17px);line-height:1.75; }
+    .arena-monitor-card { width:min(100%,550px);margin-top:clamp(24px,4vh,42px);padding:14px 16px 12px;border:1px solid rgba(101,240,180,.2);border-radius:16px;background:linear-gradient(145deg,rgba(9,26,32,.86),rgba(6,16,24,.92));box-shadow:0 18px 48px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.035); }
+    .arena-monitor-card-top,.arena-monitor-card-bottom { justify-content:space-between;gap:12px;color:#839ba8;font-size:8px;font-weight:850;letter-spacing:.14em; }
+    .arena-monitor-card-top>span:first-child { display:flex;align-items:center;gap:8px; }
+    .arena-monitor-live-dot { width:6px;height:6px; }
+    .arena-monitor-lead { color:#c5d7dd; }
+    .arena-monitor-lead b { color:var(--home-mint);font-size:8px; }
+    .arena-mini-monitor { position:relative;height:clamp(68px,8vh,92px);margin:12px 0 10px;overflow:hidden;border:1px solid rgba(101,240,180,.1);border-radius:9px;background:rgba(1,10,13,.65); }
+    .arena-mini-grid { position:absolute;inset:0;background-image:linear-gradient(rgba(82,185,148,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(82,185,148,.13) 1px,transparent 1px),linear-gradient(rgba(82,185,148,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(82,185,148,.06) 1px,transparent 1px);background-size:40px 40px,40px 40px,8px 8px,8px 8px; }
+    .arena-mini-wave { position:absolute;inset:0;width:100%;height:100%; }
+    .arena-mini-wave path { fill:none;stroke-linejoin:round;stroke-linecap:round; }
+    .arena-mini-wave-shadow { stroke:rgba(101,240,180,.12);stroke-width:8;filter:blur(5px); }
+    .arena-mini-wave-line { stroke:url(#lobbyWaveGradient);stroke-width:2.6;stroke-dasharray:900;animation:arenaWaveScroll 9s linear infinite; }
+    .arena-monitor-scan { position:absolute;top:0;bottom:0;left:-24%;width:24%;background:linear-gradient(90deg,transparent,rgba(101,240,180,.08),transparent);animation:arenaScan 6s ease-in-out infinite; }
+    .arena-monitor-card-bottom { color:#637f8a;font-size:7px; }
+    .arena-monitor-card-bottom b { color:#3c5965;padding:0 3px; }
+    .arena-lobby-actions-wrap { min-width:0; }
+    .arena-actions-heading { display:flex;align-items:center;gap:14px;margin:0 0 15px;color:#91a8b5;font-size:9px;font-weight:900;letter-spacing:.18em; }
+    .arena-actions-heading-line { height:1px;flex:1;background:linear-gradient(90deg,rgba(109,228,247,.28),transparent); }
+    .arena-home-actions { display:grid;grid-template-columns:1fr;gap:13px;width:100%; }
+    .arena-action-card { position:relative;min-width:0;min-height:166px;display:flex;flex-direction:column;justify-content:space-between;gap:17px;padding:20px 23px;border:1px solid rgba(145,174,190,.18);border-radius:18px;background:linear-gradient(145deg,rgba(15,32,43,.94),rgba(8,19,28,.97));color:#f3f8fb;text-align:left;cursor:pointer;overflow:hidden;isolation:isolate;transition:transform .24s cubic-bezier(.2,.8,.2,1),border-color .24s ease,background .24s ease,box-shadow .24s ease; }
+    .arena-action-card::before { content:"";position:absolute;z-index:-1;inset:0;opacity:0;background:radial-gradient(ellipse at 10% 10%,rgba(101,240,180,.13),transparent 58%);transition:opacity .24s ease; }
+    .arena-action-card:hover { transform:translateY(-3px);border-color:rgba(101,240,180,.5);background:linear-gradient(145deg,rgba(16,40,45,.98),rgba(8,23,31,.99));box-shadow:0 16px 38px rgba(0,0,0,.25),0 0 26px rgba(101,240,180,.06); }
+    .arena-action-card:hover::before { opacity:1; }
+    .arena-action-card:focus-visible { outline:2px solid var(--home-cyan);outline-offset:4px; }
+    .arena-action-teacher { border-color:rgba(101,240,180,.35);box-shadow:inset 0 1px rgba(255,255,255,.045),0 0 24px rgba(101,240,180,.035); }
+    .arena-action-student::before { background:radial-gradient(ellipse at 10% 10%,rgba(109,228,247,.12),transparent 58%); }
+    .arena-action-student:hover { border-color:rgba(109,228,247,.55); }
+    .arena-action-index { gap:9px;color:#718b9a;font-size:8px;font-weight:900;letter-spacing:.16em; }
+    .arena-action-index i { width:16px;height:1px;background:rgba(101,240,180,.55); }
+    .arena-action-student .arena-action-index i { background:rgba(109,228,247,.55); }
+    .arena-action-main { gap:16px; }
+    .arena-action-icon { width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;border:1px solid rgba(101,240,180,.26);border-radius:15px;color:var(--home-mint);background:linear-gradient(145deg,rgba(101,240,180,.12),rgba(101,240,180,.035));box-shadow:inset 0 1px rgba(255,255,255,.06); }
+    .arena-action-student .arena-action-icon { color:var(--home-cyan);border-color:rgba(109,228,247,.25);background:linear-gradient(145deg,rgba(109,228,247,.12),rgba(109,228,247,.035)); }
+    .arena-action-icon svg { width:26px;height:26px; }
+    .arena-action-copy { min-width:0;display:flex;flex-direction:column;gap:6px; }
+    .arena-action-copy strong { color:#f5f9fb;font-size:clamp(18px,1.7vw,23px);font-weight:900;letter-spacing:-.035em; }
+    .arena-action-copy>span { color:#9bb0be;font-size:11px;line-height:1.5; }
+    .arena-action-bottom { justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid rgba(124,155,170,.12);color:#8ba5b3;font-size:8px;font-weight:900;letter-spacing:.14em; }
+    .arena-action-teacher .arena-action-bottom { color:#85d8b2; }
+    .arena-action-student .arena-action-bottom { color:#85d7e7; }
+    .arena-action-arrow { color:var(--home-mint);font-size:18px;line-height:1;transition:transform .22s ease; }
+    .arena-action-student .arena-action-arrow { color:var(--home-cyan); }
+    .arena-action-card:hover .arena-action-arrow { transform:translate(3px,-2px); }
+    .arena-lobby-security { gap:8px;margin-top:15px;color:#718895;font-size:7px;font-weight:850;letter-spacing:.11em; }
+    .arena-security-icon { color:var(--home-mint);font-size:11px; }
+    .arena-security-divider { width:1px;height:10px;background:#304653;margin:0 2px; }
+    .arena-lobby-bottomline { justify-content:space-between;gap:14px;padding-top:16px;border-top:1px solid rgba(121,153,169,.13);color:#6c8491;font-size:8px;font-weight:850;letter-spacing:.14em; }
+    .arena-lobby-bottomline>span { gap:8px; }
+    .arena-bottom-pulse { width:6px;height:6px; }
+    .arena-lobby-bottomline b { color:#38515e;padding:0 2px; }
+    @keyframes arenaStatusPulse { 50% { opacity:.48;box-shadow:0 0 4px rgba(101,240,180,.35); } }
+    @keyframes arenaWaveScroll { from { stroke-dashoffset:900; } to { stroke-dashoffset:0; } }
+    @keyframes arenaScan { 0%,18% { transform:translateX(0);opacity:0; } 35% { opacity:1; } 72%,100% { transform:translateX(520%);opacity:0; } }
+    @media(max-width:900px) { #viewHome.arena-home-v2:not(.hidden) { min-height:calc(100vh - 90px);min-height:calc(100dvh - 90px); } .arena-lobby-layout { grid-template-columns:1fr;gap:30px;width:min(100%,720px);padding:44px 0; } .arena-lobby-intro { max-width:680px; } .arena-monitor-card { margin-top:24px; } .arena-home-actions { grid-template-columns:repeat(2,minmax(0,1fr)); } .arena-action-card { min-height:165px;padding:18px; } }
+    @media(max-width:600px) { #viewHome.arena-home-v2:not(.hidden) { min-height:calc(100dvh - 84px);padding:20px 16px;border-radius:19px; } .arena-lobby-topbar { align-items:flex-start; } .arena-lobby-brand { font-size:11px;gap:8px; } .arena-lobby-mark { width:36px;height:29px; } .arena-clinical-status { justify-content:flex-end;text-align:right;font-size:7px;letter-spacing:.1em;gap:6px;max-width:145px; } .arena-lobby-layout { gap:25px;padding:36px 0 28px; } .arena-lobby-eyebrow { font-size:7px;letter-spacing:.13em;gap:8px; } .arena-lobby-eyebrow-line { width:18px; } .arena-lobby-intro h1 { margin:14px 0 11px;font-size:clamp(2.25rem,10.8vw,3.15rem); } .arena-lobby-description { max-width:390px;font-size:12px;line-height:1.6; } .arena-monitor-card { margin-top:20px;padding:11px 12px 10px; } .arena-mini-monitor { height:68px;margin:9px 0; } .arena-monitor-card-bottom { font-size:6px; } .arena-actions-heading { margin-bottom:11px;font-size:8px; } .arena-home-actions { grid-template-columns:1fr;gap:10px; } .arena-action-card { min-height:126px;padding:15px 16px;gap:12px;border-radius:15px; } .arena-action-main { gap:12px; } .arena-action-icon { width:44px;height:44px;flex-basis:44px;border-radius:13px; } .arena-action-icon svg { width:23px;height:23px; } .arena-action-copy strong { font-size:17px; } .arena-action-copy>span { font-size:10px; } .arena-action-index,.arena-action-bottom { font-size:7px; } .arena-lobby-security { font-size:6px;letter-spacing:.08em; } .arena-lobby-bottomline { padding-top:12px;font-size:6px;letter-spacing:.1em; } }
+    @media(max-height:720px) and (min-width:601px) { #viewHome.arena-home-v2:not(.hidden) { padding-top:20px;padding-bottom:20px; } .arena-lobby-layout { padding:22px 0;gap:38px; } .arena-lobby-intro h1 { font-size:clamp(2.4rem,4.5vw,4.2rem);margin:14px 0; } .arena-monitor-card { margin-top:20px; } .arena-mini-monitor { height:64px; } .arena-action-card { min-height:145px; } }
+    @media(prefers-reduced-motion:reduce) { .arena-lobby-pulse,.arena-mini-wave-line,.arena-monitor-scan { animation:none !important; } .arena-action-card,.arena-action-card::before,.arena-action-arrow { transition:none !important; } }
+
   </style>
 </head>
 <body>
@@ -2865,30 +2955,57 @@
       
     </header>
 
-    <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto">
-  <div class="arena-lobby-brand">
-    <span class="arena-lobby-mark" aria-hidden="true"><svg viewBox="0 0 64 32" fill="none"><path d="M2 17H14L20 7L28 26L36 11L41 17H62" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    <span>ARENA <b>ECG</b></span>
-  </div>
-  <div class="arena-lobby-heading">
-    <span class="arena-lobby-eyebrow">SIMULADOR DE RITMOS CARDÍACOS</span>
-    <h1>Vamos jogar?</h1>
-    <p>Escolha como deseja entrar na partida.</p>
-  </div>
-  <div class="arena-home-actions">
-    <button id="btnStartHost" class="arena-action-card arena-action-teacher" type="button">
-      <span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 10h3l2-3 2 6 2-3h1"/></svg></span>
-      <span class="arena-action-copy"><strong>Criar uma sala</strong><span>Inicie uma partida e conduza o desafio.</span></span>
-      <span class="arena-action-arrow" aria-hidden="true">→</span>
-    </button>
-    <button id="btnGoToJoin" class="arena-action-card arena-action-student" type="button">
-      <span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 5h4M11 18h2"/></svg></span>
-      <span class="arena-action-copy"><strong>Entrar pelo celular</strong><span>Use o PIN da sala para participar.</span></span>
-      <span class="arena-action-arrow" aria-hidden="true">→</span>
-    </button>
-  </div>
-  <div class="arena-lobby-foot"><span class="arena-lobby-pulse"></span> PRONTO PARA A PARTIDA</div>
-</section>
+    <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
+      <div class="arena-lobby-topbar">
+        <div class="arena-lobby-brand">
+          <span class="arena-lobby-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 32" fill="none"><path d="M2 17H14L20 7L28 26L36 11L41 17H62" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span>ARENA <b>ECG</b></span>
+        </div>
+        <div class="arena-clinical-status"><span class="arena-lobby-pulse"></span> TREINAMENTO CLÍNICO AO VIVO</div>
+      </div>
+
+      <div class="arena-lobby-layout">
+        <div class="arena-lobby-intro">
+          <span class="arena-lobby-eyebrow"><span class="arena-lobby-eyebrow-line"></span> INTERPRETAÇÃO DE RITMOS CARDÍACOS</span>
+          <h1>Reconheça o ritmo.<br><span>Treine sua decisão.</span></h1>
+          <p class="arena-lobby-description">Uma experiência prática e colaborativa para aprimorar a leitura do ECG, ritmo após ritmo.</p>
+
+          <div class="arena-monitor-card" aria-label="Monitor cardíaco decorativo">
+            <div class="arena-monitor-card-top"><span><i class="arena-monitor-live-dot"></i> MONITOR DE ECG</span><span class="arena-monitor-lead">DII <b>●</b></span></div>
+            <div class="arena-mini-monitor">
+              <div class="arena-mini-grid" aria-hidden="true"></div>
+              <svg class="arena-mini-wave" viewBox="0 0 640 110" preserveAspectRatio="none" aria-hidden="true">
+                <defs><linearGradient id="lobbyWaveGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#62ddc0" stop-opacity=".32"/><stop offset=".25" stop-color="#67f2c5"/><stop offset=".75" stop-color="#68ddf4"/><stop offset="1" stop-color="#68ddf4" stop-opacity=".35"/></linearGradient></defs>
+                <path class="arena-mini-wave-shadow" d="M0 56H115l14-2 11 2h30l12-7 12 12 13-19 14 57 17-88 18 56 14-15 14 5h57l14-2 11 2h30l12-7 12 12 13-19 14 57 17-88 18 56 14-15 14 5h57l14-2 11 2h30l12-7 12 12 13-19 14 57 17-88 18 56 14-15 14 5h40"/>
+                <path class="arena-mini-wave-line" d="M0 56H115l14-2 11 2h30l12-7 12 12 13-19 14 57 17-88 18 56 14-15 14 5h57l14-2 11 2h30l12-7 12 12 13-19 14 57 17-88 18 56 14-15 14 5h57l14-2 11 2h30l12-7 12 12 13-19 14 57 17-88 18 56 14-15 14 5h40"/>
+              </svg>
+              <span class="arena-monitor-scan" aria-hidden="true"></span>
+            </div>
+            <div class="arena-monitor-card-bottom"><span>TRAÇADO EM TEMPO REAL</span><span>25 mm/s <b>·</b> 10 mm/mV</span></div>
+          </div>
+        </div>
+
+        <div class="arena-lobby-actions-wrap">
+          <div class="arena-actions-heading"><span>ESCOLHA COMO PARTICIPAR</span><span class="arena-actions-heading-line"></span></div>
+          <div class="arena-home-actions">
+            <button id="btnStartHost" class="arena-action-card arena-action-teacher" type="button" aria-label="Criar uma sala e conduzir o treinamento">
+              <span class="arena-action-index">01 <i></i> DOCENTE</span>
+              <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 10h3l2-3 2 6 2-3h1"/></svg></span><span class="arena-action-copy"><strong>Criar uma sala</strong><span>Configure e conduza uma sessão ao vivo.</span></span></span>
+              <span class="arena-action-bottom"><span>INICIAR TREINAMENTO</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
+            </button>
+            <button id="btnGoToJoin" class="arena-action-card arena-action-student" type="button" aria-label="Entrar pelo celular usando o PIN da sala">
+              <span class="arena-action-index">02 <i></i> PARTICIPANTE</span>
+              <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 5h4M11 18h2"/><path d="M9 10h6"/></svg></span><span class="arena-action-copy"><strong>Entrar pelo celular</strong><span>Informe o PIN da sala para responder.</span></span></span>
+              <span class="arena-action-bottom"><span>ENTRAR NA SESSÃO</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
+            </button>
+          </div>
+          <div class="arena-lobby-security"><span class="arena-security-icon" aria-hidden="true">✦</span> SIMULAÇÃO EDUCACIONAL <span class="arena-security-divider"></span> FOCO NA PRÁTICA CLÍNICA</div>
+        </div>
+      </div>
+      <div class="arena-lobby-bottomline"><span><i class="arena-bottom-pulse"></i> SISTEMA PRONTO</span><span>ARENA ECG <b>·</b> TREINAMENTO INTERATIVO DE ECG</span></div>
+    </section>
 
     <section id="viewHostSetup" class="hidden my-auto w-full">
       <!-- Topo da tela de configuração -->
