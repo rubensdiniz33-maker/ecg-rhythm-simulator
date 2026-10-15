@@ -3381,158 +3381,194 @@
       <div class="arena-lobby-bottomline"><span><i class="arena-bottom-pulse"></i> SISTEMA PRONTO</span><span>ARENA ECG <b>·</b> TREINAMENTO INTERATIVO DE ECG</span></div>
     </section>
 
-    <section id="viewHostSetup" class="hidden my-auto w-full">
+        <section id="viewHostSetup" class="hidden my-auto w-full pb-20 lg:pb-8">
       <!-- Topo da tela de configuração -->
-      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
-        <div>
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 mb-2">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800/80">
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border border-cyan-500/40 bg-cyan-500/10 text-cyan-300">
             <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            Configuração da Partida
+            Painel Docente · Preparação da Sessão
           </div>
-          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">Personalize sua sessão</h1>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-            Selecione ritmos por categorias clínicas, aplique modelos pedagógicos e configure a dinâmica da arena para sua aula.
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">Personalize sua sessão</h1>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-2xl">
+            Selecione ritmos por categorias clínicas, defina as regras e dinâmica da partida e lance a arena ao vivo.
           </p>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btnSetupBack" type="button" class="muted-btn text-xs flex items-center gap-1.5 font-bold">
+          <button id="btnSetupBack" type="button" class="muted-btn text-xs flex items-center gap-1.5 font-bold cursor-pointer">
             <span>←</span> Voltar ao início
           </button>
         </div>
       </div>
 
-      <!-- Layout Principal em 2 colunas no Desktop -->
+      <!-- Barra de Navegação Rápida entre as 4 Áreas (Guia Visual) -->
+      <nav class="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 p-2 rounded-2xl bg-slate-900/60 border border-slate-800" aria-label="Navegação das etapas de personalização">
+        <a href="#sectionSetupRhythms" class="setup-nav-pill active">
+          <span class="setup-step-num font-mono">1</span>
+          <span>Ritmos & Modelos</span>
+        </a>
+        <a href="#sectionSetupRules" class="setup-nav-pill">
+          <span class="setup-step-num font-mono">2</span>
+          <span>Regras da Partida</span>
+        </a>
+        <a href="#sectionSetupSequence" class="setup-nav-pill">
+          <span class="setup-step-num font-mono">3</span>
+          <span>Sequência</span>
+        </a>
+        <a href="#sectionSetupSummary" class="setup-nav-pill">
+          <span class="setup-step-num font-mono">4</span>
+          <span>Resumo & Início</span>
+        </a>
+      </nav>
+
+      <!-- Layout Principal em 2 Colunas no Desktop -->
       <div class="grid lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_390px] gap-6 items-start">
         
-        <!-- Coluna da Esquerda: Presets + Biblioteca de Ritmos + Configurações -->
+        <!-- Coluna da Esquerda: Ritmos, Regras e Sequência -->
         <div class="space-y-6">
-          
-          <!-- 1. MODELOS DE AULA (PRESETS) -->
-          <section class="panel p-5 sm:p-6" aria-labelledby="presetsHeading">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div>
-                <h2 id="presetsHeading" class="font-black text-lg text-white flex items-center gap-2">
-                  <span>📋</span> Modelos de aula
-                </h2>
-                <p class="text-xs text-slate-400 mt-0.5">Aplique uma seleção recomendada para o nível da sua turma ou personalize abaixo.</p>
+
+          <!-- ========================================== -->
+          <!-- ÁREA 1: RITMOS (Modelos & Biblioteca)     -->
+          <!-- ========================================== -->
+          <section id="sectionSetupRhythms" class="panel p-5 sm:p-6 space-y-6" aria-labelledby="rhythmsSectionHeading">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-lime-400/15 border border-lime-400/30 text-lime-300 flex items-center justify-center font-black text-sm font-mono">1</span>
+                <div>
+                  <h2 id="rhythmsSectionHeading" class="font-black text-lg text-white flex items-center gap-2">
+                    <span>🫀</span> Ritmos Clínicos & Modelos
+                  </h2>
+                  <p class="text-xs text-slate-400 mt-0.5">Aplique um modelo pronto ou escolha ritmos por categorias clínicas abaixo.</p>
+                </div>
               </div>
-              <div id="undoPresetBox" class="hidden">
-                <button id="btnUndoPreset" type="button" class="text-xs font-bold text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center gap-1.5 transition cursor-pointer">
-                  <span>↩</span> Desfazer modelo
+
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
+                <span class="text-slate-400">Selecionados:</span>
+                <span id="selectedCount" class="font-mono font-black text-lime-400 text-sm">0</span>
+                <span class="text-slate-500 font-mono text-[11px]">/ 18</span>
+              </div>
+            </div>
+
+            <!-- 1.1 MODELOS PEDAGÓGICOS (PRESETS) -->
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <span id="presetsHeading" class="text-xs font-black uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+                    <span>📋</span> Modelos Pedagógicos Recomendados
+                  </span>
+                  <span class="text-[10px] text-slate-500 hidden sm:inline">· Clique para preencher automaticamente</span>
+                </div>
+                <div id="undoPresetBox" class="hidden">
+                  <button id="btnUndoPreset" type="button" class="text-xs font-bold text-amber-300 hover:text-amber-200 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center gap-1.5 transition cursor-pointer">
+                    <span>↩</span> Desfazer modelo
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3" id="presetsGrid">
+                <!-- Preset 1: Fundamentos -->
+                <button type="button" class="preset-card text-left p-3.5 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group cursor-pointer" data-preset="fundamentos">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xl">🩺</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono">4 ritmos</span>
+                  </div>
+                  <div class="font-black text-xs sm:text-sm text-white group-hover:text-lime-300 transition">Fundamentos</div>
+                  <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">Sinusais normais e BAV 1º grau para introdução clínica.</p>
+                </button>
+
+                <!-- Preset 2: Arritmias -->
+                <button type="button" class="preset-card text-left p-3.5 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group cursor-pointer" data-preset="arritmias">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xl">⚡</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono">6 ritmos</span>
+                  </div>
+                  <div class="font-black text-xs sm:text-sm text-white group-hover:text-lime-300 transition">Arritmias</div>
+                  <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">FA, Flutter, TSV e extrassístoles ventriculares.</p>
+                </button>
+
+                <!-- Preset 3: Ritmos de Emergência -->
+                <button type="button" class="preset-card text-left p-3.5 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group cursor-pointer" data-preset="emergencia">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xl">🚨</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950/80 text-rose-300 font-mono">7 ritmos</span>
+                  </div>
+                  <div class="font-black text-xs sm:text-sm text-white group-hover:text-lime-300 transition">Ritmos de emergência</div>
+                  <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">PCR (FV, TV, AESP, Assistolia) e bradiarritmias críticas.</p>
+                </button>
+
+                <!-- Preset 4: Desafio Avançado -->
+                <button type="button" class="preset-card text-left p-3.5 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group cursor-pointer" data-preset="avancado">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xl">🏆</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 font-mono">8 ritmos</span>
+                  </div>
+                  <div class="font-black text-xs sm:text-sm text-white group-hover:text-lime-300 transition">Desafio avançado</div>
+                  <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">Bloqueios de 2º/3º grau, dissociação e diferenciais complexos.</p>
                 </button>
               </div>
             </div>
-            
-            <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3" id="presetsGrid">
-              <!-- Preset 1: Fundamentos -->
-              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="fundamentos">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-2xl">🩺</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono">4 ritmos</span>
-                </div>
-                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Fundamentos</div>
-                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">Sinusais normais e BAV 1º grau para introdução clínica.</p>
-              </button>
 
-              <!-- Preset 2: Arritmias -->
-              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="arritmias">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-2xl">⚡</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-lime-300 font-mono">6 ritmos</span>
+            <!-- 1.2 BARRA DE BUSCA E CONTROLES GLOBAIS -->
+            <div class="space-y-3 pt-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span id="libraryHeading" class="text-xs font-black uppercase tracking-wider text-slate-300">
+                  Categorias Clínicas
+                </span>
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <button id="btnSelectAll" type="button" class="muted-btn text-xs font-bold py-1 px-2.5">Selecionar todos</button>
+                  <button id="btnClearSelection" type="button" class="muted-btn text-xs font-bold py-1 px-2.5">Limpar</button>
+                  <button id="btnExpandAllCategories" type="button" class="muted-btn text-xs py-1 px-2.5">Expandir todas</button>
+                  <button id="btnCollapseAllCategories" type="button" class="muted-btn text-xs py-1 px-2.5">Recolher todas</button>
+                  <!-- Botões invisíveis para manter compatibilidade total de listeners -->
+                  <button id="btnSelectBlocks" type="button" class="hidden" aria-hidden="true">Bloqueios</button>
+                  <button id="btnSelectPcr" type="button" class="hidden" aria-hidden="true">PCR</button>
                 </div>
-                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Arritmias</div>
-                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">FA, Flutter, TSV e extrassístoles ventriculares.</p>
-              </button>
-
-              <!-- Preset 3: Ritmos de Emergência -->
-              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="emergencia">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-2xl">🚨</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950/80 text-rose-300 font-mono">7 ritmos</span>
-                </div>
-                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Ritmos de emergência</div>
-                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">PCR (FV, TV, AESP, Assistolia) e bradiarritmias críticas.</p>
-              </button>
-
-              <!-- Preset 4: Desafio Avançado -->
-              <button type="button" class="preset-card text-left p-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:border-lime-400/80 transition group" data-preset="avancado">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-2xl">🏆</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 font-mono">8 ritmos</span>
-                </div>
-                <div class="font-black text-sm text-white group-hover:text-lime-300 transition">Desafio avançado</div>
-                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">Bloqueios de 2º/3º grau, dissociação e diferenciais complexos.</p>
-              </button>
-            </div>
-          </section>
-
-          <!-- 2. BIBLIOTECA DE RITMOS POR CATEGORIAS CLÍNICAS -->
-          <section class="panel p-5 sm:p-6" aria-labelledby="libraryHeading">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div>
-                <h2 id="libraryHeading" class="font-black text-lg text-white flex items-center gap-2">
-                  <span>🫀</span> Biblioteca de ritmos clínicos
-                </h2>
-                <p class="text-xs text-slate-400 mt-0.5">
-                  <span id="selectedCount" class="font-bold text-lime-300">0</span> de 18 ritmos selecionados
-                </p>
               </div>
-              <div class="flex flex-wrap items-center gap-2">
-                <button id="btnSelectAll" type="button" class="muted-btn text-xs font-bold">Selecionar todos</button>
-                <button id="btnClearSelection" type="button" class="muted-btn text-xs font-bold">Limpar</button>
-                <button id="btnExpandAllCategories" type="button" class="muted-btn text-xs">Expandir todas</button>
-                <button id="btnCollapseAllCategories" type="button" class="muted-btn text-xs">Recolher todas</button>
-                <!-- Botões de compatibilidade mantidos de forma invisível -->
-                <button id="btnSelectBlocks" type="button" class="hidden" aria-hidden="true">Bloqueios</button>
-                <button id="btnSelectPcr" type="button" class="hidden" aria-hidden="true">PCR</button>
-              </div>
-            </div>
 
-            <!-- Filtro de Busca Integrado -->
-            <div class="mb-4">
+              <!-- Campo de Busca de Ritmos -->
               <div class="relative">
-                <input id="rhythmSearchInput" type="search" placeholder="🔍 Buscar por ritmo, sigla ou característica (ex: BAV, fibrilação, QRS, sinusal...)" class="field w-full text-xs py-2.5 pl-3 pr-8">
-                <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1" aria-label="Limpar busca">✕</button>
+                <input id="rhythmSearchInput" type="search" placeholder="🔍 Buscar por ritmo, sigla ou critério clínico (ex: BAV, fibrilação, QRS, sinusal, PCR...)" class="field w-full text-xs py-2.5 pl-3.5 pr-8">
+                <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1 cursor-pointer" aria-label="Limpar busca">✕</button>
               </div>
-              <p id="searchResultNotice" class="hidden text-[11px] text-cyan-300 mt-1 font-semibold"></p>
+              <p id="searchResultNotice" class="hidden text-[11px] text-cyan-300 font-semibold"></p>
             </div>
 
-            <!-- Categorias Clínicas Renderizadas Dinamicamente em #rhythmLibrary -->
-            <div id="rhythmLibrary" class="space-y-3.5"></div>
+            <!-- 1.3 CATEGORIAS EXPANSÍVEIS (Renderizadas dinamicamente em #rhythmLibrary) -->
+            <div id="rhythmLibrary" class="space-y-3"></div>
           </section>
 
-          <!-- 3. CONFIGURAÇÕES DA PARTIDA (3 GRUPOS CLAROS) -->
-          <section class="panel p-5 sm:p-6" aria-labelledby="settingsHeading">
-            <h2 id="settingsHeading" class="font-black text-lg text-white mb-4 flex items-center gap-2">
-              <span>⚙️</span> Configurações da partida
-            </h2>
-            
-            <div class="grid md:grid-cols-3 gap-5">
-              <!-- GRUPO A: REGRAS DA PARTIDA -->
+          <!-- ========================================== -->
+          <!-- ÁREA 2: REGRAS DA PARTIDA                 -->
+          <!-- ========================================== -->
+          <section id="sectionSetupRules" class="panel p-5 sm:p-6 space-y-5" aria-labelledby="settingsHeading">
+            <div class="flex items-center gap-3 border-b border-slate-800/80 pb-4">
+              <span class="w-8 h-8 rounded-xl bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 flex items-center justify-center font-black text-sm font-mono">2</span>
+              <div>
+                <h2 id="settingsHeading" class="font-black text-lg text-white flex items-center gap-2">
+                  <span>⚙️</span> Regras da Partida & Dinâmica
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">Configure a condução da sessão, tempo por questão e critérios pedagógicos.</p>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-4">
+              <!-- Bloco A: Formato & Tempo -->
               <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
                 <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-lime-300">A. Regras da Partida</span>
+                  <span class="text-xs font-black uppercase tracking-wider text-lime-300">A. Formato & Tempo</span>
                 </div>
-                
+
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Ordem das questões</span>
-                  <select id="gameMode" class="field text-xs mt-1.5 w-full">
+                  <select id="gameMode" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="random">Sorteio aleatório pelo sistema</option>
                     <option value="sequence">Sequência personalizada</option>
                   </select>
                 </label>
 
                 <label class="block">
-                  <span class="text-xs font-bold text-slate-300">Dificuldade</span>
-                  <select id="difficultySelect" class="field text-xs mt-1.5 w-full">
-                    <option value="easy">Fácil · distratores distintos</option>
-                    <option value="hard">Difícil · distratores semelhantes</option>
-                  </select>
-                </label>
-
-                <label class="block">
                   <span class="text-xs font-bold text-slate-300">Tempo de resposta</span>
-                  <select id="roundDurationSelect" class="field text-xs mt-1.5 w-full">
+                  <select id="roundDurationSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="15">15 segundos</option>
                     <option value="25" selected>25 segundos (padrão)</option>
                     <option value="40">40 segundos</option>
@@ -3542,7 +3578,7 @@
 
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Quantidade de rodadas</span>
-                  <select id="roundCountSelect" class="field text-xs mt-1.5 w-full">
+                  <select id="roundCountSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="all">Todos os ritmos selecionados</option>
                     <option value="5">5 rodadas</option>
                     <option value="10">10 rodadas</option>
@@ -3551,15 +3587,23 @@
                 </label>
               </div>
 
-              <!-- GRUPO B: EXPERIÊNCIA DA AULA -->
+              <!-- Bloco B: Condução & Didática -->
               <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
                 <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-cyan-300">B. Experiência da Aula</span>
+                  <span class="text-xs font-black uppercase tracking-wider text-cyan-300">B. Didática Clínica</span>
                 </div>
 
                 <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Dificuldade</span>
+                  <select id="difficultySelect" class="field text-xs mt-1.5 w-full cursor-pointer">
+                    <option value="easy">Fácil · distratores distintos</option>
+                    <option value="hard">Difícil · distratores semelhantes</option>
+                  </select>
+                </label>
+
+                <label class="block">
                   <span class="text-xs font-bold text-slate-300">Pausa para explicação</span>
-                  <select id="explanationPauseSelect" class="field text-xs mt-1.5 w-full">
+                  <select id="explanationPauseSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="off">Desligada</option>
                     <option value="manual" selected>Mostrar botão de pausa</option>
                     <option value="auto">Pausar automaticamente ao fim do tempo</option>
@@ -3568,22 +3612,22 @@
 
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Mostrar FC durante pergunta</span>
-                  <select id="showFcSelect" class="field text-xs mt-1.5 w-full">
+                  <select id="showFcSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="no" selected>Não</option>
                     <option value="yes">Sim (selo no monitor)</option>
                   </select>
                 </label>
               </div>
 
-              <!-- GRUPO C: PONTUAÇÃO E COMPETIÇÃO -->
+              <!-- Bloco C: Competição & Feedback -->
               <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
                 <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-amber-300">C. Pontuação e Competição</span>
+                  <span class="text-xs font-black uppercase tracking-wider text-amber-300">C. Competição & Placar</span>
                 </div>
 
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Frequência do ranking</span>
-                  <select id="rankingFrequencySelect" class="field text-xs mt-1.5 w-full">
+                  <select id="rankingFrequencySelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="every_question" selected>A cada pergunta</option>
                     <option value="every_5">A cada 5 perguntas</option>
                     <option value="end_only">Só no final da partida</option>
@@ -3596,64 +3640,95 @@
                     <input type="checkbox" id="studentShowsPositionCheck" class="w-4 h-4 rounded accent-lime-400 cursor-pointer" checked>
                     <span>Aluno vê sua colocação</span>
                   </label>
-                  <p class="text-[10px] text-slate-500 mt-1 pl-6.5">Exibe a posição individual no resultado de cada rodada do aluno.</p>
+                  <p class="text-[10px] text-slate-500 mt-1 pl-6.5">Exibe a posição individual no resultado de cada rodada no celular.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========================================== -->
+          <!-- ÁREA 3: SEQUÊNCIA                         -->
+          <!-- ========================================== -->
+          <section id="sectionSetupSequence" class="panel p-5 sm:p-6 space-y-4" aria-labelledby="sequenceSectionHeading">
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/30 text-amber-300 flex items-center justify-center font-black text-sm font-mono">3</span>
+                <div>
+                  <h2 id="sequenceSectionHeading" class="font-black text-lg text-white flex items-center gap-2">
+                    <span>🔢</span> Sequência das Rodadas
+                  </h2>
+                  <p class="text-xs text-slate-400 mt-0.5">Defina a ordem exata de apresentação dos ritmos ou utilize sorteio aleatório.</p>
                 </div>
               </div>
             </div>
 
-            <!-- Sequenciador (quando Ordem == sequence) -->
-            <div id="sequenceEditor" class="hidden mt-4 rounded-xl border border-slate-700 bg-slate-950/70 p-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-black text-slate-300 uppercase tracking-wider">Ordem Personalizada das Rodadas</span>
-                <span class="text-[10px] text-slate-400">Arraste os itens ou use as setas para ordenar</span>
+            <!-- Conteúdo do Sequenciador -->
+            <div id="sequenceEditor" class="hidden rounded-xl border border-slate-700 bg-slate-950/70 p-4">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-black text-slate-300 uppercase tracking-wider">Ordem Personalizada</span>
+                <span class="text-[10px] text-slate-400">Arraste os cards ou use as setas ▲ ▼</span>
               </div>
-              <ol id="selectedRhythmOrder" class="space-y-2 max-h-64 overflow-y-auto pr-1"></ol>
+              <ol id="selectedRhythmOrder" class="space-y-2 pt-1"></ol>
               <p id="sequenceEmpty" class="hidden text-xs text-amber-300 mt-2 font-semibold">Selecione ritmos na biblioteca para montar a sequência.</p>
+            </div>
+
+            <div id="sequenceRandomNotice" class="p-4 rounded-xl border border-slate-800/80 bg-slate-900/40 flex items-start gap-3">
+              <span class="text-xl">🎲</span>
+              <div class="space-y-1">
+                <p class="text-xs font-bold text-slate-200">Sorteio aleatório ativo</p>
+                <p class="text-[11px] text-slate-400 leading-relaxed">
+                  Os ritmos selecionados serão sorteados automaticamente pelo sistema a cada rodada. Caso queira escolher a ordem precisa de cada caso, altere a opção <strong class="text-white">Ordem das questões</strong> para <span class="text-cyan-300 font-semibold">"Sequência personalizada"</span> nas regras acima.
+                </p>
+              </div>
             </div>
           </section>
 
         </div>
 
-        <!-- Coluna da Direita: RESUMO PERSISTENTE DA SESSÃO (Sticky no Desktop) -->
-        <aside class="panel p-5 sm:p-6 lg:sticky lg:top-6 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
+        <!-- ========================================== -->
+        <!-- ÁREA 4: RESUMO DA SESSÃO & CRIAR SALA     -->
+        <!-- ========================================== -->
+        <aside id="sectionSetupSummary" class="panel p-5 sm:p-6 lg:sticky lg:top-6 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h2 id="summaryHeading" class="font-black text-base text-white flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-lime-400 animate-pulse"></span>
-              Resumo da Sessão
-            </h2>
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-lime-400/15 border border-lime-400/30 text-lime-300 flex items-center justify-center font-black text-xs font-mono">4</span>
+              <h2 id="summaryHeading" class="font-black text-base text-white flex items-center gap-2">
+                Resumo da Sessão
+              </h2>
+            </div>
             <span id="summaryBadgeStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 font-mono">Pronto</span>
           </div>
 
           <!-- Métricas Reais e Atualizadas -->
-          <div class="space-y-3">
-            <!-- Ritmos selecionados -->
+          <div class="space-y-3.5">
+            <!-- Ritmos selecionados com barra de progresso -->
             <div>
-              <div class="flex justify-between items-center text-xs mb-1">
-                <span class="text-slate-400 font-medium">Ritmos selecionados</span>
-                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300">0</b> / 18</span>
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <span class="text-slate-400 font-medium">Ritmos no jogo</span>
+                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300 text-sm">0</b> / 18</span>
               </div>
-              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                 <div id="sumRhythmsBar" class="bg-lime-400 h-full transition-all duration-300" style="width: 0%"></div>
               </div>
             </div>
 
-            <!-- Rodadas e Tempo -->
-            <div class="grid grid-cols-2 gap-2 pt-1">
+            <!-- Rodadas e Tempo Estimado -->
+            <div class="grid grid-cols-2 gap-2">
               <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
                 <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Rodadas</div>
-                <div id="sumRounds" class="text-lg font-black text-white mt-0.5">0</div>
+                <div id="sumRounds" class="text-base sm:text-lg font-black text-white mt-0.5">0</div>
                 <div id="sumRoundsDetail" class="text-[10px] text-slate-500 truncate">Todos os ritmos</div>
               </div>
               <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
                 <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Tempo estimado</div>
-                <div id="sumEstimatedTime" class="text-lg font-black text-white mt-0.5">0 min</div>
+                <div id="sumEstimatedTime" class="text-base sm:text-lg font-black text-white mt-0.5">0 min</div>
                 <div id="sumRoundDuration" class="text-[10px] text-slate-500">25s por rodada</div>
               </div>
             </div>
 
-            <!-- Badges das Regras -->
+            <!-- Badges das Regras Ativas -->
             <div class="pt-2 border-t border-slate-800/80">
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Regras da Partida</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Regras Ativas</span>
               <div class="flex flex-wrap gap-1.5" id="summaryRulesBadges">
                 <span id="sumBadgeMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sorteio aleatório</span>
                 <span id="sumBadgeDiff" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Fácil</span>
@@ -3663,13 +3738,13 @@
               </div>
             </div>
 
-            <!-- Lista compacta de ritmos selecionados -->
+            <!-- Lista compacta de ritmos selecionados (sem scroll interno desnecessário) -->
             <div class="pt-2 border-t border-slate-800/80">
               <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                <span>Ritmos no jogo</span>
+                <span>Ritmos Selecionados</span>
                 <span id="sumRhythmsPreviewCount" class="text-slate-500 font-mono">0 itens</span>
               </div>
-              <div id="summaryRhythmsChips" class="flex flex-wrap gap-1 max-h-28 overflow-y-auto pr-1">
+              <div id="summaryRhythmsChips" class="flex flex-wrap gap-1.5 pt-0.5">
                 <span class="text-xs text-slate-500 italic">Nenhum ritmo selecionado</span>
               </div>
             </div>
@@ -3681,11 +3756,11 @@
             <span>Selecione pelo menos um ritmo para criar a sala.</span>
           </div>
 
-          <!-- Botões de Ação -->
-          <div class="pt-2 space-y-2">
-            <button id="btnCreateRoom" type="button" class="primary w-full py-3.5 text-base font-black tracking-wide rounded-xl shadow-xl hover:scale-[1.01] active:scale-[0.99] transition flex items-center justify-center gap-2 cursor-pointer">
+          <!-- Botões de Ação com Destaque Máximo -->
+          <div class="pt-2 space-y-2.5">
+            <button id="btnCreateRoom" type="button" class="primary w-full py-4 text-base font-black tracking-wider rounded-xl shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2 cursor-pointer">
               <span>CRIAR SALA</span>
-              <span class="text-lg">→</span>
+              <span class="text-xl">→</span>
             </button>
 
             <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
@@ -3695,6 +3770,18 @@
           </div>
         </aside>
 
+      </div>
+
+      <!-- Barra de Ação Rápida Flutuante no Mobile (Fácil acesso ao Criar Sala) -->
+      <div class="mobile-setup-bar lg:hidden fixed bottom-0 left-0 right-0 p-3 flex items-center justify-between gap-3 z-30 shadow-2xl">
+        <div class="flex flex-col">
+          <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos no jogo</span>
+          <span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-lime-400 text-sm">0</b> / 18 ritmos</span>
+        </div>
+        <button type="button" onclick="$('btnCreateRoom').click()" class="primary py-2.5 px-5 text-xs font-black tracking-wider rounded-xl shadow-lg flex items-center gap-2 cursor-pointer">
+          <span>CRIAR SALA</span>
+          <span>→</span>
+        </button>
       </div>
     </section>
 
@@ -4441,6 +4528,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateSelectedCount(){
       const n = document.querySelectorAll('#rhythmLibrary input:checked').length;
       if ($('selectedCount')) $('selectedCount').textContent = String(n);
+      if ($('mobileSumCount')) $('mobileSumCount').textContent = String(n);
       if (n && $('setupError')) $('setupError').classList.add('hidden');
       
       // Update each category badge count
@@ -4467,7 +4555,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       container.innerHTML = Object.entries(CLINICAL_CATEGORIES).map(([cat, meta]) => {
         const rhythms = ECG_RHYTHMS.filter(r => r.category === cat);
         return `
-          <div class="category-group panel mb-3 border border-slate-700/60 rounded-xl overflow-hidden" data-category-block="${cat}">
+          <div class="category-group panel mb-3 border border-slate-700/60 rounded-xl overflow-hidden collapsed" data-category-block="${cat}">
             <div class="category-header p-3 sm:px-4 bg-slate-900/90 flex flex-wrap items-center justify-between gap-2 cursor-pointer border-b border-slate-800" data-cat-toggle="${cat}">
               <div class="flex items-center gap-2.5">
                 <span class="category-chevron text-slate-400 hover:text-white transition-transform text-xs" aria-hidden="true">▼</span>
@@ -4538,6 +4626,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             i.checked = true;
             i.closest('.rhythm-card').classList.add('selected');
           });
+          grp.classList.remove('collapsed');
           document.querySelectorAll('.preset-card').forEach(p => p.classList.remove('active'));
           updateSelectedCount();
           renderSequence();
@@ -4662,6 +4751,12 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const match = preset.rhythmIds.includes(i.value);
         i.checked = match;
         i.closest('.rhythm-card')?.classList.toggle('selected', match);
+      });
+
+      // Auto-expand categories with selected items and collapse others
+      document.querySelectorAll('.category-group').forEach(grp => {
+        const hasChecked = grp.querySelectorAll('input:checked').length > 0;
+        grp.classList.toggle('collapsed', !hasChecked);
       });
 
       // Highlight active preset card
@@ -4892,7 +4987,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
 
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
-    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if(show)renderSequence();updateSessionSummary();}
+    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.toggle('hidden',show);if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
     function initHost(){
       state.role='host';
