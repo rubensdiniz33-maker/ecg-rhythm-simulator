@@ -3602,11 +3602,10 @@
                 </label>
 
                 <label class="block">
-                  <span class="text-xs font-bold text-slate-300">Pausa para explicação</span>
-                  <select id="explanationPauseSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
-                    <option value="off">Desligada</option>
-                    <option value="manual" selected>Mostrar botão de pausa</option>
-                    <option value="auto">Pausar automaticamente ao fim do tempo</option>
+                  <span class="text-xs font-bold text-slate-300">Traçado do ECG</span>
+                  <select id="ecgModeSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
+                    <option value="static" selected>Estático (padrão · faixa fixa de ~8s)</option>
+                    <option value="animated">Animado (rolagem contínua de monitor)</option>
                   </select>
                 </label>
 
@@ -3732,7 +3731,7 @@
               <div class="flex flex-wrap gap-1.5" id="summaryRulesBadges">
                 <span id="sumBadgeMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sorteio aleatório</span>
                 <span id="sumBadgeDiff" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Fácil</span>
-                <span id="sumBadgePause" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Pausa manual</span>
+                <span id="sumBadgeEcgMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Traçado: Estático (8s)</span>
                 <span id="sumBadgeFc" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sem FC</span>
                 <span id="sumBadgeRank" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Ranking a cada rodada</span>
               </div>
@@ -4014,9 +4013,10 @@
 
     <!-- CONTROLES DO PROFESSOR EM BARRA FLUTUANTE COM BOTÕES DE 44PX E ÍCONES -->
     <nav class="projection-teacher-bar" id="projectionFooter" aria-label="Controles do professor">
-      <button id="btnPause" type="button" class="teacher-ctrl-btn teacher-btn-pause" title="Pausar / Retomar traçado e tempo (Atalho: Espaço)">
-        ⏸ Pausar
+      <button id="btnToggleAnimation" type="button" class="teacher-ctrl-btn teacher-btn-pause" title="Alternar traçado: Estático ou Animado (Atalho: Espaço)">
+        ▶ Animar
       </button>
+      <button id="btnPause" type="button" class="hidden" aria-hidden="true"></button>
       <button id="btnReveal" type="button" class="teacher-ctrl-btn teacher-btn-reveal" title="Revelar resposta e gabarito imediato">
         👁 Revelar
       </button>
@@ -4376,7 +4376,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       selectedRhythmIds:[],gameMode:'random',difficulty:'easy',roundLimit:null,
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
-      isExplaining:false,config:{explanationPause:'manual',rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:false},
+      isExplaining:false,config: { ecgMode: 'static',
+      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:false},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
@@ -4699,9 +4700,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const diff = $('difficultySelect')?.value || 'easy';
       if ($('sumBadgeDiff')) $('sumBadgeDiff').textContent = diff === 'hard' ? 'Difícil (semelhantes)' : 'Fácil (distintos)';
 
-      const pause = $('explanationPauseSelect')?.value || 'manual';
-      const pauseLabels = { off: 'Pausa: desligada', manual: 'Pausa: manual', auto: 'Pausa: automática' };
-      if ($('sumBadgePause')) $('sumBadgePause').textContent = pauseLabels[pause] || 'Pausa manual';
+      const ecgMode = $('ecgModeSelect')?.value || 'static';
+      const ecgBadge = $('sumBadgeEcgMode') || $('sumBadgePause');
+      if (ecgBadge) ecgBadge.textContent = ecgMode === 'animated' ? 'Traçado: Animado' : 'Traçado: Estático (8s)';
 
       const showFc = $('showFcSelect')?.value === 'yes';
       if ($('sumBadgeFc')) $('sumBadgeFc').textContent = showFc ? 'FC no monitor' : 'Sem FC';
@@ -5146,7 +5147,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('revealPanel')?.classList.add('hidden');
       $('btnNextFixed')?.classList.add('hidden');
       updateExplainStateUI(false);
-      if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
+      updateAnimationButtonUI();
       $('roundNumber').textContent=String(state.roundNumber);
       $('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';
       $('projectionOptions').innerHTML=state.currentChoices.map(c=>`<div class="answer-tile ${c.color}"><div class="answer-tile-content"><span class="shape">${c.shape}</span><span class="answer-label">${escapeHTML(c.label)}</span></div></div>`).join('');
@@ -5154,9 +5155,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('roundTimer').textContent=String(state.roundDuration);
       $('timerDisc').classList.remove('urgent');
       document.querySelector('.projection-question').textContent=(rhythm.id==='aesp'?'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?':'QUE RITMO É ESSE?');
-      const isNoPause=(state.config.explanationPause==='off');
-      if($('btnPause'))$('btnPause').classList.toggle('hidden',isNoPause);
-      if($('btnOpenZoom'))$('btnOpenZoom').classList.toggle('hidden',isNoPause);
+      if($('btnToggleAnimation'))$('btnToggleAnimation').classList.remove('hidden');
+      if($('btnOpenZoom'))$('btnOpenZoom').classList.remove('hidden');
 
       clearInterval(state.fcIntervalHandle);
       updateFcBadge();
@@ -5172,7 +5172,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
-    function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.isPaused||state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
+    function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
     function updateTimerDisplay(){
       const t=Math.max(0,state.timeLeft);
       if($('roundTimer'))$('roundTimer').textContent=String(t);
@@ -5224,42 +5224,13 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(state.isRevealed)return;
       state.roundLocked=true;
       clearInterval(state.timerHandle);
-      if(state.config.explanationPause==='auto'){
-        enterExplanationState();
-      }else{
-        revealRound();
-      }
-    }
-    function enterExplanationState(){
-      if(state.isRevealed)return;
-      state.roundLocked=true;
-      state.isPaused=true;
-      state.isExplaining=true;
-      state.pauseReasons.add('auto_explain');
-      clearInterval(state.timerHandle);
-      state.timeLeft=0;
-      updateTimerDisplay();
-      sendToAll({type:'ROUND_PAUSE',paused:true});
-      $('studentWaitMessage')?.classList.remove('hidden');
-      updateExplainStateUI(true);
+      revealRound();
     }
     function updateExplainStateUI(active){
       const badge=$('projectionExplainBadge');
-      if(badge)badge.classList.toggle('hidden',!active);
-      const btnRev=$('btnReveal');
-      if(btnRev){
-        if(active&&!state.isRevealed){
-          btnRev.textContent='👁 Revelar resposta ▶';
-          btnRev.classList.add('explain-action');
-        }else{
-          btnRev.textContent='👁 Revelar';
-          btnRev.classList.remove('explain-action');
-        }
-      }
-      const tDisc=$('timerDisc');
-      if(tDisc){
-        if(active&&!state.isRevealed)tDisc.classList.remove('urgent');
-      }
+      if(badge)badge.classList.add('hidden');
+      const btnRev=$('btnRevealNow');
+      if(btnRev)btnRev.classList.add('hidden');
     }
     function revealRound(){
       if(state.isRevealed||!state.currentRhythm)return;
@@ -5405,32 +5376,33 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const raw=localStorage.getItem('arena_config');
         if(raw){
           const c=JSON.parse(raw);
-          if(c.explanationPause)state.config.explanationPause=c.explanationPause;
+          if(c.ecgMode)state.config.ecgMode=c.ecgMode;
           if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
           if(typeof c.studentShowsPosition==='boolean')state.config.studentShowsPosition=c.studentShowsPosition;
           if(typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;
         }
       }catch(e){}
-      if($('explanationPauseSelect'))$('explanationPauseSelect').value=state.config.explanationPause;
+      if(!state.config.ecgMode)state.config.ecgMode='static';
+      if($('ecgModeSelect'))$('ecgModeSelect').value=state.config.ecgMode;
       if($('rankingFrequencySelect'))$('rankingFrequencySelect').value=state.config.rankingFrequency;
       if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').checked=state.config.studentShowsPosition;
       if($('showFcSelect'))$('showFcSelect').value=state.config.showBpmDuringQuestion?'yes':'no';
     }
     function saveStoredConfig(){
-      if($('explanationPauseSelect'))state.config.explanationPause=$('explanationPauseSelect').value;
+      if($('ecgModeSelect'))state.config.ecgMode=$('ecgModeSelect').value;
       if($('rankingFrequencySelect'))state.config.rankingFrequency=$('rankingFrequencySelect').value;
       if($('studentShowsPositionCheck'))state.config.studentShowsPosition=$('studentShowsPositionCheck').checked;
       if($('showFcSelect'))state.config.showBpmDuringQuestion=($('showFcSelect').value==='yes');
       try{localStorage.setItem('arena_config',JSON.stringify(state.config))}catch(e){}
     }
     function updateHostLobbySummary(){
-      const pauseMap={off:'Pausa: Desligada',manual:'Pausa: Botão ativo',auto:'Pausa: Auto ao fim do tempo'};
+      const ecgMap={static:'Traçado: Estático (8s)',animated:'Traçado: Animado'};
       const rankMap={every_question:'Ranking: A cada rodada',every_5:'Ranking: A cada 5 rodadas',end_only:'Ranking: Só no final',never:'Ranking: Nunca'};
       const posMap=state.config.studentShowsPosition?'Aluno vê posição: Sim':'Aluno vê posição: Não';
       const fcMap=state.config.showBpmDuringQuestion?'FC na pergunta: Sim':'FC na pergunta: Não';
       const el=$('hostGameSummary');
       if(el){
-        el.innerHTML=`<div class="font-bold text-sm mb-1.5" style="color:var(--text-title);">${state.selectedRhythmIds.length} ritmos · ${state.gameMode==='sequence'?'Sequência personalizada':'Sorteio aleatório'} · ${state.roundDuration}s</div><div class="flex flex-wrap gap-1.5 text-[11px]" style="color:var(--muted);"><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${pauseMap[state.config.explanationPause]||'Pausa manual'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${rankMap[state.config.rankingFrequency]||'Ranking ativo'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${posMap}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${fcMap}</span></div>`;
+        el.innerHTML=`<div class="font-bold text-sm mb-1.5" style="color:var(--text-title);">${state.selectedRhythmIds.length} ritmos · ${state.gameMode==='sequence'?'Sequência personalizada':'Sorteio aleatório'} · ${state.roundDuration}s</div><div class="flex flex-wrap gap-1.5 text-[11px]" style="color:var(--muted);"><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${ecgMap[state.config.ecgMode]||'Traçado: Estático (8s)'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${rankMap[state.config.rankingFrequency]||'Ranking ativo'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${posMap}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${fcMap}</span></div>`;
       }
     }
     function shouldShowRankingThisRound(){
@@ -5781,8 +5753,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,defs,Math.random()*1e9|0);
       ecgEngine.setSignal(1,true);
       
-      // Pré-processar ~12 s de sinal (motor a 250 Hz = 3000 amostras) para garantir monitor 100% preenchido sem faixas vazias
-      const targetSeconds=12;
+      // Pré-processar ~8 s de sinal (motor a 250 Hz = 2000 amostras) para faixa fixa sem rolagem
+      const targetSeconds=8.0;
       const preSteps=Math.round(targetSeconds/0.04);
       const chunks=[];
       let totalSamples=0;
@@ -5816,11 +5788,48 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.sampleOffset=totalSamples;
       frameLast=0;
       cancelAnimationFrame(ecgFrame);
-      ecgFrame=requestAnimationFrame(ecgLoop);
+
+      state.ecgAnimated = (state.config.ecgMode === 'animated');
+      updateAnimationButtonUI();
+
+      if(state.ecgAnimated){
+        ecgFrame=requestAnimationFrame(ecgLoop);
+      }else{
+        drawEcgFrame();
+      }
     }
+
+    function toggleEcgAnimation(){
+      if(!state.currentRhythm)return;
+      state.ecgAnimated = !state.ecgAnimated;
+      updateAnimationButtonUI();
+      if(state.ecgAnimated){
+        frameLast=0;
+        cancelAnimationFrame(ecgFrame);
+        ecgFrame=requestAnimationFrame(ecgLoop);
+      }else{
+        cancelAnimationFrame(ecgFrame);
+        drawEcgFrame();
+      }
+    }
+
+    function updateAnimationButtonUI(){
+      const btn=$('btnToggleAnimation')||$('btnPause');
+      if(!btn)return;
+      if(state.ecgAnimated){
+        btn.textContent='⏸ Parar';
+        btn.title='Traçado animado · Clique para congelar faixa fixa (o relógio não para)';
+        btn.classList.add('is-animating');
+      }else{
+        btn.textContent='▶ Animar';
+        btn.title='Traçado estático (~8s) · Clique para animar rolagem (o relógio não para)';
+        btn.classList.remove('is-animating');
+      }
+    }
+
     function ecgLoop(timestamp){
       if(!ecgEngine)return;
-      if(!state.isPaused){
+      if(state.ecgAnimated){
         const dt=frameLast?Math.min(.08,(timestamp-frameLast)/1000):.016;
         frameLast=timestamp;
         const samples=ecgEngine.advance(dt);
@@ -5834,15 +5843,17 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           state.currentSamples=combined;
           state.sampleOffset+=samples.length;
         }
+        drawEcgFrame();
+        ecgFrame=requestAnimationFrame(ecgLoop);
       }
-      drawEcgFrame();
-      ecgFrame=requestAnimationFrame(ecgLoop);
     }
+
     function ecgPalette(){
       return state.theme==='light'
         ? { bg: '#fff3f1', small: '#f7c8c6', large: '#ec8c89', trace: '#111111' }
         : { bg: '#020806', small: 'rgba(22,185,129,.10)', large: 'rgba(22,185,129,.28)', trace: '#54e7a8' };
     }
+
     function drawEcgFrame(){
       const canvas=$('roundEcgCanvas');
       if(!canvas||!state.currentSamples||!state.currentSamples.length)return;
@@ -5856,9 +5867,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ctx.fillStyle=colors.bg;
       ctx.fillRect(0,0,w,h);
 
-      // Grade maior e precisa (1 mm ≈ 14–16 px)
-      // Em telas 1080p (w >= 1600): 15 px/mm (5 mm = 75 px)
-      // Em telas 768p (w < 1600): 14 px/mm (5 mm = 70 px)
+      // Grade milimetrada de ECG (1 mm e 5 mm)
       const mm=(w>=1600)?15:14;
       const stepSmall=mm;
       const stepLarge=mm*5;
@@ -5890,12 +5899,6 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const scale=targetQrsHeight/effectiveP2P;
       const baseline=(h*0.50)+(midVal*scale);
 
-      // Velocidade do papel padrão: 25 mm/s com grade de mm px/mm
-      // O motor roda a 250 Hz (250 amostras/s) => amostras por pixel = 250 / (25 * mm) = 10 / mm
-      // Janela temporal visível mostra ~5–6 batimentos em ritmo sinusal
-      const samplesPerPx=10/mm;
-      const lastIdx=dataLen-1;
-
       ctx.beginPath();
       ctx.strokeStyle=colors.trace;
       ctx.lineWidth=state.theme==='light'?3.2:3.5;
@@ -5904,79 +5907,131 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ctx.shadowColor=state.theme==='light'?'transparent':'rgba(84,231,168,.45)';
       ctx.shadowBlur=state.theme==='light'?0:5;
 
-      let started=false;
-      for(let x=0;x<w;x++){
-        const samplePos=lastIdx-(w-1-x)*samplesPerPx;
-        let val;
-        if(samplePos<=0){
-          val=data[0];
-        }else if(samplePos>=lastIdx){
-          val=data[lastIdx];
-        }else{
+      if(!state.ecgAnimated){
+        // MODO ESTÁTICO (PADRÃO): faixa fixa de ~8s ocupando 100% da largura, sem rolar
+        let started=false;
+        for(let x=0;x<w;x++){
+          const samplePos=(x/(w-1))*(dataLen-1);
           const i0=Math.floor(samplePos);
           const frac=samplePos-i0;
-          val=data[i0]*(1-frac)+data[i0+1]*frac;
+          const val=(i0+1<dataLen)?data[i0]*(1-frac)+data[i0+1]*frac:data[i0];
+          const y=baseline-val*scale;
+          if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
         }
-        const y=baseline-val*scale;
-        if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
+      }else{
+        // MODO ANIMADO: rolagem contínua a 25 mm/s
+        const samplesPerPx=10/mm;
+        const lastIdx=dataLen-1;
+        let started=false;
+        for(let x=0;x<w;x++){
+          const samplePos=lastIdx-(w-1-x)*samplesPerPx;
+          let val;
+          if(samplePos<=0){
+            val=data[0];
+          }else if(samplePos>=lastIdx){
+            val=data[lastIdx];
+          }else{
+            const i0=Math.floor(samplePos);
+            const frac=samplePos-i0;
+            val=data[i0]*(1-frac)+data[i0+1]*frac;
+          }
+          const y=baseline-val*scale;
+          if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
+        }
       }
       ctx.stroke();
       ctx.shadowBlur=0;
     }
-    function togglePause(reason='teacher'){
-      if(state.config.explanationPause==='off')return;
-      if(state.isRevealed)return;
-      state.isPaused=!state.isPaused;
-      if(state.isPaused){
-        state.pauseReasons.add(reason);
-        state.isExplaining=true;
-        clearInterval(state.timerHandle);
-        if($('btnPause'))$('btnPause').textContent='▶ Retomar';
-        sendToAll({type:'ROUND_PAUSE',paused:true});
-        $('studentWaitMessage')?.classList.remove('hidden');
-        updateExplainStateUI(true);
-      }else{
-        state.pauseReasons.clear();
-        state.isExplaining=false;
-        if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
-        if(state.timeLeft>0){
-          state.roundDeadline=Date.now()+state.timeLeft*1000;
-          startTimer();
-        }
-        sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});
-        $('studentWaitMessage')?.classList.add('hidden');
-        updateExplainStateUI(false);
-      }
+
+    function togglePause(){
+      toggleEcgAnimation();
     }
+
     function addTime(){
       if(state.isRevealed)return;
       state.timeLeft+=10;
       state.roundLocked=false;
-      state.isPaused=false;
-      state.isExplaining=false;
-      state.pauseReasons.clear();
-      updateExplainStateUI(false);
-      if($('btnPause'))$('btnPause').textContent='⏸ Pausar';
       state.roundDeadline=Date.now()+state.timeLeft*1000;
       updateTimerDisplay();
       startTimer();
       sendToAll({type:'ROUND_TIME',seconds:state.timeLeft});
-      sendToAll({type:'ROUND_PAUSE',paused:false,seconds:state.timeLeft});
-      $('studentWaitMessage')?.classList.add('hidden');
     }
-    function openZoom(rect){if(state.config.explanationPause==='off')return;if(!state.currentSamples.length)return;window.currentZoomRect=rect;$('explainOverlay').classList.remove('hidden');const canvas=$('zoomCanvas');const box=canvas.getBoundingClientRect();const dpr=Math.min(2,devicePixelRatio||1);canvas.width=box.width*dpr;canvas.height=box.height*dpr;const ctx=canvas.getContext('2d');const light=state.theme==='light';ctx.fillStyle=light?'#fff3f1':'#020806';ctx.fillRect(0,0,box.width,box.height);const minor=light?'#f7c8c6':'rgba(22,185,129,.08)',major=light?'#ec8c89':'rgba(22,185,129,.23)';for(let step of [10,50]){ctx.strokeStyle=step===10?minor:major;ctx.lineWidth=step===10?1:1.4;for(let x=0;x<box.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,box.height);ctx.stroke()}for(let y=0;y<box.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(box.width,y);ctx.stroke()}}ctx.beginPath();ctx.strokeStyle=light?'#111':'#54e7a8';ctx.lineWidth=3;ctx.shadowColor=light?'transparent':'#54e7a8';ctx.shadowBlur=light?0:8;const data=state.currentSamples;const canW=Math.max(1,$('roundEcgCanvas')?.clientWidth||1000);const startIdx=data.length-canW;let begin=Math.max(0,startIdx),end=data.length;if(rect){begin=Math.max(0,Math.min(data.length-1,startIdx+Math.floor(rect.x)));end=Math.max(begin+1,Math.min(data.length,startIdx+Math.floor(rect.x+rect.w)));}for(let x=0;x<box.width;x++){const index=begin+Math.floor(x/box.width*(end-begin));const y=box.height*.52-data[index]*Math.min(box.height*.35,120);if(!x)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();$('zoomRuler').classList.toggle('hidden',!state.rulerOn);
+
+    function openZoom(rect){
+      if(!state.currentSamples||!state.currentSamples.length)return;
+      window.currentZoomRect=rect;
+      $('explainOverlay')?.classList.remove('hidden');
+      const canvas=$('zoomCanvas');
+      if(!canvas)return;
+      const box=canvas.getBoundingClientRect();
+      const dpr=Math.min(2,devicePixelRatio||1);
+      canvas.width=box.width*dpr;
+      canvas.height=box.height*dpr;
+      const ctx=canvas.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      const light=state.theme==='light';
+      ctx.fillStyle=light?'#fff3f1':'#020806';
+      ctx.fillRect(0,0,box.width,box.height);
+
+      const minor=light?'#f7c8c6':'rgba(22,185,129,.08)',major=light?'#ec8c89':'rgba(22,185,129,.23)';
+      for(let step of [10,50]){
+        ctx.strokeStyle=step===10?minor:major;
+        ctx.lineWidth=step===10?1:1.4;
+        for(let x=0;x<box.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,box.height);ctx.stroke();}
+        for(let y=0;y<box.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(box.width,y);ctx.stroke();}
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle=light?'#111':'#54e7a8';
+      ctx.lineWidth=3;
+      ctx.shadowColor=light?'transparent':'#54e7a8';
+      ctx.shadowBlur=light?0:8;
+
+      const data=state.currentSamples;
+      const canW=Math.max(1,$('roundEcgCanvas')?.clientWidth||1000);
+
+      let begin=0, end=data.length;
+      if(rect && rect.w > 5){
+        if(!state.ecgAnimated){
+          begin = Math.max(0, Math.min(data.length - 1, Math.floor((rect.x / canW) * (data.length - 1))));
+          end = Math.max(begin + 2, Math.min(data.length, Math.ceil(((rect.x + rect.w) / canW) * (data.length - 1))));
+        } else {
+          const startIdx = data.length - canW;
+          begin = Math.max(0, Math.min(data.length - 1, startIdx + Math.floor(rect.x)));
+          end = Math.max(begin + 2, Math.min(data.length, startIdx + Math.floor(rect.x + rect.w)));
+        }
+      }
+
+      const midVal = (state.ecgGain && state.ecgGain.p2p >= 0.25) ? state.ecgGain.midVal : 0;
+      const p2p = (state.ecgGain && state.ecgGain.p2p >= 0.25) ? state.ecgGain.p2p : 1.30;
+      const targetH = box.height * 0.40;
+      const scale = targetH / p2p;
+      const baseline = (box.height * 0.50) + (midVal * scale);
+
+      for(let x=0;x<box.width;x++){
+        const samplePos = begin + (x / (box.width - 1)) * (end - 1 - begin);
+        const i0 = Math.floor(samplePos);
+        const frac = samplePos - i0;
+        const val = (i0 + 1 < data.length) ? data[i0] * (1 - frac) + data[i0 + 1] * frac : data[i0];
+        const y = baseline - val * scale;
+        if(!x) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur=0;
+
+      $('zoomRuler')?.classList.toggle('hidden',!state.rulerOn);
       const cInfo = $('caliperInfo');
       if (cInfo) {
         cInfo.classList.toggle('hidden', !state.rulerOn);
         if (state.rulerOn) {
-          // Standard ECG speed 25 mm/s, 1 mm = 40 ms, 5 mm = 200 ms
-          const dtMs = 280; // calibrated demo measurement
+          const dtMs = 280;
           const smallBoxes = (dtMs / 40).toFixed(1);
           const hr = Math.round(60000 / dtMs);
           cInfo.innerHTML = `<b>COMPASSO ECG:</b> Δt ≈ ${dtMs} ms (${smallBoxes} quadradinhos) · FC estimada: ~${hr} bpm`;
         }
       }
     }
+
     function setupZoomSelection(){
       const stage = $('ecgStage');
       if (!stage) return;
@@ -6019,14 +6074,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         rectEl = null;
         start = null;
         if (box.w > 25) {
-          if (state.config.explanationPause === 'off') return;
-          if (!state.isPaused) togglePause('zoom');
           openZoom(box);
         }
       });
     }
 
-    // STUDENT FLOW
     function renderAvatarPicker(){const picker=$('avatarPicker');picker.innerHTML=AVATARS.map((a,i)=>`<button type="button" class="avatar-option ${i===0?'selected':''}" data-avatar="${a.id}" title="${a.label}" aria-label="${a.label}">${a.emoji}</button>`).join('');picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{picker.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');state.studentAvatar=btn.dataset.avatar}))}
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
     function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
@@ -6037,9 +6089,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if (msg.studentId && msg.type === 'ROUND_REVEAL' && state.studentId && msg.studentId !== state.studentId) return;
       if (msg.type === 'ROUND_QUESTION') showStudentQuestion(msg);
       else if (msg.type === 'ROUND_PAUSE') {
-        state.isPaused = msg.paused;
-        $('studentWaitMessage')?.classList.toggle('hidden', !msg.paused);
-        if (msg.paused) { clearInterval(window.studentTimer); }
+        /* No-op: o relógio e as respostas nunca param */
       }
       else if (msg.type === 'ROUND_TIME') {
         if ($('studentTimer')) $('studentTimer').textContent = String(msg.seconds);
@@ -6079,7 +6129,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         progBar.classList.remove('is-urgent');
       }
 
-      if ($('studentWaitMessage')) $('studentWaitMessage').classList.toggle('hidden', !msg.paused);
+      if ($('studentWaitMessage')) $('studentWaitMessage').classList.add('hidden');
 
       const grid = $('studentChoices');
       grid.classList.remove('answered');
@@ -6091,7 +6141,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       `).join('');
 
       grid.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
-        if (state.studentLastChoice || state.isPaused || state.roundLocked) return;
+        if (state.studentLastChoice || state.roundLocked) return;
         state.studentLastChoice = btn.dataset.choice;
         state.studentAnsweredAt = Date.now();
         state.roundLocked = true;
@@ -6401,7 +6451,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     $('difficultySelect').onchange = () => { state.difficulty = $('difficultySelect').value; updateSessionSummary(); };
     $('roundDurationSelect').onchange = () => { state.roundDuration = Number($('roundDurationSelect').value) || 25; updateSessionSummary(); };
     $('roundCountSelect').onchange = () => updateSessionSummary();
-    $('explanationPauseSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
+    if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     $('showFcSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     $('rankingFrequencySelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     $('studentShowsPositionCheck').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
@@ -6450,14 +6500,15 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
     if ($('btnStartGame')) $('btnStartGame').onclick = () => { buildRoundQueue(); startNextRound(); };
-    if ($('btnPause')) $('btnPause').onclick = () => togglePause();
+    if ($('btnToggleAnimation')) $('btnToggleAnimation').onclick = toggleEcgAnimation;
+    if ($('btnPause')) $('btnPause').onclick = toggleEcgAnimation;
     if ($('btnReveal')) $('btnReveal').onclick = revealRound;
     const handleNext = () => { if (!state.isRevealed) revealRound(); else startNextRound(); };
     if ($('btnNext')) $('btnNext').onclick = handleNext;
     if ($('btnNextFooter')) $('btnNextFooter').onclick = handleNext;
     if ($('btnNextFixed')) $('btnNextFixed').onclick = handleNext;
     if ($('btnAddTime')) $('btnAddTime').onclick = addTime;
-    if ($('btnOpenZoom')) $('btnOpenZoom').onclick = () => { if (!state.isPaused) togglePause('zoom'); openZoom(null); };
+    if ($('btnOpenZoom')) $('btnOpenZoom').onclick = () => openZoom(null);
     if ($('btnThemeToggle')) $('btnThemeToggle').onclick = toggleTheme;
     if ($('btnThemeProjection')) $('btnThemeProjection').onclick = toggleTheme;
     if ($('btnFullscreen')) $('btnFullscreen').onclick = () => {
@@ -6475,7 +6526,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     };
     if ($('btnCopyPin')) $('btnCopyPin').onclick = () => navigator.clipboard?.writeText(state.pin).then(() => showToast('PIN copiado'));
     if ($('btnCopyLink')) $('btnCopyLink').onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname + '?pin=' + state.pin).then(() => showToast('Link copiado'));
-    if ($('explanationPauseSelect')) $('explanationPauseSelect').onchange = saveStoredConfig;
+    if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     if ($('rankingFrequencySelect')) $('rankingFrequencySelect').onchange = saveStoredConfig;
     if ($('studentShowsPositionCheck')) $('studentShowsPositionCheck').onchange = saveStoredConfig;
     if ($('showFcSelect')) $('showFcSelect').onchange = saveStoredConfig;
@@ -6495,7 +6546,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if (e.key === 'Escape') $('explainOverlay')?.classList.add('hidden');
       if (e.code === 'Space' && state.role === 'host' && state.projection) {
         e.preventDefault();
-        togglePause();
+        toggleEcgAnimation();
       }
       if ((e.key === 'n' || e.key === 'N') && state.role === 'host' && state.isRevealed) {
         startNextRound();
@@ -6510,7 +6561,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
     });
 
-    if ($('projection')) $('projection').addEventListener('dblclick', () => togglePause());
+    if ($('projection')) $('projection').addEventListener('dblclick', () => toggleEcgAnimation());
     loadStoredConfig();
     window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)studentSend({type:'LEAVE',studentId:state.studentId})});
     function getInitialTheme(){
