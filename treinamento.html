@@ -902,30 +902,194 @@
     }
 
     /* ========================================================
-       PAINEL DE REVELAÇÃO: SUBSTITUI A ÁREA DO TRAÇADO (#ecgStage)
-       NÃO COBRE AS ALTERNATIVAS · FONTES ≥ 22PX
+       PAINEL DE EXPLICAÇÃO CLÍNICA: GAVETA LATERAL / INFERIOR
+       NUNCA COBRE O TRAÇADO DE ECG (#ecgStage)
        ======================================================== */
-    .projection-reveal-panel {
-      position: absolute;
-      inset: 0;
-      z-index: 25;
-      background: rgba(8, 14, 26, 0.96);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+    .projection-ecg {
+      min-height: 0;
+      border-radius: 20px;
+      position: relative;
+      user-select: none;
+      box-shadow: 0 0 50px var(--monitor-glow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      background: var(--ecg-bg);
+    }
+
+    .ecg-canvas-wrap {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 100%;
+      position: relative;
+    }
+
+    .projection-reveal-drawer {
+      width: 460px;
+      max-width: 42vw;
+      height: 100%;
+      flex-shrink: 0;
+      background: rgba(8, 14, 26, 0.98);
+      border-left: 2px solid var(--line-strong);
       color: var(--text);
-      padding: 20px 28px;
+      padding: 16px 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      animation: revealFadeIn .25s ease-out;
+      animation: drawerSlideIn .22s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
     }
-    .theme-light .projection-reveal-panel {
-      background: rgba(255, 255, 255, 0.97);
-      box-shadow: inset 0 0 0 1px #ebd0cc;
+
+    .theme-light .projection-reveal-drawer {
+      background: #ffffff;
+      border-left-color: #ebd0cc;
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
     }
-    @keyframes revealFadeIn {
-      from { opacity: 0; transform: scale(.985); }
+
+    @keyframes drawerSlideIn {
+      from { transform: translateX(24px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .reveal-drawer-inner {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      gap: 12px;
+    }
+    .reveal-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .reveal-drawer-title-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .reveal-rhythm-name-drawer {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-title);
+      margin: 0;
+    }
+    .reveal-drawer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-close-drawer {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--panel-subtle);
+      border: 1px solid var(--line);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 900;
+      transition: all .15s ease;
+    }
+    .btn-close-drawer:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #dc2626;
+    }
+
+    .reveal-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1 1 auto;
+      overflow-y: auto;
+    }
+
+    .teacher-btn-explain {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid var(--line-strong);
+      color: var(--text);
+    }
+    .teacher-btn-explain.is-active {
+      background: #10b981 !important;
+      border-color: #34d399 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+    }
+    .theme-light .teacher-btn-explain {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    .theme-light .teacher-btn-explain.is-active {
+      background: #047857 !important;
+      border-color: #065f46 !important;
+      color: #ffffff !important;
+    }
+
+    /* Estilo do título de gabarito no cabeçalho */
+    .projection-question.is-revealed {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 26px;
+      font-weight: 900;
+      flex-wrap: wrap;
+    }
+    .reveal-lead-tag {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .theme-light .reveal-lead-tag {
+      background: rgba(16, 185, 129, 0.15);
+      color: #047857;
+      border-color: #10b981;
+    }
+    .reveal-lead-name {
+      color: var(--text);
+      text-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+    }
+    .theme-light .reveal-lead-name {
+      text-shadow: none;
+    }
+    .reveal-lead-fc {
+      font-size: 17px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      background: var(--panel-subtle);
+      border: 1px solid var(--line);
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .projection-ecg {
+        flex-direction: column !important;
+      }
+      .projection-reveal-drawer {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 48% !important;
+        border-left: none !important;
+        border-top: 2px solid var(--line-strong) !important;
+      }
+    }
       to { opacity: 1; transform: scale(1); }
     }
 
@@ -3616,6 +3780,15 @@
                     <option value="yes">Sim (selo no monitor)</option>
                   </select>
                 </label>
+
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-300">Explicação na revelação</span>
+                  <select id="revealExplanationSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
+                    <option value="off" selected>Desligada (padrão · só ritmo e FC)</option>
+                    <option value="summary">Resumida (critérios diagnósticos)</option>
+                    <option value="full">Completa (critérios e conduta clínica)</option>
+                  </select>
+                </label>
               </div>
 
               <!-- Bloco C: Competição & Feedback -->
@@ -3733,6 +3906,7 @@
                 <span id="sumBadgeDiff" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Fácil</span>
                 <span id="sumBadgeEcgMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Traçado: Estático (8s)</span>
                 <span id="sumBadgeFc" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sem FC</span>
+              <span id="sumBadgeExplanation" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Explicação: Desligada</span>
                 <span id="sumBadgeRank" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Ranking a cada rodada</span>
               </div>
             </div>
@@ -3940,42 +4114,35 @@
         <b id="monitorFcValue" class="fc-value">--</b>
         <span class="fc-unit">bpm</span>
       </div>
-      <canvas id="roundEcgCanvas"></canvas>
 
-      <!-- Pausa: Faixa discreta embaixo do monitor, sem espremer o título -->
-      <div id="projectionExplainBadge" class="hidden projection-freeze-strip" role="status" aria-live="polite">
-        <span class="freeze-strip-dot"></span>
-        <span class="freeze-strip-title">Traçado Congelado</span>
-        <span class="freeze-strip-sep">·</span>
-        <span class="freeze-strip-desc">Modo Explicação</span>
-        <span class="freeze-strip-hint">(Espaço para retomar)</span>
+      <!-- Container do Canvas de ECG: ocupa 100% ou divide espaço lateralmente com a explicação -->
+      <div id="ecgCanvasWrap" class="ecg-canvas-wrap">
+        <canvas id="roundEcgCanvas"></canvas>
       </div>
-    
-      <!-- PAINEL DE REVELAÇÃO: Substitui a área do traçado na revelação (Fonte ≥ 22px) SEM cobrir as alternativas -->
-      <div id="revealPanel" class="hidden projection-reveal-panel" role="region" aria-label="Gabarito da Rodada">
-        <div class="reveal-inner-container">
-          <!-- Cabeçalho do Gabarito -->
-          <div class="reveal-top-bar">
-            <div class="reveal-title-wrap">
-              <span class="reveal-badge-tag">GABARITO OFICIAL</span>
-              <h2 id="revealName" class="reveal-rhythm-name"></h2>
+
+      <!-- PAINEL DE EXPLICAÇÃO: Gaveta lateral/inferior SEM COBRIR O TRAÇADO -->
+      <aside id="revealPanel" class="hidden projection-reveal-drawer" role="region" aria-label="Explicação da Rodada">
+        <div class="reveal-drawer-inner">
+          <!-- Cabeçalho da Gaveta -->
+          <div class="reveal-drawer-header">
+            <div class="reveal-drawer-title-box">
+              <span class="reveal-badge-tag">EXPLICAÇÃO</span>
+              <h2 id="revealName" class="reveal-rhythm-name-drawer"></h2>
               <span id="revealRate" class="reveal-rate-pill"></span>
             </div>
-            <div class="reveal-top-actions">
+            <div class="reveal-drawer-actions">
               <div id="revealStatsBadge" class="reveal-stat-badge">
                 <span class="stat-lbl">ACERTO:</span>
                 <b id="revealAccuracyPct" class="stat-val">0%</b>
               </div>
-              <button id="btnNext" class="btn-reveal-next" type="button" aria-label="Avançar para a próxima rodada (Atalho: N)">
-                Próximo ▶
-              </button>
+              <button id="btnCloseExplain" type="button" class="btn-close-drawer" title="Fechar explicação (Atalho: E)" aria-label="Fechar painel de explicação">✕</button>
             </div>
           </div>
 
-          <!-- Cards Clínicos: Explicação (Critérios de ECG) + Conduta Imediata com fontes ≥ 22px -->
-          <div class="reveal-cards-grid">
-            <!-- Card 1: Diagnóstico e Critérios (Explicação - Fonte ≥ 22px) -->
-            <div class="reveal-card reveal-card-feature">
+          <!-- Cards Clínicos (Critérios Diagnósticos e Conduta) -->
+          <div class="reveal-cards-container">
+            <!-- Card 1: Diagnóstico e Critérios (Explicação) -->
+            <div id="revealCardFeature" class="reveal-card reveal-card-feature">
               <div class="reveal-card-header">
                 <span class="reveal-card-icon" aria-hidden="true">📋</span>
                 <h3 class="reveal-card-title">Critérios Diagnósticos no ECG</h3>
@@ -3985,8 +4152,8 @@
               </div>
             </div>
 
-            <!-- Card 2: Conduta Imediata & Manejo (Fonte ≥ 22px) -->
-            <div class="reveal-card reveal-card-conduct">
+            <!-- Card 2: Conduta Imediata & Manejo -->
+            <div id="revealCardConduct" class="reveal-card reveal-card-conduct">
               <div class="reveal-card-header">
                 <span class="reveal-card-icon" aria-hidden="true">⚡</span>
                 <h3 class="reveal-card-title">Conduta Imediata & Manejo</h3>
@@ -3996,6 +4163,24 @@
               </div>
             </div>
           </div>
+
+          <!-- Ranking ao vivo da rodada -->
+          <div id="revealRankingSection" class="reveal-ranking-row hidden">
+            <div class="reveal-ranking-header">
+              <span class="section-label">Top Classificação ao Vivo</span>
+            </div>
+            <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
+          </div>
+
+          <!-- Botão Próximo dentro da gaveta para conveniência -->
+          <div class="pt-2">
+            <button id="btnNext" class="btn-reveal-next w-full" type="button" aria-label="Avançar para a próxima rodada (Atalho: N)">
+              Próximo ▶
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
 
           <!-- Ranking ao vivo da rodada (quando habilitado nas regras) -->
           <div id="revealRankingSection" class="reveal-ranking-row hidden">
@@ -4019,6 +4204,9 @@
       <button id="btnPause" type="button" class="hidden" aria-hidden="true"></button>
       <button id="btnReveal" type="button" class="teacher-ctrl-btn teacher-btn-reveal" title="Revelar resposta e gabarito imediato">
         👁 Revelar
+      </button>
+      <button id="btnToggleExplain" type="button" class="teacher-ctrl-btn teacher-btn-explain" title="Abrir / Fechar painel de explicação clínica (Atalho: E)">
+        📋 Explicar
       </button>
       <button id="btnNextFooter" type="button" class="teacher-ctrl-btn teacher-btn-next" title="Avançar para a próxima rodada (Atalho: N)">
         Próximo →
@@ -4707,6 +4895,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const showFc = $('showFcSelect')?.value === 'yes';
       if ($('sumBadgeFc')) $('sumBadgeFc').textContent = showFc ? 'FC no monitor' : 'Sem FC';
 
+      const expMode = $('revealExplanationSelect')?.value || 'off';
+      const expLabels = { off: 'Explicação: Desligada', summary: 'Explicação: Resumida', full: 'Explicação: Completa' };
+      if ($('sumBadgeExplanation')) $('sumBadgeExplanation').textContent = expLabels[expMode] || 'Explicação: Desligada';
+
       const rank = $('rankingFrequencySelect')?.value || 'every_question';
       const rankLabels = { every_question: 'Ranking por rodada', every_5: 'Ranking a cada 5', end_only: 'Ranking final', never: 'Sem ranking' };
       if ($('sumBadgeRank')) $('sumBadgeRank').textContent = rankLabels[rank] || 'Ranking';
@@ -5154,7 +5346,12 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('answerCount').textContent='0';
       $('roundTimer').textContent=String(state.roundDuration);
       $('timerDisc').classList.remove('urgent');
-      document.querySelector('.projection-question').textContent=(rhythm.id==='aesp'?'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?':'QUE RITMO É ESSE?');
+      const qHeader = document.querySelector('.projection-question');
+      if (qHeader) {
+        qHeader.classList.remove('is-revealed');
+        qHeader.textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
+      }
+      applyExplanationMode('off');
       if($('btnToggleAnimation'))$('btnToggleAnimation').classList.remove('hidden');
       if($('btnOpenZoom'))$('btnOpenZoom').classList.remove('hidden');
 
@@ -5296,14 +5493,24 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       });
       updateLeaderboard();
       const resultById=new Map(results.map(r=>[r.p.id,r]));
-      if($('revealName'))$('revealName').textContent=correct.name;
-      if($('revealFeature'))$('revealFeature').textContent=CLINICAL[correct.id]?.points||'Critérios em análise.';
-      if($('revealConduct'))$('revealConduct').textContent=CLINICAL[correct.id]?.conduct||'Manter monitorização e suporte avançado.';
-      if($('revealRate'))$('revealRate').textContent='· '+(correct.id==='asystole'?'FC 0 bpm':(state.chosenRate?`FC ${state.chosenRate} bpm`:(correct.rateKey==='freq'?'':`FC ${correct.defaultRate||''} bpm`)));
+      const fcText = (correct.id === 'asystole' ? 'FC 0 bpm' : (state.chosenRate ? `FC ${state.chosenRate} bpm` : (correct.rateKey === 'freq' ? '' : `FC ${correct.defaultRate || ''} bpm`)));
 
-      // Exibe o painel de revelação sobre o traçado (não cobre alternativas)
-      if($('revealPanel'))$('revealPanel').classList.remove('hidden');
-      if($('btnNextFixed'))$('btnNextFixed').classList.remove('hidden');
+      // 1. Atualiza cabeçalho da projeção com nome do ritmo e FC (NUNCA cobre o traçado de ECG)
+      const qHeader = document.querySelector('.projection-question');
+      if (qHeader) {
+        qHeader.classList.add('is-revealed');
+        qHeader.innerHTML = `<span class="reveal-lead-tag">GABARITO</span> <span class="reveal-lead-name">${escapeHTML(correct.name)}</span> <span class="reveal-lead-fc">${escapeHTML(fcText)}</span>`;
+      }
+
+      // Preenche dados do ritmo para caso o professor abra a explicação
+      if($('revealName')) $('revealName').textContent = correct.name;
+      if($('revealRate')) $('revealRate').textContent = '· ' + fcText;
+      if($('revealFeature')) $('revealFeature').textContent = CLINICAL[correct.id]?.points || 'Critérios em análise.';
+      if($('revealConduct')) $('revealConduct').textContent = CLINICAL[correct.id]?.conduct || 'Manter monitorização e suporte avançado.';
+
+      // Abre gaveta de explicação apenas se configurada para 'summary' ou 'full' (por padrão 'off' fica desligada)
+      applyExplanationMode(state.config.revealExplanation || 'off');
+      if($('btnNextFixed')) $('btnNextFixed').classList.remove('hidden');
 
       // Votos e porcentagens
       const totalVotes=state.answersReceived.size;
@@ -5377,18 +5584,22 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         if(raw){
           const c=JSON.parse(raw);
           if(c.ecgMode)state.config.ecgMode=c.ecgMode;
+          if(c.revealExplanation)state.config.revealExplanation=c.revealExplanation;
           if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
           if(typeof c.studentShowsPosition==='boolean')state.config.studentShowsPosition=c.studentShowsPosition;
           if(typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;
         }
       }catch(e){}
       if(!state.config.ecgMode)state.config.ecgMode='static';
+      if(!state.config.revealExplanation)state.config.revealExplanation='off';
+      if($('revealExplanationSelect'))$('revealExplanationSelect').value=state.config.revealExplanation;
       if($('ecgModeSelect'))$('ecgModeSelect').value=state.config.ecgMode;
       if($('rankingFrequencySelect'))$('rankingFrequencySelect').value=state.config.rankingFrequency;
       if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').checked=state.config.studentShowsPosition;
       if($('showFcSelect'))$('showFcSelect').value=state.config.showBpmDuringQuestion?'yes':'no';
     }
     function saveStoredConfig(){
+      if($('revealExplanationSelect'))state.config.revealExplanation=$('revealExplanationSelect').value;
       if($('ecgModeSelect'))state.config.ecgMode=$('ecgModeSelect').value;
       if($('rankingFrequencySelect'))state.config.rankingFrequency=$('rankingFrequencySelect').value;
       if($('studentShowsPositionCheck'))state.config.studentShowsPosition=$('studentShowsPositionCheck').checked;
@@ -5397,12 +5608,13 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function updateHostLobbySummary(){
       const ecgMap={static:'Traçado: Estático (8s)',animated:'Traçado: Animado'};
+      const expMap={off:'Explicação: Desligada',summary:'Explicação: Resumida',full:'Explicação: Completa'};
       const rankMap={every_question:'Ranking: A cada rodada',every_5:'Ranking: A cada 5 rodadas',end_only:'Ranking: Só no final',never:'Ranking: Nunca'};
       const posMap=state.config.studentShowsPosition?'Aluno vê posição: Sim':'Aluno vê posição: Não';
       const fcMap=state.config.showBpmDuringQuestion?'FC na pergunta: Sim':'FC na pergunta: Não';
       const el=$('hostGameSummary');
       if(el){
-        el.innerHTML=`<div class="font-bold text-sm mb-1.5" style="color:var(--text-title);">${state.selectedRhythmIds.length} ritmos · ${state.gameMode==='sequence'?'Sequência personalizada':'Sorteio aleatório'} · ${state.roundDuration}s</div><div class="flex flex-wrap gap-1.5 text-[11px]" style="color:var(--muted);"><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${ecgMap[state.config.ecgMode]||'Traçado: Estático (8s)'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${rankMap[state.config.rankingFrequency]||'Ranking ativo'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${posMap}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${fcMap}</span></div>`;
+        el.innerHTML=`<div class="font-bold text-sm mb-1.5" style="color:var(--text-title);">${state.selectedRhythmIds.length} ritmos · ${state.gameMode==='sequence'?'Sequência personalizada':'Sorteio aleatório'} · ${state.roundDuration}s</div><div class="flex flex-wrap gap-1.5 text-[11px]" style="color:var(--muted);"><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${ecgMap[state.config.ecgMode]||'Traçado: Estático (8s)'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${expMap[state.config.revealExplanation]||'Explicação: Desligada'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${rankMap[state.config.rankingFrequency]||'Ranking ativo'}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${posMap}</span><span class="inline-flex items-center px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border);">${fcMap}</span></div>`;
       }
     }
     function shouldShowRankingThisRound(){
@@ -5943,6 +6155,48 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ctx.shadowBlur=0;
     }
 
+    function applyExplanationMode(mode){
+      const panel = $('revealPanel');
+      const cardFeature = $('revealCardFeature');
+      const cardConduct = $('revealCardConduct');
+      const btnExplain = $('btnToggleExplain');
+
+      if(mode === 'off'){
+        panel?.classList.add('hidden');
+        btnExplain?.classList.remove('is-active');
+        if(btnExplain) btnExplain.textContent = '📋 Explicar';
+      } else if(mode === 'summary'){
+        panel?.classList.remove('hidden');
+        cardFeature?.classList.remove('hidden');
+        cardConduct?.classList.add('hidden');
+        btnExplain?.classList.add('is-active');
+        if(btnExplain) btnExplain.textContent = '✕ Fechar Explicação';
+      } else if(mode === 'full'){
+        panel?.classList.remove('hidden');
+        cardFeature?.classList.remove('hidden');
+        cardConduct?.classList.remove('hidden');
+        btnExplain?.classList.add('is-active');
+        if(btnExplain) btnExplain.textContent = '✕ Fechar Explicação';
+      }
+
+      // Reajusta desenho do traçado no canvas para a largura atual
+      requestAnimationFrame(() => {
+        drawEcgFrame();
+      });
+    }
+
+    function toggleExplainPanel(){
+      const panel = $('revealPanel');
+      if(!panel) return;
+      const isHidden = panel.classList.contains('hidden');
+      if(isHidden){
+        const targetMode = (state.config.revealExplanation === 'summary') ? 'summary' : 'full';
+        applyExplanationMode(targetMode);
+      } else {
+        applyExplanationMode('off');
+      }
+    }
+
     function togglePause(){
       toggleEcgAnimation();
     }
@@ -6033,7 +6287,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
 
     function setupZoomSelection(){
-      const stage = $('ecgStage');
+      const stage = $('ecgCanvasWrap') || $('ecgStage');
       if (!stage) return;
       let start = null, rectEl = null;
       stage.addEventListener('pointerdown', e => {
@@ -6503,6 +6757,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     if ($('btnToggleAnimation')) $('btnToggleAnimation').onclick = toggleEcgAnimation;
     if ($('btnPause')) $('btnPause').onclick = toggleEcgAnimation;
     if ($('btnReveal')) $('btnReveal').onclick = revealRound;
+    if ($('btnToggleExplain')) $('btnToggleExplain').onclick = toggleExplainPanel;
+    if ($('btnCloseExplain')) $('btnCloseExplain').onclick = () => applyExplanationMode('off');
+    if ($('revealExplanationSelect')) $('revealExplanationSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     const handleNext = () => { if (!state.isRevealed) revealRound(); else startNextRound(); };
     if ($('btnNext')) $('btnNext').onclick = handleNext;
     if ($('btnNextFooter')) $('btnNextFooter').onclick = handleNext;
@@ -6550,6 +6807,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
       if ((e.key === 'n' || e.key === 'N') && state.role === 'host' && state.isRevealed) {
         startNextRound();
+      }
+      if ((e.key === 'e' || e.key === 'E') && state.role === 'host' && state.projection) {
+        e.preventDefault();
+        toggleExplainPanel();
       }
     });
 
