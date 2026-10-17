@@ -1612,32 +1612,48 @@
     }
 
     
+    /* Esconder o cabeçalho global nas telas do aluno (lobby, pergunta, resultado) */
+    body:has(#studentLobby:not(.hidden)) #globalHeader,
+    body:has(#studentGame:not(.hidden)) #globalHeader,
+    body:has(#studentReveal:not(.hidden)) #globalHeader {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
     /* ========================================================
        TELAS DO ALUNO (MOBILE PREMIUM)
        ======================================================== */
 
-    /* Barra de progresso do relógio na borda superior */
+    /* Barra de progresso discreta e sempre visível no topo da tela do aluno */
     .student-progress-track {
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: relative;
       width: 100%;
       height: 4px;
-      background: rgba(255, 255, 255, 0.15);
-      z-index: 50;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 9999px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
       overflow: hidden;
+      z-index: 50;
+    }
+    .theme-light .student-progress-track {
+      background: rgba(0, 0, 0, 0.14);
     }
     .student-progress-bar {
       height: 100%;
       width: 100%;
       background: #10b981;
       background-image: linear-gradient(90deg, #10b981, #f59e0b);
+      border-radius: 9999px;
       transform-origin: left;
       transition: width 0.95s linear, background-color 0.3s ease;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
     }
     .student-progress-bar.is-urgent {
       background: #f43f5e;
       background-image: linear-gradient(90deg, #f59e0b, #ef4444);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
       animation: pulse-urgent 0.5s infinite alternate;
     }
     @keyframes pulse-urgent {
@@ -1649,10 +1665,10 @@
     .student-fullscreen {
       position: fixed;
       inset: 0;
-      z-index: 15;
+      z-index: 30;
       background: var(--bg);
       color: var(--text);
-      padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+      padding: max(8px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       height: 100dvh;
@@ -1664,12 +1680,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 8px;
-      padding-right: 68px; /* Folga ampla para o botão de tema flutuante (42px) não sobrepor */
-      height: 52px;
-      min-height: 52px;
+      padding: 0 4px;
+      height: 46px;
+      min-height: 46px;
       flex-shrink: 0;
       box-sizing: border-box;
+      margin-bottom: 6px;
     }
     .student-round-pill {
       display: inline-flex;
@@ -4579,7 +4595,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     const CHANNEL_PREFIX='ecg-rhythm-room-';
 
     function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
-    function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');$('globalHeader').classList.remove('hidden');const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
+    function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');const isStudentScreen=['studentLobby','studentGame','studentReveal'].includes(view);if(isStudentScreen){$('globalHeader')?.classList.add('hidden')}else{$('globalHeader')?.classList.remove('hidden')}const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
     function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
     function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
@@ -6354,7 +6370,18 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         /* No-op: o relógio e as respostas nunca param */
       }
       else if (msg.type === 'ROUND_TIME') {
-        if ($('studentTimer')) $('studentTimer').textContent = String(msg.seconds);
+        const t = Number(msg.seconds);
+        if (!isNaN(t)) {
+          if ($('studentTimer')) $('studentTimer').textContent = String(t);
+          const pb = $('studentProgressBar');
+          if (pb) {
+            const tot = state.currentTotalSec || 25;
+            const pct = Math.max(0, (t / tot) * 100);
+            pb.style.width = pct + '%';
+            if (t <= 5) pb.classList.add('is-urgent');
+            else pb.classList.remove('is-urgent');
+          }
+        }
       }
       else if (msg.type === 'ROUND_REVEAL') showStudentReveal(msg);
       else if (msg.type === 'KICK' && msg.studentId === state.studentId) switchView('viewStudentJoin');
@@ -6382,6 +6409,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
 
       const totalSec = Number(msg.seconds) || 25;
+      state.currentTotalSec = totalSec;
       let sec = totalSec;
       if ($('studentTimer')) $('studentTimer').textContent = String(sec);
 
@@ -6512,6 +6540,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       // 4. Interface visual do aluno (com validação prévia de cada elemento)
       try {
         if ($('studentWaitMessage')) $('studentWaitMessage').classList.add('hidden');
+        switchView('studentReveal');
         const revealEl = $('studentReveal');
         const timedOut = Boolean(msg?.timeExpired || (!answered));
 
