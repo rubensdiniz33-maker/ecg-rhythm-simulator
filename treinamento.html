@@ -123,24 +123,29 @@
     button, input, select { font: inherit; }
     button { cursor: pointer; }
 
-    /* Botão Sol/Lua SEMPRE VISÍVEL no canto da tela */
-    .theme-toggle-floating {
-      position: fixed;
-      top: 12px;
-      right: 14px;
-      z-index: 1000;
-      width: 42px;
-      height: 42px;
-      border-radius: 9999px;
+    /* BARRA DE FERRAMENTAS DO CABEÇALHO (Botão de tema integrado sem cobrir relógio nem cards) */
+    .header-toolbar {
       display: flex;
       align-items: center;
+      gap: 8px;
+    }
+    .theme-toggle-floating,
+    .header-theme-btn {
+      position: static !important;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      font-size: 20px;
-      line-height: 1;
+      gap: 7px;
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 12px;
       border: 1px solid var(--btn-border);
       background: var(--btn);
       color: var(--text);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       cursor: pointer;
@@ -148,13 +153,22 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .theme-toggle-floating:hover {
-      transform: scale(1.08);
+    .theme-toggle-floating:hover,
+    .header-theme-btn:hover {
+      transform: translateY(-1px);
       border-color: var(--btn-hover-border);
       background: var(--btn-hover-bg);
     }
-    .theme-toggle-floating:active {
-      transform: scale(0.95);
+    .theme-toggle-floating:active,
+    .header-theme-btn:active {
+      transform: translateY(1px);
+    }
+    .theme-light .theme-toggle-floating,
+    .theme-light .header-theme-btn {
+      background: #ffffff;
+      border-color: #ebd0cc;
+      color: #1e293b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .shell {
@@ -733,44 +747,72 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
     }
 
-    /* Alternativas do jogo (4 botões em grade de 4 colunas) */
+    /* ========================================================
+       ALTERNATIVAS DO JOGO NA PROJEÇÃO (4 BOTÕES EM GRADE)
+       Nomes quebram em duas linhas sem cortes nem "..."
+       ======================================================== */
     .projection-options {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      min-height: 120px;
-      max-height: 165px;
+      min-height: 104px;
+      max-height: 155px;
     }
     .projection-options .answer-tile {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 10px 16px;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
       border-radius: 16px;
       text-align: left;
-      font-size: clamp(16px, 1.4vw, 24px);
+      font-size: clamp(13px, 1.12vw, 17px);
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1.15;
+      position: relative;
+      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .25s ease, opacity .25s ease, filter .25s ease;
+      overflow: hidden;
+      box-sizing: border-box;
+      min-width: 0;
     }
     .projection-options .shape {
-      font-size: clamp(40px, 4vw, 68px);
+      font-size: clamp(28px, 2.5vw, 42px);
       line-height: 1;
       flex-shrink: 0;
+    }
+    .answer-tile-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .answer-tile-content .answer-label {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: break-word;
+      line-height: 1.15;
+      display: block;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     @media (max-height: 820px) {
       .projection-options {
         gap: 8px;
-        min-height: 96px;
-        max-height: 125px;
+        min-height: 90px;
+        max-height: 120px;
       }
       .projection-options .answer-tile {
-        padding: 8px 12px;
-        gap: 10px;
-        font-size: 16px;
+        padding: 6px 10px;
+        gap: 8px;
+        font-size: clamp(12px, 1.2vw, 15px);
+        line-height: 1.12;
       }
       .projection-options .shape {
-        font-size: 36px;
+        font-size: clamp(24px, 2.2vw, 32px);
       }
     }
 
@@ -801,39 +843,7 @@
       -webkit-text-stroke: 2.2px #0f172a;
     }
 
-    /* TILES DAS ALTERNATIVAS NA PROJEÇÃO */
-    .projection-options .answer-tile {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 18px;
-      border-radius: 18px;
-      text-align: left;
-      font-size: clamp(16px, 1.35vw, 22px);
-      font-weight: 800;
-      line-height: 1.2;
-      position: relative;
-      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .25s ease, opacity .25s ease, filter .25s ease;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
-    .projection-options .shape {
-      font-size: clamp(38px, 3.4vw, 56px);
-      line-height: 1;
-    }
-    .answer-tile-content {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex: 1;
-      min-width: 0;
-    }
-    .answer-tile-content .answer-label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    /* Tiles das alternativas já configurados acima sem cortes */
 
     /* REVELAÇÃO: CORRETA CRESCE, BRILHA E MOSTRA ✓ */
     .projection-options .answer-tile.is-correct {
@@ -2154,12 +2164,12 @@
 
     @media(max-width: 760px) {
       .shell { padding: 12px; }
-      .theme-toggle-floating { top: 8px; right: 8px; width: 36px; height: 36px; font-size: 17px; }
+      .theme-toggle-floating, .header-theme-btn { height: 34px; padding: 0 10px; font-size: 12px; }
       .projection-layout { padding: 8px 9px; grid-template-rows: 48px minmax(0,1fr) auto auto; gap: 7px; }
       .projection-header { grid-template-columns: auto 1fr auto; }
       .projection-question { font-size: 21px; }
       .projection-options { grid-template-columns: repeat(2,1fr); grid-template-rows: 1fr 1fr; min-height: 140px; gap: 7px; }
-      .projection-options .answer-tile { padding: 8px; gap: 8px; font-size: 15px; }
+      .projection-options .answer-tile { padding: 8px; gap: 8px; font-size: 13px; line-height: 1.15; }
       .projection-options .shape { font-size: 36px; }
       .projection-footer { opacity: 1; }
       .student-choice { height: calc((100dvh - 56px)/2); }
@@ -3482,13 +3492,9 @@
   </style>
 </head>
 <body>
-  <!-- Botão sol/lua SEMPRE visível em todas as telas -->
-  <button id="themeToggleFloating" class="theme-toggle-floating" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema claro/escuro">
-    <span id="themeToggleFloatingIcon">☀️</span>
-  </button>
 
   <main class="shell">
-    <header id="globalHeader" class="flex items-center justify-between gap-4 mb-7 pr-14 sm:pr-16 z-20 relative">
+    <header id="globalHeader" class="flex items-center justify-between gap-4 mb-7 z-20 relative">
       <a href="./" class="flex items-center gap-3.5 no-underline text-white group">
         <img src="assets/ecg-arena-icon-3d.png" alt="Arena ECG 3D Icon" class="brand-mark-3d" />
         <span>
@@ -3496,7 +3502,14 @@
           <span class="block text-[11px] text-slate-400">Treino de interpretação em tempo real</span>
         </span>
       </a>
-      
+
+      <!-- BARRA DE FERRAMENTAS DO CABEÇALHO (Botão de tema integrado) -->
+      <div class="header-toolbar">
+        <button id="themeToggleFloating" class="header-theme-btn" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema claro/escuro">
+          <span id="themeToggleFloatingIcon">☀️</span>
+          <span id="themeToggleFloatingText" class="header-theme-label text-xs font-bold hidden sm:inline">Claro</span>
+        </button>
+      </div>
     </header>
 
     <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
@@ -4172,12 +4185,7 @@
             <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
           </div>
 
-          <!-- Botão Próximo dentro da gaveta para conveniência -->
-          <div class="pt-2">
-            <button id="btnNext" class="btn-reveal-next w-full" type="button" aria-label="Avançar para a próxima rodada (Atalho: N)">
-              Próximo ▶
-            </button>
-          </div>
+
         </div>
       </aside>
     </div>
@@ -4208,9 +4216,7 @@
       <button id="btnToggleExplain" type="button" class="teacher-ctrl-btn teacher-btn-explain" title="Abrir / Fechar painel de explicação clínica (Atalho: E)">
         📋 Explicar
       </button>
-      <button id="btnNextFooter" type="button" class="teacher-ctrl-btn teacher-btn-next" title="Avançar para a próxima rodada (Atalho: N)">
-        Próximo →
-      </button>
+
       <div class="teacher-bar-divider" aria-hidden="true"></div>
       <button id="btnAddTime" type="button" class="teacher-ctrl-btn icon-btn" title="Adicionar +10 segundos ao cronômetro">
         +10s
@@ -4682,6 +4688,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         floatBtn.title = isLight ? 'Mudar para tema escuro (🌙)' : 'Mudar para tema claro (☀️)';
         floatBtn.setAttribute('aria-label', floatBtn.title);
       }
+      const floatText = $('themeToggleFloatingText');
+      if (floatText) floatText.textContent = isLight ? 'Escuro' : 'Claro';
       const hostToggle = $('btnThemeToggle');
       if (hostToggle) hostToggle.textContent = isLight ? '🌙 Escuro' : '☀️ Claro';
       const projToggle = $('btnThemeProjection');
