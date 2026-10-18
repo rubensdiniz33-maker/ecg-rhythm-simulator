@@ -257,6 +257,33 @@
       font-weight: 900;
     }
 
+        .duration-preset-btn {
+      border: 1px solid var(--btn-border);
+      background: var(--btn);
+      color: var(--btn-text);
+      border-radius: 9px;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      transition: all .15s ease;
+      cursor: pointer;
+      line-height: 1.2;
+    }
+    .duration-preset-btn:hover {
+      border-color: var(--btn-hover-border);
+      background: var(--btn-hover-bg);
+      color: var(--btn-hover-text);
+      transform: translateY(-1px);
+    }
+    .duration-preset-btn.is-active {
+      background: var(--primary-bg) !important;
+      border-color: var(--lime) !important;
+      color: var(--primary-text) !important;
+      box-shadow: 0 0 12px var(--primary-shadow);
+      font-weight: 900;
+    }
+
     .field {
       width: 100%;
       border: 1px solid var(--field-border);
@@ -3780,15 +3807,28 @@
                   </select>
                 </label>
 
-                <label class="block">
-                  <span class="text-xs font-bold text-slate-300">Tempo de resposta</span>
-                  <select id="roundDurationSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
-                    <option value="15">15 segundos</option>
-                    <option value="25" selected>25 segundos (padrão)</option>
-                    <option value="40">40 segundos</option>
-                    <option value="60">60 segundos</option>
-                  </select>
-                </label>
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-300">Tempo de resposta</span>
+                    <span id="roundDurationBadge" class="text-xs font-mono font-black px-2 py-0.5 rounded-md" style="background:var(--btn); border:1px solid var(--btn-border); color:var(--lime);">25s</span>
+                  </div>
+
+                  <!-- Atalhos rápidos (15, 25, 40, 60 s) -->
+                  <div class="grid grid-cols-4 gap-1.5" id="roundDurationShortcuts" role="group" aria-label="Atalhos de tempo de resposta">
+                    <button type="button" class="duration-preset-btn text-center" data-seconds="15">15s</button>
+                    <button type="button" class="duration-preset-btn text-center is-active" data-seconds="25">25s</button>
+                    <button type="button" class="duration-preset-btn text-center" data-seconds="40">40s</button>
+                    <button type="button" class="duration-preset-btn text-center" data-seconds="60">60s</button>
+                  </div>
+
+                  <!-- Campo livre de 5 a 180 s -->
+                  <div class="relative flex items-center">
+                    <input type="number" id="roundDurationInput" min="5" max="180" step="1" value="25" class="field text-xs py-2 px-3 pr-14 font-mono font-bold" placeholder="5 a 180" aria-label="Tempo personalizado de resposta (5 a 180 s)">
+                    <span class="absolute right-3 text-[11px] font-bold pointer-events-none text-slate-400">seg</span>
+                  </div>
+                  <span class="block text-[10px] text-slate-400">Atalhos rápidos ou ajuste livre de 5 a 180 s (padrão: 25 s).</span>
+                  <input type="hidden" id="roundDurationSelect" value="25">
+                </div>
 
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Quantidade de rodadas</span>
@@ -4890,6 +4930,25 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       updateSelectedCount();
     }
 
+        window.setRoundDuration = setRoundDuration;
+    function setRoundDuration(val, fromInput = false) {
+      let num = parseInt(val, 10);
+      if (isNaN(num)) num = 25;
+      num = Math.max(5, Math.min(180, num));
+      state.roundDuration = num;
+
+      if ($('roundDurationSelect')) $('roundDurationSelect').value = String(num);
+      if ($('roundDurationBadge')) $('roundDurationBadge').textContent = `${num}s`;
+      if (!fromInput && $('roundDurationInput')) $('roundDurationInput').value = num;
+
+      document.querySelectorAll('#roundDurationShortcuts .duration-preset-btn').forEach(btn => {
+        const sec = Number(btn.dataset.seconds);
+        btn.classList.toggle('is-active', sec === num);
+      });
+
+      updateSessionSummary();
+    }
+
     function updateSessionSummary(){
       const checkedInputs = document.querySelectorAll('#rhythmLibrary input:checked');
       const count = checkedInputs.length;
@@ -5418,7 +5477,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
-    function startTimer(){clearInterval(state.timerHandle);state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
+    function startTimer(reset = true){clearInterval(state.timerHandle);if(reset){state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;}updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
     function updateTimerDisplay(){
       const t=Math.max(0,state.timeLeft);
       if($('roundTimer'))$('roundTimer').textContent=String(t);
@@ -5637,8 +5696,12 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
           if(typeof c.studentShowsPosition==='boolean')state.config.studentShowsPosition=c.studentShowsPosition;
           if(typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;
+          if(typeof c.roundDuration==='number' && c.roundDuration>=5 && c.roundDuration<=180){
+            setRoundDuration(c.roundDuration, false);
+          }
         }
       }catch(e){}
+      if(!state.roundDuration) setRoundDuration(25, false);
       if(!state.config.ecgMode)state.config.ecgMode='static';
       if(!state.config.revealExplanation)state.config.revealExplanation='off';
       if($('revealExplanationSelect'))$('revealExplanationSelect').value=state.config.revealExplanation;
@@ -5653,6 +5716,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if($('rankingFrequencySelect'))state.config.rankingFrequency=$('rankingFrequencySelect').value;
       if($('studentShowsPositionCheck'))state.config.studentShowsPosition=$('studentShowsPositionCheck').checked;
       if($('showFcSelect'))state.config.showBpmDuringQuestion=($('showFcSelect').value==='yes');
+      state.config.roundDuration = state.roundDuration || 25;
       try{localStorage.setItem('arena_config',JSON.stringify(state.config))}catch(e){}
     }
     function updateHostLobbySummary(){
@@ -6263,7 +6327,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.roundLocked=false;
       state.roundDeadline=Date.now()+state.timeLeft*1000;
       updateTimerDisplay();
-      startTimer();
+      startTimer(false);
       sendToAll({type:'ROUND_TIME',seconds:state.timeLeft});
     }
 
@@ -6848,7 +6912,42 @@ function animatePoints(points) {
     // Settings listeners
     $('gameMode').onchange = () => { toggleSequenceEditor(); updateSessionSummary(); };
     $('difficultySelect').onchange = () => { state.difficulty = $('difficultySelect').value; updateSessionSummary(); };
-    $('roundDurationSelect').onchange = () => { state.roundDuration = Number($('roundDurationSelect').value) || 25; updateSessionSummary(); };
+        // Atalhos e campo livre de tempo de resposta (5 a 180s)
+    document.querySelectorAll('#roundDurationShortcuts .duration-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sec = Number(btn.dataset.seconds) || 25;
+        setRoundDuration(sec, false);
+        saveStoredConfig();
+      });
+    });
+    if ($('roundDurationInput')) {
+      $('roundDurationInput').addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val === '') return;
+        const num = parseInt(val, 10);
+        if (!isNaN(num) && num >= 5 && num <= 180) {
+          setRoundDuration(num, true);
+          saveStoredConfig();
+        } else if (!isNaN(num) && num > 180) {
+          e.target.value = 180;
+          setRoundDuration(180, true);
+          saveStoredConfig();
+        }
+      });
+      $('roundDurationInput').addEventListener('change', (e) => {
+        setRoundDuration(e.target.value, false);
+        saveStoredConfig();
+      });
+      $('roundDurationInput').addEventListener('blur', (e) => {
+        setRoundDuration(e.target.value, false);
+        saveStoredConfig();
+      });
+    }
+    if ($('roundDurationSelect')) {
+      $('roundDurationSelect').onchange = () => {
+        setRoundDuration($('roundDurationSelect').value, false);
+      };
+    }
     $('roundCountSelect').onchange = () => updateSessionSummary();
     if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     $('showFcSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
@@ -6878,7 +6977,7 @@ function animatePoints(points) {
       }
       state.gameMode = $('gameMode').value;
       state.difficulty = $('difficultySelect').value;
-      state.roundDuration = Number($('roundDurationSelect').value) || 25;
+      state.roundDuration = state.roundDuration || Number($('roundDurationSelect')?.value) || 25;
       const n = $('roundCountSelect').value;
       state.roundLimit = n === 'all' ? null : Number(n);
       if (state.gameMode === 'sequence') {
