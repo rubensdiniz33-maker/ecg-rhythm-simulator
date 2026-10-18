@@ -5989,8 +5989,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,defs,Math.random()*1e9|0);
       ecgEngine.setSignal(1,true);
       
-      // Pré-processar ~8 s de sinal (motor a 250 Hz = 2000 amostras) para faixa fixa sem rolagem
-      const targetSeconds=8.0;
+      // Pré-processar ~12 s de sinal (motor a 250 Hz = 3000 amostras) para preencher a tela na escala padrão de 25 mm/s
+      const targetSeconds=12.0;
       const preSteps=Math.round(targetSeconds/0.04);
       const chunks=[];
       let totalSamples=0;
@@ -6054,11 +6054,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(!btn)return;
       if(state.ecgAnimated){
         btn.textContent='⏸ Parar';
-        btn.title='Traçado animado · Clique para congelar faixa fixa (o relógio não para)';
+        btn.title='Traçado animado (25 mm/s) · Clique para congelar quadro (o relógio não para)';
         btn.classList.add('is-animating');
       }else{
         btn.textContent='▶ Animar';
-        btn.title='Traçado estático (~8s) · Clique para animar rolagem (o relógio não para)';
+        btn.title='Traçado parado (25 mm/s) · Clique para animar rolagem (o relógio não para)';
         btn.classList.remove('is-animating');
       }
     }
@@ -6143,37 +6143,25 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ctx.shadowColor=state.theme==='light'?'transparent':'rgba(84,231,168,.45)';
       ctx.shadowBlur=state.theme==='light'?0:5;
 
-      if(!state.ecgAnimated){
-        // MODO ESTÁTICO (PADRÃO): faixa fixa de ~8s ocupando 100% da largura, sem rolar
-        let started=false;
-        for(let x=0;x<w;x++){
-          const samplePos=(x/(w-1))*(dataLen-1);
+      // ESCALA DE ECG PADRÃO: 25 mm/s unificada nos dois modos (estático e animado)
+      // O modo parado exibe exatamente os últimos N segundos que cabem na tela (congelar quadro do traçado rolante)
+      const samplesPerPx=10/mm;
+      const lastIdx=dataLen-1;
+      let started=false;
+      for(let x=0;x<w;x++){
+        const samplePos=lastIdx-(w-1-x)*samplesPerPx;
+        let val;
+        if(samplePos<=0){
+          val=data[0];
+        }else if(samplePos>=lastIdx){
+          val=data[lastIdx];
+        }else{
           const i0=Math.floor(samplePos);
           const frac=samplePos-i0;
-          const val=(i0+1<dataLen)?data[i0]*(1-frac)+data[i0+1]*frac:data[i0];
-          const y=baseline-val*scale;
-          if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
+          val=data[i0]*(1-frac)+data[i0+1]*frac;
         }
-      }else{
-        // MODO ANIMADO: rolagem contínua a 25 mm/s
-        const samplesPerPx=10/mm;
-        const lastIdx=dataLen-1;
-        let started=false;
-        for(let x=0;x<w;x++){
-          const samplePos=lastIdx-(w-1-x)*samplesPerPx;
-          let val;
-          if(samplePos<=0){
-            val=data[0];
-          }else if(samplePos>=lastIdx){
-            val=data[lastIdx];
-          }else{
-            const i0=Math.floor(samplePos);
-            const frac=samplePos-i0;
-            val=data[i0]*(1-frac)+data[i0+1]*frac;
-          }
-          const y=baseline-val*scale;
-          if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
-        }
+        const y=baseline-val*scale;
+        if(!started){ctx.moveTo(x,y);started=true;}else{ctx.lineTo(x,y);}
       }
       ctx.stroke();
       ctx.shadowBlur=0;
@@ -6267,17 +6255,15 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
       const data=state.currentSamples;
       const canW=Math.max(1,$('roundEcgCanvas')?.clientWidth||1000);
+      const mm=(canW>=1600)?15:14;
+      const samplesPerPx=10/mm;
+      const lastIdx=data.length-1;
 
-      let begin=0, end=data.length;
+      let begin=Math.max(0,Math.floor(lastIdx-(canW-1)*samplesPerPx));
+      let end=lastIdx;
       if(rect && rect.w > 5){
-        if(!state.ecgAnimated){
-          begin = Math.max(0, Math.min(data.length - 1, Math.floor((rect.x / canW) * (data.length - 1))));
-          end = Math.max(begin + 2, Math.min(data.length, Math.ceil(((rect.x + rect.w) / canW) * (data.length - 1))));
-        } else {
-          const startIdx = data.length - canW;
-          begin = Math.max(0, Math.min(data.length - 1, startIdx + Math.floor(rect.x)));
-          end = Math.max(begin + 2, Math.min(data.length, startIdx + Math.floor(rect.x + rect.w)));
-        }
+        begin=Math.max(0,Math.min(lastIdx,Math.floor(lastIdx-(canW-1-rect.x)*samplesPerPx)));
+        end=Math.max(begin+2,Math.min(data.length,Math.ceil(lastIdx-(canW-1-(rect.x+rect.w))*samplesPerPx)));
       }
 
       const midVal = (state.ecgGain && state.ecgGain.p2p >= 0.25) ? state.ecgGain.midVal : 0;
