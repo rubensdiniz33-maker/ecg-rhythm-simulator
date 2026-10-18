@@ -1491,6 +1491,27 @@
       background: rgba(59, 130, 246, 0.15);
       color: #1d4ed8;
     }
+        .teacher-btn-end {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+      font-size: 13px;
+    }
+    .teacher-btn-end:hover {
+      background: rgba(239, 68, 68, 0.20);
+      border-color: rgba(239, 68, 68, 0.50);
+      color: #fca5a5;
+    }
+    .theme-light .teacher-btn-end {
+      color: #b91c1c;
+      background: rgba(239, 68, 68, 0.07);
+      border-color: rgba(239, 68, 68, 0.30);
+    }
+    .theme-light .teacher-btn-end:hover {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.55);
+      color: #991b1b;
+    }
     .teacher-bar-divider {
       width: 1px;
       height: 26px;
@@ -4246,6 +4267,10 @@
       <button id="btnThemeProjection" type="button" class="teacher-ctrl-btn icon-btn" title="Alternar tema claro / escuro">
         ☀️/🌙
       </button>
+      <div class="teacher-bar-divider" aria-hidden="true"></div>
+      <button id="btnEndGame" type="button" class="teacher-ctrl-btn teacher-btn-end" title="Encerrar jogo e ir direto ao ranking final">
+        ⏹ Encerrar jogo
+      </button>
     </nav>
     <!-- BOTÃO PRÓXIMO GRANDE E FIXO NA TELA -->
     <button id="btnNextFixed" class="hidden projection-btn-next-fixed" type="button" aria-label="Avançar para a próxima rodada (Atalho: N)">
@@ -5664,9 +5689,28 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       setProjectionVisible(false);
       $('revealPanel')?.classList.add('hidden');
       $('btnNextFixed')?.classList.add('hidden');
+      $('explainOverlay')?.classList.add('hidden');
       $('hostPodium')?.classList.remove('hidden');
 
       const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
+
+      // Avisa os celulares dos alunos para mostrar o resultado com pontuações acumuladas
+      list.forEach((p, index) => {
+        const rank = index + 1;
+        const payload = {
+          type: 'SESSION_END',
+          studentId: p.id,
+          targetStudentId: p.id,
+          rank: rank,
+          totalScore: p.score,
+          totalStudents: list.length
+        };
+        sendParticipant(p, payload);
+      });
+      sendToAll({
+        type: 'SESSION_END',
+        totalStudents: list.length
+      });
       const placesContainer = $('podiumPlaces');
       if (!placesContainer) {
         fanfare();
@@ -6370,6 +6414,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }
       }
       else if (msg.type === 'ROUND_REVEAL') showStudentReveal(msg);
+      else if (msg.type === 'SESSION_END') showStudentSessionEnd(msg);
       else if (msg.type === 'KICK' && msg.studentId === state.studentId) switchView('viewStudentJoin');
     }
     function showStudentQuestion(msg) {
@@ -6627,7 +6672,84 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
     }
 
-    function animatePoints(points) {
+        function showStudentSessionEnd(msg) {
+      clearInterval(window.studentTimer);
+      switchView('studentReveal');
+      const revealEl = $('studentReveal');
+      if (revealEl) {
+        revealEl.classList.remove('hidden');
+        revealEl.style.background = 'linear-gradient(155deg, #064e3b 0%, #065f46 50%, #047857 100%)';
+      }
+
+      if (typeof msg?.totalScore === 'number') state.studentScore = msg.totalScore;
+      if (msg?.rank !== undefined && msg?.rank !== null) state.studentPosition = msg.rank;
+
+      const score = Number(state.studentScore) || 0;
+      const rank = state.studentPosition || 1;
+      const total = msg?.totalStudents || state.participants?.size || '';
+
+      if ($('studentScore')) $('studentScore').textContent = String(score);
+      if ($('studentScoreLobby')) $('studentScoreLobby').textContent = String(score);
+
+      const icon = (rank === 1) ? '👑' : (rank === 2) ? '🥈' : (rank === 3) ? '🥉' : '🏆';
+      if ($('studentRevealIcon')) $('studentRevealIcon').textContent = icon;
+      if ($('studentRevealTitle')) $('studentRevealTitle').textContent = 'FIM DE JOGO!';
+      if ($('studentRevealSubtitle')) {
+        $('studentRevealSubtitle').textContent = (rank <= 3)
+          ? `Parabéns! Você alcançou o pódio em #${rank}º lugar!`
+          : (total ? `Parabéns pela dedicação! #${rank}º de ${total} participantes.` : `Parabéns pela dedicação! #${rank}º no ranking geral.`);
+      }
+
+      if ($('pointsAnimation')) {
+        $('pointsAnimation').textContent = `${score} pts`;
+        $('pointsAnimation').classList.remove('points-pop');
+        void $('pointsAnimation').offsetWidth;
+        $('pointsAnimation').classList.add('points-pop');
+      }
+      if ($('studentTotalPointsLabel')) {
+        $('studentTotalPointsLabel').textContent = 'Pontuação Total Acumulada';
+      }
+
+      const comp = $('studentChoicesComparison');
+      if (comp) {
+        comp.innerHTML = `
+          <div class="panel p-4 w-full text-center border border-white/20 rounded-2xl bg-white/10 backdrop-blur-md shadow-xl">
+            <div class="text-xs uppercase font-black tracking-wider text-emerald-200 mb-1">Classificação Final</div>
+            <div class="text-3xl sm:text-4xl font-black font-mono text-lime-300">#${rank}º LUGAR</div>
+            <div class="text-xs font-bold text-white/80 mt-1">${score} pontos acumulados</div>
+          </div>
+        `;
+      }
+
+      if ($('studentRevealName')) $('studentRevealName').textContent = 'Treinamento de ECG';
+      if ($('studentRevealFeature')) $('studentRevealFeature').textContent = 'Confira o pódio e os destaques da turma no telão!';
+
+      if ($('studentStreakBadge')) $('studentStreakBadge').classList.add('hidden');
+
+      const rankBadge = $('studentRankBadge');
+      if (rankBadge) {
+        rankBadge.classList.remove('hidden');
+        rankBadge.className = 'student-meta-pill bg-amber-400/25 text-amber-100 border border-amber-300/40 font-black';
+      }
+      if ($('studentRevealRank')) {
+        $('studentRevealRank').innerHTML = `🏆 <b>#${rank}º Lugar</b> no ranking geral`;
+        $('studentRevealRank').classList.remove('hidden');
+      }
+
+      const waitInd = document.querySelector('.student-waiting-indicator');
+      if (waitInd) {
+        waitInd.innerHTML = `
+          <span class="text-base">🏁</span>
+          <span>Partida encerrada pelo professor · Acompanhe o telão!</span>
+        `;
+      }
+
+      try {
+        fanfare();
+      } catch (e) {}
+    }
+
+function animatePoints(points) {
       const el = $('pointsAnimation');
       if (!el) return;
       el.classList.remove('points-pop');
@@ -6795,6 +6917,20 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
       else document.exitFullscreen?.();
     };
+        function confirmAndEndGame() {
+      const total = state.roundQueue ? state.roundQueue.length : (state.roundLimit || 0);
+      const current = state.roundNumber || 0;
+      const remaining = Math.max(0, total - current);
+      const msg = `Encerrar agora? Restam ${remaining} perguntas.`;
+      if (!confirm(msg)) return;
+      clearInterval(state.timerHandle);
+      cancelAnimationFrame(ecgFrame);
+      state.roundLocked = true;
+      state.isPaused = true;
+      showPodium();
+    }
+
+if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
     if ($('btnLeaveHost')) $('btnLeaveHost').onclick = () => {
       if (confirm('Encerrar esta sala?')) {
         state.peer?.destroy();
