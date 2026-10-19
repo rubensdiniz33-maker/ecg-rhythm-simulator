@@ -9530,7 +9530,6 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
         state.participants.clear();
         state.previousRank.clear();
         state.lastRankChanges = new Map();
-        try { sessionStorage.removeItem(ARENA_HOST_SESSION_KEY); } catch (error) {}
         const canvas = $('confettiCanvas');
         const context = canvas?.getContext?.('2d');
         if (context) context.clearRect(0, 0, canvas.width, canvas.height);
