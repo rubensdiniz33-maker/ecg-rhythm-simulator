@@ -784,12 +784,15 @@
       gap: 12px;
       min-height: 104px;
       max-height: 155px;
+      grid-auto-rows: minmax(104px, 1fr);
+      align-items: stretch;
     }
     .projection-options .answer-tile {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
       padding: 10px 14px;
       border-radius: 16px;
       text-align: left;
@@ -797,10 +800,13 @@
       font-weight: 800;
       line-height: 1.15;
       position: relative;
-      transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .25s ease, opacity .25s ease, filter .25s ease;
+      transition: border-color .2s ease;
       overflow: hidden;
       box-sizing: border-box;
       min-width: 0;
+      height: 100%;
+      min-height: 0;
+      transform: none !important;
     }
     .projection-options .shape {
       font-size: clamp(28px, 2.5vw, 42px);
@@ -819,7 +825,9 @@
       text-overflow: clip;
       white-space: normal;
       word-break: normal;
-      overflow-wrap: break-word;
+      overflow-wrap: normal;
+      word-break: keep-all;
+      hyphens: none;
       line-height: 1.15;
       display: block;
       flex: 1 1 auto;
@@ -872,46 +880,44 @@
 
     /* Tiles das alternativas já configurados acima sem cortes */
 
-    /* REVELAÇÃO: CORRETA CRESCE, BRILHA E MOSTRA ✓ */
+    /* GABARITO: destaque restrito à borda e ao check */
     .projection-options .answer-tile.is-correct {
-      transform: scale(1.05) translateY(-4px);
-      z-index: 15;
-      box-shadow: 0 0 0 4px #ffffff, 0 0 35px rgba(52, 211, 153, 0.95), 0 16px 36px rgba(0,0,0,0.5);
-      filter: brightness(1.12);
       border: 2px solid #34d399;
-      animation: correctGlowPulse 1.6s infinite ease-in-out;
-    }
-    @keyframes correctGlowPulse {
-      0%, 100% { box-shadow: 0 0 0 4px #ffffff, 0 0 32px rgba(52, 211, 153, 0.9), 0 16px 36px rgba(0,0,0,0.5); }
-      50% { box-shadow: 0 0 0 5px #ffffff, 0 0 48px rgba(52, 211, 153, 1), 0 20px 42px rgba(0,0,0,0.6); }
+      box-shadow: none;
+      filter: none;
+      transform: none !important;
+      animation: none;
     }
 
-    /* REVELAÇÃO: DEMAIS ALTERNATIVAS ESMAECEM */
     .projection-options .answer-tile.is-dimmed {
-      opacity: 0.38 !important;
-      filter: grayscale(0.45) contrast(0.85);
-      transform: scale(0.97);
+      opacity: 1;
+      filter: none;
+      transform: none !important;
     }
 
     /* BADGES DE REVELAÇÃO DENTRO DAS ALTERNATIVAS */
     .answer-reveal-meta {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
       flex-shrink: 0;
+      min-height: 18px;
     }
     .answer-check-mark {
-      width: 36px;
-      height: 36px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       background: #ffffff;
       color: #059669;
-      font-size: 24px;
+      font-size: 15px;
       font-weight: 1000;
       display: inline-grid;
       place-items: center;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-      animation: checkmarkPop .35s cubic-bezier(.34, 1.56, .64, 1);
+      box-shadow: none;
+      animation: none;
+      flex-shrink: 0;
     }
     @keyframes checkmarkPop {
       0% { transform: scale(0); }
@@ -919,23 +925,23 @@
       100% { transform: scale(1); }
     }
     .answer-vote-pill {
-      padding: 6px 12px;
-      border-radius: 9999px;
-      font-size: clamp(13px, 1.05vw, 16px);
-      font-weight: 900;
-      letter-spacing: 0.02em;
-      background: rgba(15, 23, 42, 0.88);
+      padding: 0;
+      border-radius: 0;
+      font-size: clamp(10px, 0.78vw, 12px);
+      font-weight: 600;
+      letter-spacing: 0;
+      background: transparent;
       color: #f8fafc;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      border: 0;
+      box-shadow: none;
       white-space: nowrap;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
     .is-correct .answer-vote-pill {
-      background: rgba(4, 120, 87, 0.95);
-      color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+      background: transparent;
+      color: #f8fafc;
+      border: 0;
+      box-shadow: none;
     }
 
     /* ========================================================
@@ -2233,7 +2239,7 @@
       .projection-header { grid-template-columns: auto 1fr auto; }
       .projection-question { font-size: 21px; }
       .projection-options { grid-template-columns: repeat(2,1fr); grid-template-rows: 1fr 1fr; min-height: 140px; gap: 7px; }
-      .projection-options .answer-tile { padding: 8px; gap: 8px; font-size: 13px; line-height: 1.15; }
+      .projection-options .answer-tile { padding: 8px; gap: 6px; font-size: 13px; line-height: 1.15; }
       .projection-options .shape { font-size: 36px; }
       .projection-footer { opacity: 1; }
       .student-choice { height: calc((100dvh - 56px)/2); }
@@ -6520,11 +6526,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           const voteText=`${voteCount} ${voteCount===1?'voto':'votos'} (${votePct}%)`;
 
           tile.classList.remove('is-correct','is-dimmed');
-          if(isCorrect){
-            tile.classList.add('is-correct');
-          }else{
-            tile.classList.add('is-dimmed');
-          }
+          if(isCorrect) tile.classList.add('is-correct');
 
           tile.innerHTML=`
             <div class="answer-tile-content">
@@ -6532,8 +6534,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
               <span class="answer-label">${escapeHTML(c.label)}</span>
             </div>
             <div class="answer-reveal-meta">
-              ${isCorrect?'<span class="answer-check-mark" aria-label="Alternativa correta">✓</span>':''}
               <span class="answer-vote-pill">${voteText}</span>
+              ${isCorrect?'<span class="answer-check-mark" aria-label="Alternativa correta">✓</span>':''}
             </div>
           `;
         });
