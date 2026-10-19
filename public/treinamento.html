@@ -4562,6 +4562,160 @@
       #viewHome .arena-action-card { min-height: 95px !important; }
     }
 
+   
+    /* Ajustes solicitados: alternativas da projeção, sem alterar a mecânica da rodada */
+    .projection-layout {
+      grid-template-rows: 60px minmax(50dvh, 1fr) minmax(208px, 28dvh);
+    }
+    .projection-options {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(96px, 1fr));
+      grid-auto-rows: minmax(96px, 1fr);
+      gap: clamp(8px, 1vw, 14px);
+      min-height: 208px;
+      max-height: none;
+      height: 100%;
+      align-content: stretch;
+    }
+    .projection-options .answer-tile {
+      min-height: 0;
+      padding: clamp(10px, 1.1vw, 18px) clamp(12px, 1.4vw, 22px);
+      gap: 8px;
+      justify-content: center;
+      border: 2px solid rgba(148,163,184,.35);
+      background: #263244;
+      color: #f8fafc !important;
+      box-shadow: none;
+      filter: none;
+      transition: background .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease;
+    }
+    .projection-options .answer-tile.answer-red { background: #7f1d1d; color: #fff !important; }
+    .projection-options .answer-tile.answer-blue { background: #1e3a8a; color: #fff !important; }
+    .projection-options .answer-tile.answer-yellow { background: #78350f; color: #fff !important; }
+    .projection-options .answer-tile.answer-green { background: #065f46; color: #fff !important; }
+    .projection-options .answer-tile .answer-tile-content {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: clamp(12px, 1.5vw, 24px);
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .projection-options .answer-tile .shape {
+      font-size: clamp(38px, 3.2vw, 54px);
+      line-height: 1;
+    }
+    .projection-options .answer-tile .answer-label {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
+      font-size: clamp(28px, 2.2vw, 36px);
+      font-weight: 900;
+      line-height: 1.08;
+      color: inherit !important;
+      text-shadow: none;
+    }
+    .projection-options .answer-tile.is-correct {
+      background: #047857 !important;
+      color: #ffffff !important;
+      border: 3px solid #6ee7b7;
+      box-shadow: 0 0 0 2px rgba(52,211,153,.22), 0 0 28px rgba(16,185,129,.48);
+      filter: none;
+      transform: none !important;
+      animation: none;
+    }
+    .projection-options .answer-tile.is-correct.answer-yellow { background: #854d0e !important; border-color: #fde047; box-shadow: 0 0 0 2px rgba(250,204,21,.2), 0 0 26px rgba(250,204,21,.3); }
+    .projection-options .answer-tile.is-correct.answer-red { background: #b91c1c !important; border-color: #fca5a5; box-shadow: 0 0 0 2px rgba(248,113,113,.18), 0 0 26px rgba(248,113,113,.3); }
+    .projection-options .answer-tile.is-correct.answer-blue { background: #1d4ed8 !important; border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(96,165,250,.18), 0 0 26px rgba(96,165,250,.3); }
+    .projection-options .answer-tile.is-correct.answer-green { background: #047857 !important; border-color: #6ee7b7; }
+    .projection-options .answer-tile.is-dimmed {
+      background: #303744 !important;
+      border-color: #4b5563;
+      color: #e5e7eb !important;
+      box-shadow: none !important;
+      filter: saturate(.28);
+      opacity: 1;
+    }
+    .theme-light .projection-options .answer-tile.is-dimmed {
+      background: #303744 !important;
+      border-color: #4b5563;
+      color: #e5e7eb !important;
+    }
+    .answer-reveal-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      width: 100%;
+      flex: 0 0 auto;
+      min-height: 14px;
+      padding-left: clamp(0px, .25vw, 4px);
+    }
+    .answer-vote-bar {
+      position: relative;
+      display: block;
+      flex: 1 1 auto;
+      min-width: 36px;
+      max-width: 240px;
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148,163,184,.34);
+    }
+    .answer-vote-bar-fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #94a3b8;
+      transition: width 1s cubic-bezier(.22,.61,.36,1);
+    }
+    .is-correct .answer-vote-bar-fill { background: #6ee7b7; }
+    .is-correct.answer-yellow .answer-vote-bar-fill { background: #fde047; }
+    .is-correct.answer-red .answer-vote-bar-fill { background: #fca5a5; }
+    .is-correct.answer-blue .answer-vote-bar-fill { background: #93c5fd; }
+    .answer-vote-count {
+      min-width: 1.6em;
+      text-align: right;
+      font-size: clamp(13px, 1vw, 16px);
+      line-height: 1;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #f8fafc !important;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .answer-check-mark {
+      width: 28px;
+      height: 28px;
+      background: #ffffff;
+      color: #065f46;
+      font-size: 18px;
+      box-shadow: 0 0 12px rgba(255,255,255,.28);
+      animation: checkmarkPop .28s ease-out;
+    }
+    @media (max-height: 820px) {
+      .projection-layout { grid-template-rows: 60px minmax(50dvh, 1fr) minmax(208px, 28dvh); }
+      .projection-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(2, minmax(96px, 1fr));
+        min-height: 208px;
+        max-height: none;
+        gap: 8px;
+      }
+      .projection-options .answer-tile { padding: 8px 12px; font-size: clamp(28px, 2.2vw, 36px); }
+      .projection-options .answer-tile .shape { font-size: clamp(36px, 3vw, 48px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .answer-vote-bar-fill { transition: none; }
+      .answer-check-mark { animation: none; }
+    }
+
   </style>
 </head>
 <body>
@@ -6644,18 +6798,32 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           const voteText=`${voteCount} ${voteCount===1?'voto':'votos'} (${votePct}%)`;
 
           tile.classList.remove('is-correct','is-dimmed');
-          if(isCorrect) tile.classList.add('is-correct');
+          tile.classList.add(isCorrect?'is-correct':'is-dimmed');
 
           tile.innerHTML=`
             <div class="answer-tile-content">
               <span class="shape">${c.shape}</span>
               <span class="answer-label">${escapeHTML(c.label)}</span>
-            </div>
-            <div class="answer-reveal-meta">
-              <span class="answer-vote-pill">${voteText}</span>
               ${isCorrect?'<span class="answer-check-mark" aria-label="Alternativa correta">✓</span>':''}
             </div>
+            <div class="answer-reveal-meta">
+              <span class="answer-vote-bar" role="img" aria-label="${voteCount} votos"><span class="answer-vote-bar-fill" style="--vote-width:${votePct}%"></span></span>
+              <span class="answer-vote-count" data-vote-target="${voteCount}">0</span>
+            </div>
           `;
+          const voteFill=tile.querySelector('.answer-vote-bar-fill');
+          const voteCounter=tile.querySelector('.answer-vote-count');
+          requestAnimationFrame(()=>{ if(voteFill) voteFill.style.width=votePct+'%'; });
+          if(voteCounter){
+            const start=performance.now();
+            const animateCount=(now)=>{
+              const progress=Math.min(1,(now-start)/1000);
+              const eased=1-Math.pow(1-progress,3);
+              voteCounter.textContent=String(Math.round(voteCount*eased));
+              if(progress<1)requestAnimationFrame(animateCount);
+            };
+            requestAnimationFrame(animateCount);
+          }
         });
       }
 
