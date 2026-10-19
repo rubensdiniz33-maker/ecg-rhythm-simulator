@@ -1741,6 +1741,37 @@
       box-sizing: border-box;
       margin-bottom: 6px;
     }
+    .student-fc-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 54px;
+      padding: 5px 7px;
+      border-radius: 9999px;
+      border: 1px solid rgba(16,185,129,.28);
+      background: rgba(16,185,129,.08);
+      color: #86efac;
+      font: 800 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+      flex-shrink: 0;
+      opacity: .88;
+    }
+    .student-fc-pill.hidden { display: none !important; }
+    .student-fc-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 5px rgba(52,211,153,.45);
+      animation: pulse 1.5s infinite;
+      flex-shrink: 0;
+    }
+    .student-fc-unit {
+      font-size: 9px;
+      font-weight: 700;
+      opacity: .7;
+    }
     .student-round-pill {
       display: inline-flex;
       align-items: center;
@@ -5677,6 +5708,10 @@
       </div>
 
       <div class="student-topline-right flex items-center gap-1.5">
+        <div id="studentFcBadge" class="student-fc-pill hidden" aria-label="Frequência cardíaca do traçado">
+          <span class="student-fc-dot"></span>
+          <span id="studentFcValue">--</span><span class="student-fc-unit">bpm</span>
+        </div>
         <div class="student-timer-pill">
           <span class="text-xs opacity-75">⏱️</span>
           <span class="timer-num" id="studentTimer">25</span><span class="text-[10px] opacity-60">s</span>
@@ -6776,10 +6811,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       setProjectionVisible(true);
       state.roundDeadline=Date.now()+state.roundDuration*1000;
       const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
-      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition});
+      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
       startTimer();
     }
-    function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition}}
+    function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
     function startTimer(reset = true){clearInterval(state.timerHandle);if(reset){state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;}updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
     function updateTimerDisplay(){
@@ -6810,7 +6845,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(badge)badge.classList.toggle('hidden',!show);
       // A FC deve aparecer somente sobre o monitor de ECG, nunca no cabeçalho.
       if(projBadge)projBadge.classList.add('hidden');
-      if(!show)return;
+      if(!show){
+        sendToAll({type:'STUDENT_FC',show:false});
+        return;
+      }
       let bpmText='--';
       if(state.currentRhythm?.id==='asystole'){
         bpmText='0';
@@ -6828,6 +6866,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
       if($('monitorFcValue'))$('monitorFcValue').textContent=bpmText;
       if($('projectionFcValue'))$('projectionFcValue').textContent=bpmText;
+      sendToAll({type:'STUDENT_FC',show:true,value:bpmText});
     }
     function updateAnswerProgress(){$('answerCount').textContent=String(state.answersReceived.size);$('totalStudents').textContent=String(state.participants.size);$('answerProgress').style.width=state.participants.size?Math.min(100,state.answersReceived.size/state.participants.size*100)+'%':'0%'}
     function handleRoundEnd(){
@@ -7797,6 +7836,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         if (countEl) countEl.textContent = colleagues + (colleagues === 1 ? ' colega conectado' : ' colegas conectados');
       }
       else if (msg.type === 'ROUND_QUESTION') showStudentQuestion(msg);
+      else if (msg.type === 'STUDENT_FC') {
+        const fcBadge = $('studentFcBadge');
+        if (fcBadge) fcBadge.classList.toggle('hidden', !msg.show);
+        if (msg.show && $('studentFcValue')) $('studentFcValue').textContent = msg.value || '--';
+      }
       else if (msg.type === 'ROUND_PAUSE') {
         /* No-op: o relógio e as respostas nunca param */
       }
@@ -7840,6 +7884,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }
       }
 
+      const studentFcBadge = $('studentFcBadge');
+      if (studentFcBadge) studentFcBadge.classList.toggle('hidden', !msg.showFc);
+      if (!msg.showFc && $('studentFcValue')) $('studentFcValue').textContent = '--';
       const totalSec = Number(msg.seconds) || 25;
       state.currentTotalSec = totalSec;
       let sec = totalSec;
