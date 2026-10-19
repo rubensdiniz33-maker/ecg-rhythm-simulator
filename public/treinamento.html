@@ -4751,6 +4751,7 @@
     @keyframes answerCorrectPulse { 0%,100% { filter:brightness(1); } 35% { filter:brightness(1.45); } 60% { filter:brightness(1.12); } }
     @keyframes leaderboardSlideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
     @keyframes rankMovementPop { 0% { opacity:0; transform:scale(.65); } 75% { opacity:1; transform:scale(1.12); } 100% { transform:scale(1); } }
+    .answer-vote-percent { color:rgba(255,255,255,.78); font-size:clamp(10px,.8vw,13px); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
     .answer-vote-count {
       min-width: 1.6em;
       text-align: right;
@@ -7712,6 +7713,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             <div class="answer-reveal-meta">
               <span class="answer-vote-bar" role="img" aria-label="${voteCount} votos"><span class="answer-vote-bar-fill" style="--vote-width:${votePct}%"></span></span>
               <span class="answer-vote-count ${state.config.showVoteCounts===false?'hidden':''}" data-vote-target="${voteCount}" aria-label="${voteCount} votos">0</span>
+              <span class="answer-vote-percent ${state.config.showVoteCounts===false?'hidden':''}">${votePct}%</span>
             </div>
           `;
           const voteFill=tile.querySelector('.answer-vote-bar-fill');
