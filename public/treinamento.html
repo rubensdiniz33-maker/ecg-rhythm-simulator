@@ -6636,7 +6636,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           });
       });
     }
-    function arenaSnapshot(){return {schemaVersion:2,savedAt:Date.now(),selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,roundQueue:Array.isArray(state.roundQueue)?state.roundQueue:[],currentRhythmId:state.currentRhythm?.id||null,currentChoices:Array.isArray(state.currentChoices)?state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})):[],chosenRate:Number(state.chosenRate)||null,roundStartTime:Number(state.roundStartTime)||null,roundDeadline:Number(state.roundDeadline)||null,timeLeft:Number(state.timeLeft)||0,answersReceived:Array.from(state.answersReceived.entries()).map(([id,a])=>[String(id),{choiceId:a.choiceId,answeredAt:a.answeredAt,receivedOrder:a.receivedOrder??null,elapsedMs:a.elapsedMs??null}]),isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,roundLocked:!!state.roundLocked,sessionFinished:!!state.sessionFinished,sessionClosed:!!state.sessionClosed,sessionStats:state.sessionStats||{}}}
+    function arenaSnapshot(){return {schemaVersion:2,savedAt:Date.now(),selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,roundQueue:Array.isArray(state.roundQueue)?state.roundQueue:[],currentRhythmId:state.currentRhythm?.id||null,currentChoices:Array.isArray(state.currentChoices)?state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})):[],chosenRate:Number(state.chosenRate)||null,roundStartTime:Number(state.roundStartTime)||null,roundDeadline:Number(state.serverRoundDeadline)||Number(state.roundDeadline)||null,timeLeft:Number(state.timeLeft)||0,answersReceived:Array.from(state.answersReceived.entries()).map(([id,a])=>[String(id),{choiceId:a.choiceId,answeredAt:a.answeredAt,receivedOrder:a.receivedOrder??null,elapsedMs:a.elapsedMs??null}]),isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,roundLocked:!!state.roundLocked,sessionFinished:!!state.sessionFinished,sessionClosed:!!state.sessionClosed,sessionStats:state.sessionStats||{}}}
     function registerArenaHostRoom(pin){
       state.sessionFinished=false;
       state.sessionClosed=false;
@@ -7528,7 +7528,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.studentLastChoice=null;
       state.studentRank=0;
       state.sampleOffset=0;
-      state.roundStartTime=Date.now();
+      state.roundStartTime=Date.now();state.serverRoundDeadline=null;
       $('revealPanel')?.classList.add('hidden');
       $('btnNextFixed')?.classList.add('hidden');
       updateExplainStateUI(false);
@@ -7555,7 +7555,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       updateAnswerProgress();
       initRealEcg(rhythm.id,chosenRate);
       setProjectionVisible(true);
-      state.roundDeadline=Date.now()+state.roundDuration*1000;
+      state.serverRoundDeadline=null;state.roundDeadline=Date.now()+state.roundDuration*1000;
       const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
       state.roundOpenInProgress=true;
       try{
@@ -7563,7 +7563,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         if(!created||!state.arenaHostToken||!arenaRealtimeReady)throw new Error('A sala não está conectada ao servidor em tempo real.');
         const opened=await arenaApi({action:'open_round',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber,durationSeconds:state.roundDuration,gameState:arenaSnapshot()});
         state.roundStartTime=Number(opened.startedAtMs)||state.roundStartTime;
-        state.roundDeadline=Number(opened.deadlineAtMs)||state.roundDeadline;
+        state.serverRoundDeadline=Number(opened.deadlineAtMs)||state.roundDeadline;
+        const serverOffset=Number(opened.serverNowMs)-Date.now();
+        state.roundDeadline=state.serverRoundDeadline-(Number.isFinite(serverOffset)?serverOffset:0);
         state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));
         sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
         startTimer(false);
