@@ -8086,31 +8086,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             <h3 class="text-base sm:text-lg font-black uppercase tracking-wide" style="color:var(--text-title);">Resumo da Sessão</h3>
           </div>
 
-        <section class="mt-6 pt-5 border-t border-slate-800" aria-labelledby="rhythmReviewTitle">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h4 id="rhythmReviewTitle" class="text-sm font-black uppercase tracking-wide" style="color:var(--text-title);">Pontos para revisar</h4>
-            <span class="text-[11px] text-slate-400">Acerto por ritmo, com base nas respostas recebidas</span>
-          </div>
-          ${(() => {
-            const byRhythm = Object.values(state.sessionStats?.byRhythm || {})
-              .filter(item => item && item.answers > 0)
-              .sort((a,b) => (a.correct / a.answers) - (b.correct / b.answers) || b.answers - a.answers);
-            if (!byRhythm.length) return '<p class="text-sm text-slate-400">Ainda não há respostas suficientes para identificar temas de revisão.</p>';
-            const weakest = byRhythm.slice(0,3);
-            return '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">' + weakest.map(item => {
-              const pct = Math.round((item.correct / item.answers) * 100);
-              const label = escapeHTML(item.name || 'Ritmo');
-              const tone = pct < 60 ? '#fb7185' : pct < 80 ? '#fbbf24' : '#86efac';
-              return '<article class="p-3 rounded-xl border border-slate-800" style="background:var(--btn);">' +
-                '<div class="flex items-start justify-between gap-3"><strong class="text-sm leading-snug" style="color:var(--text-title);">' + label + '</strong>' +
-                '<span class="text-sm font-black font-mono" style="color:' + tone + ';">' + pct + '%</span></div>' +
-                '<div class="h-2 rounded-full overflow-hidden mt-3" style="background:var(--btn-border);"><div class="h-full rounded-full" style="width:' + pct + '%;background:' + tone + ';"></div></div>' +
-                '<p class="text-[11px] text-slate-400 mt-2">' + item.correct + ' de ' + item.answers + ' respostas certas</p>' +
-                (pct < 80 ? '<p class="text-xs font-bold mt-2" style="color:var(--muted);">Sugestão: retomar os achados do traçado e o diagnóstico diferencial.</p>' : '<p class="text-xs mt-2" style="color:var(--muted);">Bom domínio neste tema. Continue praticando.</p>') +
-                '</article>';
-            }).join('') + '</div>';
-          })()}
-        </section>
+
           <span class="text-xs font-bold text-slate-400">${totalRounds} ${totalRounds === 1 ? 'rodada realizada' : 'rodadas realizadas'}</span>
         </div>
 
@@ -8159,6 +8135,32 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             <div class="text-[11px] text-slate-400 mt-1">Alunos na sala</div>
           </div>
         </div>
+
+        <section class="mt-6 pt-5 border-t border-slate-800" aria-labelledby="rhythmReviewTitle">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h4 id="rhythmReviewTitle" class="text-sm font-black uppercase tracking-wide" style="color:var(--text-title);">Pontos para revisar</h4>
+            <span class="text-[11px] text-slate-400">Acerto por ritmo, com base nas respostas recebidas</span>
+          </div>
+          ${(() => {
+            const byRhythm = Object.values(state.sessionStats?.byRhythm || {})
+              .filter(item => item && item.answers > 0)
+              .sort((a,b) => (a.correct / a.answers) - (b.correct / b.answers) || b.answers - a.answers);
+            if (!byRhythm.length) return '<p class="text-sm text-slate-400">Ainda não há respostas suficientes para identificar temas de revisão.</p>';
+            const weakest = byRhythm.slice(0,3);
+            return '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">' + weakest.map(item => {
+              const pct = Math.round((item.correct / item.answers) * 100);
+              const label = escapeHTML(item.name || 'Ritmo');
+              const tone = pct < 60 ? '#fb7185' : pct < 80 ? '#fbbf24' : '#86efac';
+              return '<article class="p-3 rounded-xl border border-slate-800" style="background:var(--btn);">' +
+                '<div class="flex items-start justify-between gap-3"><strong class="text-sm leading-snug" style="color:var(--text-title);">' + label + '</strong>' +
+                '<span class="text-sm font-black font-mono" style="color:' + tone + ';">' + pct + '%</span></div>' +
+                '<div class="h-2 rounded-full overflow-hidden mt-3" style="background:var(--btn-border);"><div class="h-full rounded-full" style="width:' + pct + '%;background:' + tone + ';"></div></div>' +
+                '<p class="text-[11px] text-slate-400 mt-2">' + item.correct + ' de ' + item.answers + ' respostas certas</p>' +
+                (pct < 80 ? '<p class="text-xs font-bold mt-2" style="color:var(--muted);">Sugestão: retomar os achados do traçado e o diagnóstico diferencial.</p>' : '<p class="text-xs mt-2" style="color:var(--muted);">Bom domínio neste tema. Continue praticando.</p>') +
+                '</article>';
+            }).join('') + '</div>';
+          })()}
+        </section>
       `;
     }
     // REAL ECG WAVEFORM RENDERER (Autêntico do simulador)
