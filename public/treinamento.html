@@ -4194,6 +4194,237 @@
       color: var(--text-title) !important;
     }
 
+  
+    /* HOME ARENA ECG: composição responsiva, foco no conteúdo e neon discreto */
+    #viewHome.arena-home-v2 {
+      position: relative !important;
+      isolation: isolate;
+      width: 100% !important;
+      max-width: 1200px !important;
+      min-height: 0 !important;
+      margin: auto !important;
+      padding: clamp(.5rem, 2.4vh, 1.5rem) clamp(.25rem, 2vw, 1.25rem) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      gap: clamp(.85rem, 2.2vh, 1.5rem) !important;
+      overflow: visible !important;
+    }
+    #viewHome.arena-home-v2::before {
+      opacity: .07 !important;
+      background-size: 44px 44px !important;
+    }
+    #viewHome.arena-home-v2::after { opacity: .55 !important; }
+    #viewHome .arena-lobby-topbar { display: none !important; }
+    #viewHome .arena-home-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(.85rem, 2.2vh, 1.5rem);
+      width: 100%;
+      min-width: 0;
+    }
+    #viewHome .arena-home-heading { width: 100%; text-align: center; }
+    #viewHome .arena-lobby-intro h1,
+    #viewHome .arena-home-heading h1 {
+      margin: 0 !important;
+      color: #f7fafc !important;
+      font-size: clamp(2rem, 5.2vw, 4.35rem) !important;
+      line-height: 1.02 !important;
+      font-weight: 900 !important;
+      letter-spacing: -.045em !important;
+      text-wrap: balance;
+    }
+    #viewHome .arena-home-heading h1 span {
+      display: inline-block;
+      color: #c5f36a !important;
+      text-decoration-line: underline;
+      text-decoration-color: rgba(197,243,106,.85);
+      text-decoration-thickness: .075em;
+      text-underline-offset: .12em;
+      text-shadow: none !important;
+    }
+    #viewHome .arena-home-visuals {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+      align-items: center;
+      justify-items: center;
+      gap: clamp(1rem, 4vw, 3rem);
+      width: min(100%, 850px);
+      margin: 0 auto;
+    }
+    #viewHome .arena-monitor-card {
+      width: 100% !important;
+      max-width: 470px !important;
+      margin: 0 !important;
+      padding: clamp(.65rem, 1.5vh, 1rem) clamp(.75rem, 1.5vw, 1rem) !important;
+      border-color: rgba(101,240,180,.16) !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.035) !important;
+    }
+    #viewHome .arena-mini-monitor { height: clamp(58px, 8vh, 86px) !important; }
+    #viewHome .arena-mini-wave-shadow { filter: blur(2px) !important; stroke-width: 4 !important; }
+    #viewHome .arena-mini-wave-line { stroke-width: 2.1 !important; }
+    #viewHome .arena-monitor-scan { opacity: .4; }
+    #viewHome .arena-heart-hologram {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: clamp(145px, 19vw, 230px);
+      aspect-ratio: 1 / 1;
+      isolation: isolate;
+    }
+    #viewHome .arena-heart-hologram svg {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 82%;
+      height: auto;
+      overflow: visible;
+    }
+    #viewHome .arena-heart-outline,
+    #viewHome .arena-heart-inner,
+    #viewHome .arena-heart-vessel {
+      fill: rgba(75,207,221,.025);
+      stroke: url(#arenaHeartStroke);
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: url(#arenaHeartGlow);
+    }
+    #viewHome .arena-heart-inner { opacity: .52; stroke-width: .8; }
+    #viewHome .arena-heart-vessel { fill: none; opacity: .72; stroke-width: 1.4; }
+    #viewHome .arena-heart-pulse {
+      fill: none;
+      stroke: #c5f36a;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 3px rgba(197,243,106,.24));
+    }
+    #viewHome .arena-heart-orbit {
+      position: absolute;
+      inset: 8%;
+      border: 1px solid rgba(98,221,192,.13);
+      border-radius: 50%;
+      transform: rotate(-18deg) scaleY(.35);
+    }
+    #viewHome .arena-heart-orbit-two {
+      inset: 2% 13%;
+      border-color: rgba(104,221,244,.12);
+      transform: rotate(54deg) scaleY(.4);
+    }
+    #viewHome .arena-heart-caption {
+      position: absolute;
+      bottom: 3%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #8298a8;
+      font-size: clamp(.48rem, .65vw, .6rem);
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+    #viewHome .arena-home-actions {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: clamp(.7rem, 1.8vw, 1.25rem) !important;
+      width: min(100%, 850px) !important;
+      margin: 0 auto !important;
+    }
+    #viewHome .arena-action-card {
+      min-height: clamp(110px, 14vh, 145px) !important;
+      padding: clamp(.85rem, 1.7vh, 1.15rem) clamp(.9rem, 1.8vw, 1.35rem) !important;
+      gap: .85rem !important;
+      border-radius: 15px !important;
+      background: linear-gradient(145deg, rgba(17,29,39,.76), rgba(8,17,26,.88)) !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.15) !important;
+      transition: border-color .18s ease, background .18s ease !important;
+      will-change: auto !important;
+    }
+    #viewHome .arena-action-card:hover {
+      transform: none !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2) !important;
+    }
+    #viewHome .arena-action-card::before { display: none !important; }
+    #viewHome .arena-action-teacher { border-color: rgba(197,243,106,.38) !important; }
+    #viewHome .arena-action-teacher .arena-action-icon { color: #c5f36a !important; }
+    #viewHome .arena-action-teacher .arena-action-bottom { color: #c5f36a !important; }
+    #viewHome .arena-action-student { border-color: rgba(96,165,250,.38) !important; }
+    #viewHome .arena-action-student .arena-action-icon { color: #7db8ff !important; }
+    #viewHome .arena-action-student .arena-action-bottom { color: #7db8ff !important; }
+    #viewHome .arena-action-main { align-items: center !important; gap: .8rem !important; }
+    #viewHome .arena-action-icon {
+      width: clamp(2.1rem, 3.4vw, 2.65rem) !important;
+      height: clamp(2.1rem, 3.4vw, 2.65rem) !important;
+      border-radius: .8rem !important;
+      background: rgba(255,255,255,.035) !important;
+      box-shadow: none !important;
+      flex-shrink: 0;
+    }
+    #viewHome .arena-action-icon svg { width: 1.25rem !important; height: 1.25rem !important; }
+    #viewHome .arena-action-copy strong {
+      display: block;
+      font-size: clamp(.95rem, 1.45vw, 1.2rem) !important;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+    }
+    #viewHome .arena-action-copy > span {
+      display: block;
+      margin-top: .28rem;
+      color: #9babb8;
+      font-size: clamp(.7rem, .9vw, .82rem);
+      line-height: 1.4;
+    }
+    #viewHome .arena-action-index { display: none !important; }
+    #viewHome .arena-action-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      font-size: clamp(.58rem, .75vw, .7rem) !important;
+      letter-spacing: .12em;
+    }
+    #viewHome .arena-action-arrow { opacity: .8; }
+    #viewHome .arena-lobby-actions-wrap,
+    #viewHome .arena-actions-heading,
+    #viewHome .arena-lobby-security,
+    #viewHome .arena-lobby-bottomline { display: none !important; }
+    @media (max-width: 640px) {
+      #viewHome.arena-home-v2 {
+        min-height: auto !important;
+        padding: .65rem .15rem 1rem !important;
+        gap: 1.15rem !important;
+      }
+      #viewHome .arena-home-content { gap: 1rem !important; }
+      #viewHome .arena-home-heading h1 { font-size: clamp(2rem, 9vw, 3.1rem) !important; }
+      #viewHome .arena-home-visuals {
+        grid-template-columns: minmax(0, 1fr) minmax(105px, .62fr);
+        gap: .6rem;
+        width: 100%;
+      }
+      #viewHome .arena-monitor-card { padding: .6rem !important; border-radius: 12px !important; }
+      #viewHome .arena-monitor-card-top,
+      #viewHome .arena-monitor-card-bottom { font-size: .48rem !important; letter-spacing: .06em !important; gap: .25rem !important; }
+      #viewHome .arena-mini-monitor { height: 54px !important; margin: .5rem 0 !important; }
+      #viewHome .arena-heart-hologram { width: min(100%, 145px); }
+      #viewHome .arena-heart-caption { font-size: .42rem; letter-spacing: .06em; }
+      #viewHome .arena-home-actions { grid-template-columns: minmax(0, 1fr) !important; gap: .65rem !important; }
+      #viewHome .arena-action-card { min-height: 98px !important; padding: .85rem .9rem !important; }
+      #viewHome .arena-action-copy strong { font-size: 1rem !important; }
+      #viewHome .arena-action-copy > span { font-size: .74rem !important; }
+      #viewHome .arena-action-bottom { font-size: .62rem !important; }
+    }
+    @media (min-width: 641px) and (max-height: 700px) {
+      #viewHome.arena-home-v2 { gap: .6rem !important; padding-top: .3rem !important; padding-bottom: .3rem !important; }
+      #viewHome .arena-home-content { gap: .65rem !important; }
+      #viewHome .arena-home-heading h1 { font-size: clamp(2rem, 4.4vw, 3.6rem) !important; }
+      #viewHome .arena-home-visuals { width: min(100%, 700px); }
+      #viewHome .arena-heart-hologram { width: clamp(120px, 14vw, 180px); }
+      #viewHome .arena-action-card { min-height: 95px !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -4218,16 +4449,14 @@
     </header>
 
     <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
-      <div class="arena-lobby-topbar">
-        <div class="arena-clinical-status"><span class="arena-lobby-pulse"></span> TREINAMENTO CLÍNICO AO VIVO</div>
-      </div>
+      <div class="arena-lobby-topbar" aria-hidden="true"></div>
 
-      <div class="arena-lobby-layout">
-        <div class="arena-lobby-intro">
-          <span class="arena-lobby-eyebrow"><span class="arena-lobby-eyebrow-line"></span> INTERPRETAÇÃO DE RITMOS CARDÍACOS</span>
-          <h1>Reconheça o ritmo.<br><span>Treine sua decisão.</span></h1>
-          <p class="arena-lobby-description">Uma experiência prática e colaborativa para aprimorar a leitura do ECG, ritmo após ritmo.</p>
+      <div class="arena-home-content">
+        <div class="arena-home-heading">
+          <h1>Leia o traçado.<br><span>Acerte em equipe.</span></h1>
+        </div>
 
+        <div class="arena-home-visuals" aria-label="Elementos visuais da Arena ECG">
           <div class="arena-monitor-card" aria-label="Monitor cardíaco decorativo">
             <div class="arena-monitor-card-top"><span><i class="arena-monitor-live-dot"></i> MONITOR DE ECG</span><span class="arena-monitor-lead">DII <b>●</b></span></div>
             <div class="arena-mini-monitor">
@@ -4241,26 +4470,35 @@
             </div>
             <div class="arena-monitor-card-bottom"><span>TRAÇADO EM TEMPO REAL</span><span>25 mm/s <b>·</b> 10 mm/mV</span></div>
           </div>
+
+          <div class="arena-heart-hologram" aria-hidden="true">
+            <span class="arena-heart-orbit arena-heart-orbit-one"></span>
+            <span class="arena-heart-orbit arena-heart-orbit-two"></span>
+            <svg viewBox="0 0 260 250" role="img" aria-label="">
+              <defs>
+                <linearGradient id="arenaHeartStroke" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9cf7d4"/><stop offset=".55" stop-color="#62e6e9"/><stop offset="1" stop-color="#79a8ff"/></linearGradient>
+                <filter id="arenaHeartGlow" x="-35%" y="-35%" width="170%" height="170%"><feGaussianBlur stdDeviation="3.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <path class="arena-heart-outline" d="M130 213 C111 197 48 151 38 105 C29 64 65 38 96 51 C113 58 124 72 130 83 C140 62 160 47 181 48 C214 49 235 78 223 112 C211 151 158 193 130 213Z"/>
+              <path class="arena-heart-inner" d="M130 196 C108 177 62 143 54 108 C48 81 69 60 93 65 C112 68 123 87 130 103 C143 79 159 63 180 64 C202 65 218 84 210 109 C199 143 156 180 130 196Z"/>
+              <path class="arena-heart-pulse" d="M20 132 H78 L94 116 L108 146 L128 91 L146 157 L163 126 H239"/>
+              <path class="arena-heart-vessel" d="M119 79 C115 57 113 40 121 24 M141 80 C149 58 158 45 174 34 M105 91 C86 81 75 67 73 51"/>
+            </svg>
+            <span class="arena-heart-caption">RITMO • CONEXÃO • EQUIPE</span>
+          </div>
         </div>
 
-        <div class="arena-lobby-actions-wrap">
-          <div class="arena-actions-heading"><span>ESCOLHA COMO PARTICIPAR</span><span class="arena-actions-heading-line"></span></div>
-          <div class="arena-home-actions">
-            <button id="btnStartHost" class="arena-action-card arena-action-teacher" type="button" aria-label="Criar uma sala e conduzir o treinamento">
-              <span class="arena-action-index">01 <i></i> DOCENTE</span>
-              <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 10h3l2-3 2 6 2-3h1"/></svg></span><span class="arena-action-copy"><strong>Criar uma sala</strong><span>Configure e conduza uma sessão ao vivo.</span></span></span>
-              <span class="arena-action-bottom"><span>INICIAR TREINAMENTO</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
-            </button>
-            <button id="btnGoToJoin" class="arena-action-card arena-action-student" type="button" aria-label="Entrar pelo celular usando o PIN da sala">
-              <span class="arena-action-index">02 <i></i> PARTICIPANTE</span>
-              <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 5h4M11 18h2"/><path d="M9 10h6"/></svg></span><span class="arena-action-copy"><strong>Entrar pelo celular</strong><span>Informe o PIN da sala para responder.</span></span></span>
-              <span class="arena-action-bottom"><span>ENTRAR NA SESSÃO</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
-            </button>
-          </div>
-          <div class="arena-lobby-security"><span class="arena-security-icon" aria-hidden="true">✦</span> SIMULAÇÃO EDUCACIONAL <span class="arena-security-divider"></span> FOCO NA PRÁTICA CLÍNICA</div>
+        <div class="arena-home-actions" aria-label="Escolha como participar">
+          <button id="btnStartHost" class="arena-action-card arena-action-teacher" type="button" aria-label="Criar sala da Arena e configurar a sessão">
+            <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 10h3l2-3 2 6 2-3h1"/></svg></span><span class="arena-action-copy"><strong>Configure a sessão</strong><span>Defina os ritmos e as regras.</span></span></span>
+            <span class="arena-action-bottom"><span>CRIAR SALA DA ARENA</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
+          </button>
+          <button id="btnGoToJoin" class="arena-action-card arena-action-student" type="button" aria-label="Entrar com PIN pelo celular">
+            <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 5h4M11 18h2"/><path d="M9 10h6"/></svg></span><span class="arena-action-copy"><strong>Entre pelo celular</strong><span>Entre na sala com o PIN.</span></span></span>
+            <span class="arena-action-bottom"><span>ENTRAR COM PIN</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
+          </button>
         </div>
       </div>
-      <div class="arena-lobby-bottomline"><span><i class="arena-bottom-pulse"></i> SISTEMA PRONTO</span><span>ARENA ECG <b>·</b> TREINAMENTO INTERATIVO DE ECG</span></div>
     </section>
 
         <section id="viewHostSetup" class="hidden my-auto w-full pb-20 lg:pb-8">
