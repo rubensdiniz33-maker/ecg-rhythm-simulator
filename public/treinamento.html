@@ -8795,17 +8795,18 @@ function animatePoints(points) {
       updateSelectedCount(); renderSequence();
     });
     // Navegação do assistente: quatro etapas clicáveis; resumo lateral persistente.
-    function showSetupTab(tab){
+    function showSetupTab(tab, scrollToPanel = false){
       if(!['model','rhythms','rules','summary'].includes(tab))tab='model';
       document.querySelectorAll('[data-setup-panel]').forEach(panel=>{if(panel.id!=='sectionSetupSummary')panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab);});
       document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{const active=button.dataset.setupTab===tab;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});
       const index=['model','rhythms','rules','summary'].indexOf(tab); if($('setupProgressFill'))$('setupProgressFill').style.width=`${Math.max(0,index)/3*100}%`;
       if(tab==='rules')toggleSequenceEditor(); if(tab==='summary')updateSessionSummary();
+      if(scrollToPanel){const panel=document.querySelector(`[data-setup-panel="${tab}"]`);if(panel){const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;panel.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});}}
       if(window.innerWidth<=1023&&tab==='summary'){ $('mobileSummaryDetails')?.classList.remove('hidden'); $('mobileSetupBar')?.classList.add('is-expanded'); $('mobileSummaryToggle')?.setAttribute('aria-expanded','true'); if($('mobileSummaryToggle'))$('mobileSummaryToggle').textContent='Fechar resumo⌃'; }
     }
-    document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab)));
-    document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep)));
-    $('reviewSummaryContent')?.addEventListener('click',(event)=>{const button=event.target.closest('[data-go-step]');if(button)showSetupTab(button.dataset.goStep);});
+    document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab,true)));
+    document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep,true)));
+    $('reviewSummaryContent')?.addEventListener('click',(event)=>{const button=event.target.closest('[data-go-step]');if(button)showSetupTab(button.dataset.goStep,true);});
     $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
     $('mobileCreateRoomButton')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
     $('btnCreateRoomFromReview')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
