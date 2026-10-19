@@ -5257,7 +5257,9 @@
     #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(2) { grid-column:1; }
     #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) { grid-column:1/-1; }
     #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(4) { grid-column:2; grid-row:2; }
-    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) > .flex.flex-wrap { max-height:92px; overflow:auto; scrollbar-width:thin; }
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) > .flex.flex-wrap { max-height:none; overflow:visible; }
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) label,
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) [data-review-rhythm-results] { display:none!important; }
     #viewHostSetup #reviewSummaryContent > :last-child { display:none; }
     body.theme-light #viewHostSetup .setup-action-bar { background:rgba(255,255,255,.94); border-color:#cbd5e1; box-shadow:0 12px 36px rgba(15,23,42,.16); }
     body.theme-light #viewHostSetup .setup-action-button { background:#fff; color:#0f172a; border-color:#cbd5e1; }
@@ -8907,6 +8909,33 @@ function animatePoints(points) {
       updateSelectedCount(); renderSequence();
     });
     // Navegação do assistente: quatro etapas clicáveis; resumo lateral persistente.
+    function getActiveSetupTab(){return document.querySelector('#setupTabs [data-setup-tab].active')?.dataset.setupTab||'model';}
+    function updateSetupActionBar(){
+      const tab=getActiveSetupTab(),selectedCount=document.querySelectorAll('#rhythmLibrary input:checked').length;
+      const back=$('setupActionBack'),next=$('setupActionNext'),create=$('setupActionCreate');
+      if(back)back.textContent=tab==='model'?'← Início':'← Voltar';
+      if(next){next.disabled=tab==='summary';next.setAttribute('aria-disabled',String(tab==='summary'));}
+      if(create){create.disabled=selectedCount===0;create.setAttribute('aria-disabled',String(selectedCount===0));create.title=selectedCount?'Criar uma sala com as configurações atuais':'Selecione pelo menos um ritmo para criar a sala';}
+    }
+    $('setupActionBack')?.addEventListener('click',()=>{
+      const tab=getActiveSetupTab(),previous={rhythms:'model',rules:'rhythms',summary:'rules'};
+      if(tab==='model'){saveSetupPreferences();switchView('viewHome');return;}
+      showSetupTab(previous[tab]||'model',true);
+    });
+    $('setupActionNext')?.addEventListener('click',()=>{
+      const tab=getActiveSetupTab();
+      if(tab==='summary')return;
+      if(tab==='rhythms'&&!document.querySelector('#rhythmLibrary input:checked')){
+        $('rhythmSetupError')?.classList.remove('hidden');$('setupError')?.classList.remove('hidden');updateSetupActionBar();return;
+      }
+      const next={model:'rhythms',rhythms:'rules',rules:'summary'};
+      if(next[tab])showSetupTab(next[tab],true);
+    });
+    $('setupActionCreate')?.addEventListener('click',()=>{$('btnCreateRoom')?.click();});
+    $('viewHostSetup')?.addEventListener('change',()=>{saveSetupPreferences();updateSetupActionBar();});
+    $('viewHostSetup')?.addEventListener('input',event=>{if(event.target.id==='roundDurationInput')saveSetupPreferences();});
+    $('viewHostSetup')?.addEventListener('click',event=>{if(event.target.closest('button,summary')){saveSetupPreferences();updateSetupActionBar();}});
+    $('selectedRhythmOrder')?.addEventListener('drop',()=>window.setTimeout(saveSetupPreferences,0));
     function showSetupTab(tab, scrollToPanel = false){
       if(!['model','rhythms','rules','summary'].includes(tab))tab='model';
       document.querySelectorAll('[data-setup-panel]').forEach(panel=>{if(panel.id!=='sectionSetupSummary')panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab);});
@@ -8915,6 +8944,7 @@ function animatePoints(points) {
       if(tab==='rules')toggleSequenceEditor(); if(tab==='summary')updateSessionSummary();
       if(scrollToPanel){const panel=document.querySelector(`[data-setup-panel="${tab}"]`);if(panel){const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;panel.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});}}
       if(window.innerWidth<=1023&&tab==='summary'){ $('mobileSummaryDetails')?.classList.remove('hidden'); $('mobileSetupBar')?.classList.add('is-expanded'); $('mobileSummaryToggle')?.setAttribute('aria-expanded','true'); if($('mobileSummaryToggle'))$('mobileSummaryToggle').textContent='Fechar resumo⌃'; }
+      updateSetupActionBar();saveSetupPreferences();
     }
     document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab,true)));
     document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep,true)));
