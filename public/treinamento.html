@@ -7741,7 +7741,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           };
         }
       }
-      results.sort((a,b)=>b.p.score-a.p.score);
+      results.sort((a,b)=>compareArenaParticipants(a.p,b.p));
       state.lastRankChanges = new Map();
       results.forEach((r,i)=>{
         const old=state.previousRank.get(r.p.id)||0;
@@ -8000,6 +8000,14 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         });
       }catch(e){}
     }
+    function compareArenaParticipants(a,b){
+      const scoreDifference=(Number(b.score)||0)-(Number(a.score)||0);
+      if(scoreDifference)return scoreDifference;
+      const orderA=state.answersReceived.get(a.id)?.receivedOrder;
+      const orderB=state.answersReceived.get(b.id)?.receivedOrder;
+      if(Number.isFinite(Number(orderA))&&Number.isFinite(Number(orderB))&&Number(orderA)!==Number(orderB))return Number(orderA)-Number(orderB);
+      return (Number(a.joinedAt)||0)-(Number(b.joinedAt)||0);
+    }
     function updateLeaderboard(forceReveal=false){
       const panel=$('liveCompetitionPanel');
       const requestedShow=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound());
@@ -8019,7 +8027,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }
       }
       if(!show)return;
-      const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
+      const list=[...state.participants.values()].sort(compareArenaParticipants);
       const top=list.slice(0,5);
       const listEl=$('liveCompetitionList');
       const msgEl=$('liveCompetitionMessage');
@@ -8081,7 +8089,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       hideLiveCompetitionPanel();
       $('hostPodium')?.classList.remove('hidden');
 
-      const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
+      const list = [...state.participants.values()].sort(compareArenaParticipants);
 
       // Avisa os celulares dos alunos para mostrar o resultado com pontuações acumuladas
       list.forEach((p, index) => {
