@@ -5187,6 +5187,10 @@
               <span class="text-xl">→</span>
             </button>
 
+            <button id="btnResumePreviousRoom" type="button" class="hidden muted-btn w-full py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+              <span>↻</span><span>RETOMAR SALA ANTERIOR</span>
+            </button>
+
             <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
               <span>👁</span>
               <span>Visualizar partida</span>
@@ -5858,7 +5862,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function queueArenaHostSync(){
       if(!state.arenaHostToken||!state.pin)return;
       if(arenaHostSyncTimer)clearTimeout(arenaHostSyncTimer);
-      arenaHostSyncTimer=setTimeout(async()=>{const participants=Array.from(state.participants?.values?.()||[]).map(p=>({id:String(p.id),score:Number(p.score)||0,streak:Number(p.streak)||0,connected:!!p.conn?.open,participantState:{lastAnswer:p.lastAnswer||null}}));const status=state.isPaused?'paused':(state.currentRhythm&&!state.isRevealed?'running':(state.roundNumber===0?'waiting':'finished'));try{await arenaApi({action:'host_sync',pin:state.pin,hostToken:state.arenaHostToken,participants,gameState:arenaSnapshot(),status})}catch(error){console.warn('Arena Supabase sync:',error)}},700);
+      arenaHostSyncTimer=setTimeout(async()=>{const participants=Array.from(state.participants?.values?.()||[]).map(p=>({id:String(p.id),score:Number(p.score)||0,streak:Number(p.streak)||0,connected:!!p.conn?.open,participantState:{lastAnswer:p.lastAnswer||null}}));const status=state.isPaused?'paused':(state.currentRhythm?'running':'waiting');try{await arenaApi({action:'host_sync',pin:state.pin,hostToken:state.arenaHostToken,participants,gameState:arenaSnapshot(),status})}catch(error){console.warn('Arena Supabase sync:',error)}},700);
     }
     let studentReconnectTimer=null, studentReconnectAttempts=0, pendingConfirmAction=null;
     function readStudentSession(){try{const x=JSON.parse(sessionStorage.getItem(STUDENT_SESSION_KEY)||'null');return x&&/^\d{6}$/.test(String(x.pin||''))&&x.studentId?x:null}catch(e){return null}}
@@ -6524,21 +6528,50 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
     function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sectionSetupSequence')?.classList.toggle('hidden',!show);$('sequenceEditor')?.classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.add('hidden');if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
-    function initHost(){
+    function initHost(recovery=null){
       state.role='host';
-      state.pin=randomPin();
-      state.arenaHostToken=null;state.arenaRoomId=null;
-      registerArenaHostRoom(state.pin);
-      state.participants.clear();
-      state.roundNumber=0;
-      state.lastRoundId=null;
-      state.sessionStats = {
-        totalRounds: 0,
-        totalAnswers: 0,
-        totalCorrect: 0,
-        fastestAnswer: null,
-        highestStreak: null
-      };
+      if(recovery){
+        state.pin=recovery.session.pin;
+        state.arenaHostToken=recovery.session.hostToken;
+        state.arenaRoomId=recovery.session.roomId||recovery.snapshot.room?.id||null;
+        const gs=recovery.snapshot.room?.game_state||{};
+        state.selectedRhythmIds=Array.isArray(gs.selectedRhythmIds)?gs.selectedRhythmIds.filter(id=>rhythmById(id)):state.selectedRhythmIds;
+        state.gameMode=gs.gameMode||state.gameMode;
+        state.difficulty=gs.difficulty||state.difficulty;
+        state.roundLimit=gs.roundLimit??state.roundLimit;
+        state.roundDuration=Number(gs.roundDuration)||state.roundDuration;
+        state.roundNumber=Number(gs.roundNumber)||0;
+        state.queueIndex=Number(gs.queueIndex)||0;
+        state.lastRoundId=null;
+        state.currentRhythm=null;
+        state.currentChoices=[];
+        state.isRevealed=false;
+        state.isPaused=false;
+        state.answersReceived.clear();
+        state.roundLocked=false;
+        state.sessionStats=gs.sessionStats||{totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null};
+        state.participants.clear();
+        for(const saved of (recovery.snapshot.participants||[])){
+          const id=String(saved.participant_key||'');
+          if(!id)continue;
+          state.participants.set(id,{id,name:saved.display_name||'Participante',avatar:saved.avatar||'stetho',conn:null,score:Number(saved.score)||0,streak:Number(saved.streak)||0,lastAnswer:saved.participant_state?.lastAnswer||null,joinedAt:Date.parse(saved.joined_at)||Date.now(),reconnectTimer:null});
+        }
+        try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin:state.pin,hostToken:state.arenaHostToken,roomId:state.arenaRoomId}))}catch(e){}
+      }else{
+        state.pin=randomPin();
+        state.arenaHostToken=null;state.arenaRoomId=null;
+        registerArenaHostRoom(state.pin);
+        state.participants.clear();
+        state.roundNumber=0;
+        state.lastRoundId=null;
+        state.sessionStats = {
+          totalRounds: 0,
+          totalAnswers: 0,
+          totalCorrect: 0,
+          fastestAnswer: null,
+          highestStreak: null
+        };
+      }
       $('hostPinDisplay').innerHTML=state.pin.split('').map(d=>'<span class="host-pin-digit">'+d+'</span>').join('');
       const url=location.origin+location.pathname+'?pin='+state.pin;
       $('hostDirectUrl').textContent=url;
@@ -8275,6 +8308,23 @@ function animatePoints(points) {
       updateHostLobbySummary();
       initHost();
     };
+    async function resumePreviousHostRoom(){
+      let saved;
+      try{saved=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
+      if(!saved?.pin||!saved?.hostToken){showToast('Não há uma sala anterior salva neste navegador.');return}
+      const btn=$('btnResumePreviousRoom');if(btn){btn.disabled=true;btn.querySelector('span:last-child').textContent='RECUPERANDO SALA…'}
+      try{
+        const snapshot=await arenaApi({action:'host_snapshot',pin:saved.pin,hostToken:saved.hostToken});
+        initHost({session:saved,snapshot});
+        showToast('Sala recuperada. Os alunos podem reconectar com o mesmo PIN.');
+      }catch(error){
+        console.warn('Arena recovery:',error);
+        showToast('Não foi possível recuperar a sala. Ela pode ter expirado ou a sessão não ser válida.');
+        if(btn){btn.classList.add('hidden')}
+      }finally{
+        if(btn){btn.disabled=false;btn.querySelector('span:last-child').textContent='RETOMAR SALA ANTERIOR'}
+      }
+    }
     function toggleSound() {
       soundOn = !soundOn;
       if ($('btnToggleSound')) $('btnToggleSound').textContent = soundOn ? '🔊 Som' : '🔇 Mudo';
@@ -8282,6 +8332,12 @@ function animatePoints(points) {
       showToast(soundOn ? 'Som ativado' : 'Som desativado');
     }
 
+    if ($('btnResumePreviousRoom')) {
+      let savedHostSession=null;
+      try{savedHostSession=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
+      if(savedHostSession?.pin&&savedHostSession?.hostToken)$('btnResumePreviousRoom').classList.remove('hidden');
+      $('btnResumePreviousRoom').onclick=resumePreviousHostRoom;
+    }
     if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
