@@ -7918,7 +7918,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(listEl){
         listEl.innerHTML=top.map((p,i)=>{
           const above=i===0?null:top[i-1];
-          const gap=above?Math.max(0,above.score-p.score):Math.max(0,(top[1]?.score||p.score)-p.score);
+          const gap=above?Math.max(0,above.score-p.score):Math.max(0,p.score-(top[1]?.score??p.score));
           const gapText=i===0?(top.length>1?'LIDERA POR '+gap+' PTS':'LÍDER'):(gap+' pts do #'+i);
           const change=state.lastRankChanges?.get(p.id);
           const movement=state.config.showRankChanges!==false&&change?.from&&change.delta!==0?'<span class="live-rank-movement '+(change.delta>0?'up':'down')+'">'+(change.delta>0?'▲ +':'▼ ')+Math.abs(change.delta)+'</span>':'';
