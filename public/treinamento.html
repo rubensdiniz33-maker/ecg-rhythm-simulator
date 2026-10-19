@@ -1742,20 +1742,37 @@
       margin-bottom: 6px;
     }
     .student-fc-pill {
+      position: absolute;
+      top: calc(max(8px, env(safe-area-inset-top)) + 52px);
+      right: max(12px, env(safe-area-inset-right));
+      z-index: 40;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      min-width: 54px;
-      padding: 5px 7px;
-      border-radius: 9999px;
-      border: 1px solid rgba(16,185,129,.28);
-      background: rgba(16,185,129,.08);
-      color: #86efac;
-      font: 800 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      gap: 7px;
+      min-width: 112px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(52,211,153,.55);
+      background: linear-gradient(145deg, rgba(4,38,29,.97), rgba(5,18,18,.96));
+      color: #a7f3d0;
+      font: 900 20px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
       white-space: nowrap;
       flex-shrink: 0;
-      opacity: .88;
+      opacity: 1;
+      box-shadow: 0 8px 24px rgba(0,0,0,.38), 0 0 18px rgba(16,185,129,.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      pointer-events: none;
+    }
+    .student-fc-pill::before {
+      content: "♥ FC";
+      color: #6ee7b7;
+      font: 900 11px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .06em;
+    }
+    .student-fullscreen:has(.student-fc-pill:not(.hidden)) .student-answer-grid {
+      padding-top: 54px;
     }
     .student-fc-pill.hidden { display: none !important; }
     .student-fc-dot {
@@ -5708,16 +5725,17 @@
       </div>
 
       <div class="student-topline-right flex items-center gap-1.5">
-        <div id="studentFcBadge" class="student-fc-pill hidden" aria-label="Frequência cardíaca do traçado">
-          <span class="student-fc-dot"></span>
-          <span id="studentFcValue">--</span><span class="student-fc-unit">bpm</span>
-        </div>
         <div class="student-timer-pill">
           <span class="text-xs opacity-75">⏱️</span>
           <span class="timer-num" id="studentTimer">25</span><span class="text-[10px] opacity-60">s</span>
         </div>
       </div>
     </header>
+
+    <div id="studentFcBadge" class="student-fc-pill hidden" aria-label="Frequência cardíaca do traçado">
+      <span class="student-fc-dot"></span>
+      <span id="studentFcValue">--</span><span class="student-fc-unit">bpm</span>
+    </div>
 
     <div id="studentChoices" class="student-answer-grid"></div>
 
