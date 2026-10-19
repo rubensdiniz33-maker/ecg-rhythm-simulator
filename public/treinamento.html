@@ -6182,10 +6182,6 @@
       <button id="btnReveal" type="button" class="teacher-ctrl-btn teacher-btn-reveal" title="Revelar resposta e gabarito imediato">
         👁 Revelar
       </button>
-      <button id="btnToggleExplain" type="button" class="teacher-ctrl-btn teacher-btn-explain" title="Abrir / Fechar painel de explicação clínica (Atalho: E)">
-        📋 Explicar
-      </button>
-
       <div class="teacher-bar-divider" aria-hidden="true"></div>
       <button id="btnAddTime" type="button" class="teacher-ctrl-btn icon-btn" title="Adicionar +10 segundos ao cronômetro">
         +10s
@@ -9472,7 +9468,6 @@ function animatePoints(points) {
     if ($('btnToggleAnimation')) $('btnToggleAnimation').onclick = toggleEcgAnimation;
     if ($('btnPause')) $('btnPause').onclick = toggleEcgAnimation;
     if ($('btnReveal')) $('btnReveal').onclick = revealRound;
-    if ($('btnToggleExplain')) $('btnToggleExplain').onclick = toggleExplainPanel;
     if ($('btnCloseExplain')) $('btnCloseExplain').onclick = () => applyExplanationMode('off');
     if ($('revealExplanationSelect')) $('revealExplanationSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     const handleNext = () => { if (!state.isRevealed) revealRound(); else startNextRound(); };
@@ -9525,10 +9520,6 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       }
       if ((e.key === 'n' || e.key === 'N') && state.role === 'host' && state.isRevealed) {
         startNextRound();
-      }
-      if ((e.key === 'e' || e.key === 'E') && state.role === 'host' && state.projection) {
-        e.preventDefault();
-        toggleExplainPanel();
       }
     });
 
