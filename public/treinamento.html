@@ -8555,11 +8555,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const btn=$('btnToggleAnimation')||$('btnPause');
       if(!btn)return;
       if(state.ecgAnimated){
-        btn.textContent='⏸ Parar';
+        btn.textContent='⏸';
         btn.title='Traçado animado (25 mm/s) · Clique para congelar quadro (o relógio não para)';
         btn.classList.add('is-animating');
       }else{
-        btn.textContent='▶ Animar';
+        btn.textContent='▶';
         btn.title='Traçado parado (25 mm/s) · Clique para animar rolagem (o relógio não para)';
         btn.classList.remove('is-animating');
       }
