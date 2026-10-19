@@ -4507,7 +4507,7 @@
       </div>
     </section>
 
-        <section id="viewHostSetup" class="hidden my-auto w-full pb-20 lg:pb-8">
+        <section id="viewHostSetup" class="hidden my-auto w-full pb-24">
       <!-- Topo da tela de configuração -->
       <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800/80">
         <div class="space-y-1">
@@ -4528,23 +4528,10 @@
       </div>
 
       <!-- Barra de Navegação Rápida entre as 4 Áreas (Guia Visual) -->
-      <nav class="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 p-2 rounded-2xl bg-slate-900/60 border border-slate-800" aria-label="Navegação das etapas de personalização">
-        <a href="#sectionSetupRhythms" class="setup-nav-pill active">
-          <span class="setup-step-num font-mono">1</span>
-          <span>Ritmos & Modelos</span>
-        </a>
-        <a href="#sectionSetupRules" class="setup-nav-pill">
-          <span class="setup-step-num font-mono">2</span>
-          <span>Regras da Partida</span>
-        </a>
-        <a href="#sectionSetupSequence" class="setup-nav-pill">
-          <span class="setup-step-num font-mono">3</span>
-          <span>Sequência</span>
-        </a>
-        <a href="#sectionSetupSummary" class="setup-nav-pill">
-          <span class="setup-step-num font-mono">4</span>
-          <span>Resumo & Início</span>
-        </a>
+      <nav id="setupTabs" class="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 p-2 rounded-2xl bg-slate-900/60 border border-slate-800" aria-label="Etapas de configuração">
+        <button type="button" class="setup-nav-pill active" data-setup-tab="rhythms" aria-selected="true"><span class="setup-step-num font-mono">1</span><span>Ritmos</span></button>
+        <button type="button" class="setup-nav-pill" data-setup-tab="rules" aria-selected="false"><span class="setup-step-num font-mono">2</span><span>Regras</span></button>
+        <button type="button" class="setup-nav-pill" data-setup-tab="summary" aria-selected="false"><span class="setup-step-num font-mono">3</span><span>Início</span></button>
       </nav>
 
       <!-- Layout Principal em 2 Colunas no Desktop -->
@@ -4556,7 +4543,7 @@
           <!-- ========================================== -->
           <!-- ÁREA 1: RITMOS (Modelos & Biblioteca)     -->
           <!-- ========================================== -->
-          <section id="sectionSetupRhythms" class="panel p-5 sm:p-6 space-y-6" aria-labelledby="rhythmsSectionHeading">
+          <section id="sectionSetupRhythms" data-setup-panel="rhythms" class="panel p-5 sm:p-6 space-y-6" aria-labelledby="rhythmsSectionHeading">
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
               <div class="flex items-center gap-3">
                 <span class="w-8 h-8 rounded-xl bg-lime-400/15 border border-lime-400/30 text-lime-300 flex items-center justify-center font-black text-sm font-mono">1</span>
@@ -4564,7 +4551,7 @@
                   <h2 id="rhythmsSectionHeading" class="font-black text-lg text-white flex items-center gap-2">
                     <span>🫀</span> Ritmos Clínicos & Modelos
                   </h2>
-                  <p class="text-xs text-slate-400 mt-0.5">Aplique um modelo pronto ou escolha ritmos por categorias clínicas abaixo.</p>
+                  
                 </div>
               </div>
 
@@ -4666,22 +4653,22 @@
           <!-- ========================================== -->
           <!-- ÁREA 2: REGRAS DA PARTIDA                 -->
           <!-- ========================================== -->
-          <section id="sectionSetupRules" class="panel p-5 sm:p-6 space-y-5" aria-labelledby="settingsHeading">
+          <section id="sectionSetupRules" data-setup-panel="rules" class="hidden panel p-5 sm:p-6 space-y-5" aria-labelledby="settingsHeading">
             <div class="flex items-center gap-3 border-b border-slate-800/80 pb-4">
               <span class="w-8 h-8 rounded-xl bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 flex items-center justify-center font-black text-sm font-mono">2</span>
               <div>
                 <h2 id="settingsHeading" class="font-black text-lg text-white flex items-center gap-2">
                   <span>⚙️</span> Regras da Partida & Dinâmica
                 </h2>
-                <p class="text-xs text-slate-400 mt-0.5">Configure a condução da sessão, tempo por questão e critérios pedagógicos.</p>
+                
               </div>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid md:grid-cols-2 gap-4">
               <!-- Bloco A: Formato & Tempo -->
               <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
                 <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-lime-300">A. Formato & Tempo</span>
+                  <span class="text-xs font-black uppercase tracking-wider text-lime-300">Tempo e rodadas</span>
                 </div>
 
                 <label class="block">
@@ -4725,11 +4712,10 @@
                   </select>
                 </label>
               </div>
-
               <!-- Bloco B: Condução & Didática -->
               <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
                 <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-cyan-300">B. Didática Clínica</span>
+                  <span class="text-xs font-black uppercase tracking-wider text-cyan-300">Exibição e placar</span>
                 </div>
 
                 <label class="block">
@@ -4764,13 +4750,7 @@
                     <option value="full">Completa (critérios e conduta clínica)</option>
                   </select>
                 </label>
-              </div>
 
-              <!-- Bloco C: Competição & Feedback -->
-              <div class="space-y-3.5 p-4 rounded-xl border border-slate-800 bg-slate-900/60">
-                <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-amber-300">C. Competição & Placar</span>
-                </div>
 
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Frequência do ranking</span>
@@ -4788,7 +4768,6 @@
                     <span>Aluno vê sua colocação</span>
                   </label>
                   <p class="text-[10px] text-slate-500 mt-1 pl-6.5">Exibe a posição individual no resultado de cada rodada no celular.</p>
-                </div>
               </div>
             </div>
           </section>
@@ -4796,7 +4775,8 @@
           <!-- ========================================== -->
           <!-- ÁREA 3: SEQUÊNCIA                         -->
           <!-- ========================================== -->
-          <section id="sectionSetupSequence" class="panel p-5 sm:p-6 space-y-4" aria-labelledby="sequenceSectionHeading">
+
+          <section id="sectionSetupSequence" class="hidden panel p-5 sm:p-6 space-y-4" aria-labelledby="sequenceSectionHeading">
             <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
               <div class="flex items-center gap-3">
                 <span class="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/30 text-amber-300 flex items-center justify-center font-black text-sm font-mono">3</span>
@@ -4835,7 +4815,7 @@
         <!-- ========================================== -->
         <!-- ÁREA 4: RESUMO DA SESSÃO & CRIAR SALA     -->
         <!-- ========================================== -->
-        <aside id="sectionSetupSummary" class="panel p-5 sm:p-6 lg:sticky lg:top-6 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
+        <aside id="sectionSetupSummary" data-setup-panel="summary" class="hidden panel p-5 sm:p-6 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <div class="flex items-center gap-2.5">
               <span class="w-7 h-7 rounded-lg bg-lime-400/15 border border-lime-400/30 text-lime-300 flex items-center justify-center font-black text-xs font-mono">4</span>
@@ -4843,7 +4823,7 @@
                 Resumo da Sessão
               </h2>
             </div>
-            <span id="summaryBadgeStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 font-mono">Pronto</span>
+            <span id="summaryBadgeStatus" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 font-mono">Pronto</span>
           </div>
 
           <!-- Métricas Reais e Atualizadas -->
@@ -4874,7 +4854,7 @@
             </div>
 
             <!-- Badges das Regras Ativas -->
-            <div class="pt-2 border-t border-slate-800/80">
+            <div class="hidden pt-2 border-t border-slate-800/80">
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Regras Ativas</span>
               <div class="flex flex-wrap gap-1.5" id="summaryRulesBadges">
                 <span id="sumBadgeMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sorteio aleatório</span>
@@ -4887,7 +4867,7 @@
             </div>
 
             <!-- Lista compacta de ritmos selecionados (sem scroll interno desnecessário) -->
-            <div class="pt-2 border-t border-slate-800/80">
+            <div class="hidden pt-2 border-t border-slate-800/80">
               <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                 <span>Ritmos Selecionados</span>
                 <span id="sumRhythmsPreviewCount" class="text-slate-500 font-mono">0 itens</span>
@@ -4921,7 +4901,7 @@
       </div>
 
       <!-- Barra de Ação Rápida Flutuante no Mobile (Fácil acesso ao Criar Sala) -->
-      <div class="mobile-setup-bar lg:hidden fixed bottom-0 left-0 right-0 p-3 flex items-center justify-between gap-3 z-30 shadow-2xl">
+      <div class="mobile-setup-bar fixed bottom-0 left-0 right-0 p-3 flex items-center justify-between gap-3 z-30 shadow-2xl">
         <div class="flex flex-col">
           <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos no jogo</span>
           <span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-lime-400 text-sm">0</b> / 18 ritmos</span>
@@ -6173,7 +6153,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
 
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
-    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sequenceEditor').classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.toggle('hidden',show);if(show)renderSequence();updateSessionSummary();}
+    function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sectionSetupSequence')?.classList.toggle('hidden',!show);$('sequenceEditor')?.classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.add('hidden');if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
     function initHost(){
       state.role='host';
@@ -7723,6 +7703,7 @@ function animatePoints(points) {
       renderRhythmLibrary();
       loadStoredConfig();
       updateSessionSummary();
+      showSetupTab('rhythms');
       switchView('viewHostSetup');
     };
     $('btnSetupBack').onclick = () => switchView('viewHome');
@@ -7789,6 +7770,20 @@ function animatePoints(points) {
         filterRhythms('');
       };
     }
+
+    // Abas da configuração: exibe uma etapa por vez.
+    function showSetupTab(tab){
+      if(!['rhythms','rules','summary'].includes(tab))tab='rhythms';
+      document.querySelectorAll('[data-setup-panel]').forEach(panel=>panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab));
+      document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{
+        const active=button.dataset.setupTab===tab;
+        button.classList.toggle('active',active);
+        button.setAttribute('aria-selected',String(active));
+      });
+      if(tab==='rules')toggleSequenceEditor();
+      if(tab==='summary')updateSessionSummary();
+    }
+    document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab)));
 
     // Settings listeners
     $('gameMode').onchange = () => { toggleSequenceEditor(); updateSessionSummary(); };
@@ -7984,7 +7979,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       });
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
-    const params=new URLSearchParams(location.search);if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();switchView('viewHostSetup')}else switchView('viewHome');
+    const params=new URLSearchParams(location.search);if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('rhythms');switchView('viewHostSetup')}else switchView('viewHome');
   </script>
 </body>
 </html>
