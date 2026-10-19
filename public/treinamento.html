@@ -6514,7 +6514,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
-    let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
+    let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null, lastHeartSoundAt=0;
     let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
@@ -6575,7 +6575,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
     function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
     function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');const isStudentScreen=['studentLobby','studentGame','studentReveal'].includes(view);if(isStudentScreen){$('globalHeader')?.classList.add('hidden')}else{$('globalHeader')?.classList.remove('hidden')}const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
-    function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
+    function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume().catch(()=>{});return audioCtx}
     function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
     function playHeartSound(){
       if(!soundOn)return;
@@ -6595,11 +6595,19 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function playSynchronizedBeats(){
       if(!ecgEngine)return;
-      // O próprio motor informa os instantes dos complexos organizados, evitando
-      // inferir batimentos por limiar de amplitude e evitando pulso fictício em FV/assistolia.
-      const beats=ecgEngine.takeBeats();
-      const canPlay=soundOn&&!['vf','asystole'].includes(state.currentRhythm?.id)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
-      if(canPlay&&beats.length)beats.forEach(()=>playHeartSound());
+      const rhythmId=state.currentRhythm?.id;
+      const canPlay=soundOn&&state.ecgAnimated&&!['vf','asystole'].includes(rhythmId)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
+      if(!canPlay){lastHeartSoundAt=0;return;}
+
+      // O som acompanha o ritmo da animação e a FC medida/configurada.
+      // O primeiro som começa ao ativar a animação; ao congelá-la, o ciclo é interrompido.
+      const bpm=Number(ecgEngine.measuredBpm())||Number(state.chosenRate)||Number(ecgEngine.params?.rate)||75;
+      const intervalMs=60000/Math.max(30,Math.min(220,bpm));
+      const now=performance.now();
+      if(!lastHeartSoundAt||now-lastHeartSoundAt>=intervalMs){
+        playHeartSound();
+        lastHeartSoundAt=now;
+      }
     }
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
     function playJoinChime() {
@@ -8227,6 +8235,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       currentRateTarget=(rhythm.rateKey==='rate'&&Number.isFinite(Number(defs.rate)))?Number(defs.rate):null;
       lastRateVariationAt=performance.now();
       state.ecgAnimated = (state.config.ecgMode === 'animated');
+      lastHeartSoundAt=0;
+      if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
 
       if(state.ecgAnimated){
@@ -8239,6 +8249,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function toggleEcgAnimation(){
       if(!state.currentRhythm)return;
       state.ecgAnimated = !state.ecgAnimated;
+      lastHeartSoundAt=0;
+      if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
       if(state.ecgAnimated){
         frameLast=0;
@@ -9243,6 +9255,8 @@ function animatePoints(points) {
     }
     function toggleSound() {
       soundOn = !soundOn;
+      if(soundOn&&state.ecgAnimated)getAudio();
+      if(!soundOn)lastHeartSoundAt=0;
       if ($('btnToggleSound')) $('btnToggleSound').textContent = soundOn ? '🔊 Som' : '🔇 Mudo';
       if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').textContent = soundOn ? '🔊' : '🔇';
       showToast(soundOn ? 'Som ativado' : 'Som desativado');
