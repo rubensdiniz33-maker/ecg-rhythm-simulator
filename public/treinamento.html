@@ -4751,6 +4751,7 @@
     @keyframes answerCorrectPulse { 0%,100% { filter:brightness(1); } 35% { filter:brightness(1.45); } 60% { filter:brightness(1.12); } }
     @keyframes leaderboardSlideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
     @keyframes rankMovementPop { 0% { opacity:0; transform:scale(.65); } 75% { opacity:1; transform:scale(1.12); } 100% { transform:scale(1); } }
+    .projection-options .answer-tile .answer-label { font-size:clamp(18px,1.55vw,27px); line-height:1.18; font-weight:900; }
     .answer-vote-percent { color:rgba(255,255,255,.78); font-size:clamp(10px,.8vw,13px); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
     .answer-vote-count {
       min-width: 1.6em;
@@ -4781,6 +4782,7 @@
         gap: 8px;
       }
       .projection-options .answer-tile { padding: 8px 12px; font-size: clamp(28px, 2.2vw, 36px); }
+      .projection-options .answer-tile .answer-label { font-size:clamp(16px,1.35vw,22px); line-height:1.15; }
       .projection-options .answer-tile .shape { font-size: clamp(36px, 3vw, 48px); }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -5730,8 +5732,12 @@
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Frequência do ranking</span>
                   <select id="rankingFrequencySelect" class="field text-xs mt-1.5 w-full cursor-pointer">
-                    <option value="every_question" selected>A cada pergunta</option>
-                    <option value="every_5">A cada 5 perguntas</option>
+                    <option value="every_20_percent" selected>A cada 20% das questões</option>
+                    <option value="every_40_percent">A cada 40% das questões</option>
+                    <option value="every_60_percent">A cada 60% das questões</option>
+                    <option value="every_80_percent">A cada 80% das questões</option>
+                    <option value="every_question">Após toda questão</option>
+                    <option value="every_5">A cada 5 questões</option>
                     <option value="end_only">Só no final da partida</option>
                     <option value="never">Nunca (sem ranking)</option>
                   </select>
@@ -6540,7 +6546,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
       isExplaining:false,config: { ecgMode: 'static',
-      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true,
+      ecgAnimated: false,rankingFrequency:'every_20_percent',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true,
       revealAnimation:'immersive',showVoteCounts:true,showRankChanges:true,showStreakHighlights:true},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map(),lastRankChanges:new Map()
@@ -7843,7 +7849,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateHostLobbySummary(){
       const ecgMap={static:'Traçado: Estático (8s)',animated:'Traçado: Animado'};
       const expMap={off:'Explicação: Desligada',summary:'Explicação: Resumida',full:'Explicação: Completa'};
-      const rankMap={every_question:'Ranking: A cada rodada',every_5:'Ranking: A cada 5 rodadas',end_only:'Ranking: Só no final',never:'Ranking: Nunca'};
+      const rankMap={every_20_percent:'Ranking: A cada 20%',every_40_percent:'Ranking: A cada 40%',every_60_percent:'Ranking: A cada 60%',every_80_percent:'Ranking: A cada 80%',every_question:'Ranking: Toda rodada',every_5:'Ranking: A cada 5 rodadas',end_only:'Ranking: Só no final',never:'Ranking: Nunca'};
       const posMap=state.config.studentShowsPosition?'Aluno vê posição: Sim':'Aluno vê posição: Não';
       const fcMap=state.config.showBpmDuringQuestion?'FC na pergunta: Sim':'FC na pergunta: Não';
       const el=$('hostGameSummary');
@@ -7854,25 +7860,31 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function shouldShowRankingThisRound(){
       const freq=state.config.rankingFrequency;
       if(freq==='never'||freq==='end_only')return false;
-      if(state.roundNumber===1)return true;
-      if(freq==='every_5'){
-        const isLast=(state.roundLimit&&state.roundNumber>=state.roundLimit)||(state.queueIndex>=state.roundQueue.length);
-        return(state.roundNumber%5===0)||isLast;
+      const total=Math.max(1,Number(state.roundLimit)||Number(state.roundQueue?.length)||1);
+      const isLast=(state.roundLimit&&state.roundNumber>=state.roundLimit)||(state.queueIndex>=state.roundQueue.length);
+      if(isLast)return true;
+      if(freq==='every_5')return state.roundNumber%5===0;
+      if(freq==='every_question')return true;
+      const match=freq.match(/^every_(20|40|60|80)_percent$/);
+      if(match){
+        const interval=Math.max(1,Math.ceil(total*Number(match[1])/100));
+        return state.roundNumber>0&&state.roundNumber%interval===0;
       }
       return true;
     }
     function updateLeaderboard(){
-      const show=shouldShowRankingThisRound();
-      const sec=$('revealRankingSection');
-      if(sec)sec.classList.toggle('hidden',!show);
+      const show=state.isRevealed&&shouldShowRankingThisRound();
+      const sections=document.querySelectorAll('#revealRankingSection');
+      sections.forEach(sec=>sec.classList.toggle('hidden',!show));
       if(!show)return;
       const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
-      $('teacherLeaderboard').innerHTML=list.slice(0,5).map((p,i)=>{
+      const markup=list.slice(0,5).map((p,i)=>{
         const change=state.lastRankChanges?.get(p.id);
         const movement=state.config.showRankChanges!==false&&change?.from&&change.delta!==0 ? '<span class="rank-movement '+(change.delta>0?'rank-up':'rank-down')+'">'+(change.delta>0?'▲':'▼')+' '+Math.abs(change.delta)+'</span>' : '';
         const streak=state.config.showStreakHighlights!==false&&p.streak>=2 ? '<span class="rank-streak" title="'+p.streak+' acertos consecutivos">🔥 '+p.streak+'</span>' : '';
         return '<div class="leaderboard-player flex items-center gap-2 rounded-lg bg-slate-950 px-2 py-1.5" style="--rank-delay:'+(i*70)+'ms"><span>'+avatarEmoji(p.avatar)+'</span><span class="text-[10px] text-amber-300 font-black">#'+(i+1)+'</span><span class="truncate flex-1 text-xs font-bold">'+escapeHTML(p.name)+'</span>'+movement+streak+'<span class="text-xs font-black text-lime-300">'+p.score+'</span></div>';
       }).join('')||'<p class="text-xs text-slate-500">Aguardando participantes.</p>';
+      document.querySelectorAll('#teacherLeaderboard').forEach(el=>{el.innerHTML=markup;});
     }
     function showPodium() {
       state.sessionFinished=true;
