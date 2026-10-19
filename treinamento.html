@@ -5864,7 +5864,19 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function readStudentSession(){try{const x=JSON.parse(sessionStorage.getItem(STUDENT_SESSION_KEY)||'null');return x&&/^\d{6}$/.test(String(x.pin||''))&&x.studentId?x:null}catch(e){return null}}
     function persistStudentSession(){if(state.role!=='student'||!state.studentId||!state.pin)return;try{sessionStorage.setItem(STUDENT_SESSION_KEY,JSON.stringify({pin:state.pin,studentId:state.studentId,name:state.studentName||'',avatar:state.studentAvatar||'stetho',score:Number(state.studentScore)||0,streak:Number(state.studentStreak)||0,sessionToken:state.arenaSessionToken||null}))}catch(e){}}
     async function registerArenaStudent(reuse,saved){
-      try{let data;if(reuse&&saved?.sessionToken){data=await arenaApi({action:'resume_room',pin:state.pin,participantKey:state.studentId,sessionToken:saved.sessionToken});state.arenaSessionToken=saved.sessionToken}else{data=await arenaApi({action:'join_room',pin:state.pin,participantKey:state.studentId,displayName:state.studentName,avatar:state.studentAvatar});state.arenaSessionToken=data.sessionToken}if(data.participant){state.studentScore=Number(data.participant.score)||state.studentScore;state.studentStreak=Number(data.participant.streak)||state.studentStreak;persistStudentSession()}}catch(error){console.warn('Arena Supabase student session:',error)}
+      for(let attempt=0;attempt<6;attempt++){
+        try{
+          let data;
+          if(reuse&&saved?.sessionToken){data=await arenaApi({action:'resume_room',pin:state.pin,participantKey:state.studentId,sessionToken:saved.sessionToken});state.arenaSessionToken=saved.sessionToken}
+          else{data=await arenaApi({action:'join_room',pin:state.pin,participantKey:state.studentId,displayName:state.studentName,avatar:state.studentAvatar});state.arenaSessionToken=data.sessionToken}
+          if(data.participant){state.studentScore=Number(data.participant.score)||state.studentScore;state.studentStreak=Number(data.participant.streak)||state.studentStreak;persistStudentSession()}
+          return data;
+        }catch(error){
+          if(attempt===5){console.warn('Arena Supabase student session:',error);return null}
+          await new Promise(resolve=>setTimeout(resolve,700));
+        }
+      }
+      return null;
     }
     function setStudentReconnectStatus(active){const el=$('studentReconnectStatus');if(!el)return;el.classList.toggle('hidden',!active);if(active)el.textContent='Reconectando…'}
     function scheduleStudentReconnect(){if(state.role!=='student'||!state.studentId||!state.pin||!navigator.onLine)return;setStudentReconnectStatus(true);if(studentReconnectTimer)return;studentReconnectTimer=setTimeout(()=>{studentReconnectTimer=null;connectStudentTransport(true)},2200)}
