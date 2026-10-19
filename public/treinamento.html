@@ -5303,6 +5303,27 @@
     #hostLobby > .panel:last-child > div:last-child{display:none!important}
     #participantsEmpty{padding:20px 12px!important}
     #participantsList{overflow-y:auto;align-content:start}
+
+    /* Lobby desktop: viewport fixo; rolagem restrita à lista de participantes. */
+    @media (min-width: 901px) {
+      body:has(#viewHost:not(.hidden)) { height:100dvh; min-height:0; overflow:hidden; }
+      body:has(#viewHost:not(.hidden)) .shell { height:100dvh; min-height:0; padding:12px clamp(14px,2vw,28px); overflow:hidden; }
+      body:has(#viewHost:not(.hidden)) #globalHeader { flex:0 0 auto; margin-bottom:10px !important; }
+      body:has(#viewHost:not(.hidden)) #viewHost { flex:1 1 auto; min-height:0; overflow:hidden; gap:10px; }
+      #viewHost .host-brand-lockup, #viewHost #btnHostTheme { display:none !important; }
+      #viewHost .host-lobby-header { flex:0 0 auto; min-height:48px; padding:6px 12px; justify-content:flex-end; }
+      #viewHost .host-header-actions { width:100%; }
+      #hostLobby { flex:1 1 auto; min-height:0; height:100%; overflow:hidden; }
+      #hostLobby > .panel { height:100%; max-height:none; min-height:0 !important; overflow:hidden; }
+      #hostLobby > .panel:last-child { display:flex; flex-direction:column; }
+      #hostLobby > .panel:last-child > div:nth-child(2) { flex:1 1 auto; min-height:0; }
+      #participantsList { min-height:0; max-height:100%; overflow-y:auto; overscroll-behavior:contain; }
+      #participantsEmpty { flex:1 1 auto; min-height:0; }
+      #btnStartGame { position:static !important; left:auto !important; bottom:auto !important; transform:none !important; flex:0 0 auto; margin-top:12px; }
+      #btnStartGame:hover { transform:translateY(-2px) !important; }
+      #btnStartGame:active { transform:scale(.98) !important; }
+    }
+
     #btnStartGame{position:fixed!important;left:50%!important;bottom:max(14px,env(safe-area-inset-bottom))!important;transform:translateX(-50%);z-index:100;min-width:min(320px,calc(100vw - 28px));justify-content:center;padding:15px 28px!important;border-radius:16px!important;box-shadow:0 12px 42px rgba(0,0,0,.5),0 0 28px var(--primary-shadow)!important}
     #btnStartGame:hover{transform:translateX(-50%) translateY(-2px)!important}
     #btnStartGame:active{transform:translateX(-50%) scale(.98)!important}
@@ -5352,13 +5373,7 @@
         </span>
       </a>
 
-      <!-- BARRA DE FERRAMENTAS DO CABEÇALHO (Botão de tema integrado) -->
-      <div class="header-toolbar">
-        <button id="themeToggleFloating" class="header-theme-btn" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema claro/escuro">
-          <span id="themeToggleFloatingIcon">☀️</span>
-          <span id="themeToggleFloatingText" class="header-theme-label text-xs font-bold hidden sm:inline">Claro</span>
-        </button>
-      </div>
+      <!-- Marca principal única, sem controle de tema duplicado -->
     </header>
 
     <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
@@ -5855,7 +5870,7 @@
       <div class="host-lobby-header panel">
         <div class="host-brand-lockup"><span class="brand-mark" aria-hidden="true">♥</span><div class="host-brand-copy"><strong>ARENA ECG</strong><span id="hostNetBadge" role="status" aria-live="polite">Abrindo sala...</span></div></div>
         <div class="host-header-actions">
-          <button id="btnHostTheme" type="button" class="muted-btn" title="Alternar tema">☀️ Claro</button>
+
           <button id="btnToggleSound" type="button" class="muted-btn" title="Alternar som">🔊 Som</button>
           <button id="btnFullscreen" type="button" class="muted-btn" title="Abrir projeção">⛶ Projeção</button>
           <button id="btnLeaveHost" type="button" class="muted-btn host-end-button" title="Encerrar sala">Encerrar</button>
@@ -9273,7 +9288,6 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
         }catch(err){}
       });
     }
-    $('themeToggleFloating')?.addEventListener('click', toggleTheme);
     const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();restoreSetupPreferences();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
   
     // Feedback de clique da Home: breve pulso antes de executar a ação existente.
