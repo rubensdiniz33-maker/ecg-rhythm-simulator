@@ -5667,16 +5667,14 @@
       </div>
 
       <!-- Barra de Ação Rápida Flutuante no Mobile (Fácil acesso ao Criar Sala) -->
-      <div class="mobile-setup-bar fixed bottom-0 left-0 right-0 p-3 flex items-center justify-between gap-3 z-30 shadow-2xl">
-        <div class="flex flex-col">
-          <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos no jogo</span>
-          <span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-lime-400 text-sm">0</b> / 18 ritmos</span>
-        </div>
-        <button type="button" onclick="$('btnCreateRoom').click()" class="primary py-2.5 px-5 text-xs font-black tracking-wider rounded-xl shadow-lg flex items-center gap-2 cursor-pointer">
-          <span>CRIAR SALA</span>
-          <span>→</span>
-        </button>
-      </div>
+      <div id="mobileSetupBar" class="mobile-setup-bar fixed bottom-0 left-0 right-0 p-3 z-30 shadow-2xl">
+  <div class="flex items-center justify-between gap-3"><div class="flex flex-col min-w-0"><span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos selecionados</span><span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-cyan-300 text-sm">0</b> / 18 ritmos</span></div>
+    <div class="flex items-center gap-2"><button id="mobileSummaryToggle" type="button" class="muted-btn py-2.5 px-3 text-xs font-bold" aria-expanded="false" aria-controls="mobileSummaryDetails">Resumo⌄</button><button type="button" id="mobileCreateRoomButton" class="primary py-2.5 px-4 text-xs font-black tracking-wider rounded-xl shadow-lg flex items-center gap-2 cursor-pointer"><span>Criar sala</span><span aria-hidden="true">→</span></button></div>
+  </div>
+  <div id="mobileSummaryDetails" class="hidden mt-3 pt-3 border-t border-slate-700/70"><div class="grid grid-cols-3 gap-2 text-xs"><div><span class="block text-slate-400 text-[10px]">Rodadas</span><b id="mobileSumRounds">0</b></div><div><span class="block text-slate-400 text-[10px]">Duração</span><b id="mobileSumDuration">0 min</b></div><div><span class="block text-slate-400 text-[10px]">Tempo/rodada</span><b id="mobileSumRoundDuration">25s</b></div></div>
+    <div class="flex flex-wrap gap-2 mt-3"><button type="button" class="muted-btn text-xs" data-go-step="model">Editar modelo</button><button type="button" class="muted-btn text-xs" data-go-step="rhythms">Editar ritmos</button><button type="button" class="muted-btn text-xs" data-go-step="rules">Editar regras</button></div>
+  </div>
+</div>
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
@@ -6529,6 +6527,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if ($('selectedCount')) $('selectedCount').textContent = String(n);
       if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
       if ($('mobileSumCount')) $('mobileSumCount').textContent = String(n);
+      if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
       renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value || '');
       if (n && $('setupError')) $('setupError').classList.add('hidden');
 
@@ -6570,11 +6569,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
               </div>
               <div class="flex items-center gap-2">
                 <span class="category-badge text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 transition-colors">
-                  <span class="cat-selected-count">0</span> / ${rhythms.length}
+                  <span class="cat-selected-count">0/${rhythms.length}</span>
                 </span>
                 <div class="flex items-center gap-1">
-                  <button type="button" class="btn-cat-all muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Todos</button>
-                  <button type="button" class="btn-cat-none muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Nenhum</button>
+                  <button type="button" class="btn-cat-all muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Selecionar todos</button>
+                  <button type="button" class="btn-cat-none muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Desmarcar todos</button>
                 </div>
               </div>
             </div>
@@ -6708,6 +6707,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const duration = Number($('roundDurationSelect')?.value) || 25;
       if ($('sumRoundDuration')) $('sumRoundDuration').textContent = `${duration}s por rodada`;
 
+      if ($('mobileSumRounds')) $('mobileSumRounds').textContent = String(effectiveRounds);
+      if ($('mobileSumDuration')) $('mobileSumDuration').textContent = `${effectiveRounds > 0 ? Math.max(1, Math.round((effectiveRounds * (duration + 5)) / 60)) : 0} min`;
+      if ($('mobileSumRoundDuration')) $('mobileSumRoundDuration').textContent = `${duration}s`;
       if ($('mobileSumRounds')) $('mobileSumRounds').textContent = String(effectiveRounds);
       if ($('mobileSumDuration')) $('mobileSumDuration').textContent = `${effectiveRounds > 0 ? Math.max(1, Math.round((effectiveRounds * (duration + 5)) / 60)) : 0} min`;
       if ($('mobileSumRoundDuration')) $('mobileSumRoundDuration').textContent = `${duration}s`;
@@ -8754,6 +8756,9 @@ function animatePoints(points) {
     }
     document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab)));
     document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep)));
+    $('reviewSummaryContent')?.addEventListener('click',(event)=>{const button=event.target.closest('[data-go-step]');if(button)showSetupTab(button.dataset.goStep);});
+    $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
+    $('mobileCreateRoomButton')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
     $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
     $('btnCreateRoomFromReview')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
     // Settings listeners
