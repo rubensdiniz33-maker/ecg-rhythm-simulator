@@ -4729,7 +4729,38 @@
     #arenaConfirmAccept{background:#e11d48;color:white;box-shadow:0 8px 24px rgba(225,29,72,.22)}
     #studentReconnectStatus{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:9999;padding:10px 16px;border:1px solid rgba(250,204,21,.35);border-radius:999px;background:rgba(15,23,42,.94);color:#fef3c7;font-size:13px;font-weight:900;box-shadow:0 8px 30px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none}
     #studentReconnectStatus.hidden{display:none}
-  </style>
+  
+    /* Correções da projeção: FC no monitor e cronômetro sem sobreposição */
+    #projectionFcBadge { display: none !important; }
+    .projection-layout {
+      grid-template-rows: minmax(88px, auto) minmax(0, 1fr) auto;
+    }
+    .projection-header {
+      grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(88px, 1fr);
+      min-height: 88px;
+    }
+    .projection-header-left,
+    .projection-header-center,
+    .projection-header-right {
+      min-width: 0;
+    }
+    .projection-header-center {
+      overflow: hidden;
+    }
+    .projection-question {
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    @media (max-height: 820px), (max-width: 1400px) {
+      .projection-layout {
+        grid-template-rows: minmax(74px, auto) minmax(0, 1fr) auto;
+      }
+      .projection-header {
+        min-height: 74px;
+      }
+    }
+</style>
 </head>
 <body>
 
@@ -6777,7 +6808,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const badge=$('monitorFcBadge');
       const projBadge=$('projectionFcBadge');
       if(badge)badge.classList.toggle('hidden',!show);
-      if(projBadge)projBadge.classList.toggle('hidden',!show);
+      // A FC deve aparecer somente sobre o monitor de ECG, nunca no cabeçalho.
+      if(projBadge)projBadge.classList.add('hidden');
       if(!show)return;
       let bpmText='--';
       if(state.currentRhythm?.id==='asystole'){
