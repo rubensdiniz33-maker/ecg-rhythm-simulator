@@ -5306,13 +5306,13 @@
 
     /* Lobby desktop: viewport fixo; rolagem restrita à lista de participantes. */
     @media (min-width: 901px) {
-      body:has(#viewHost:not(.hidden)) { height:100dvh; min-height:0; overflow:hidden; }
-      body:has(#viewHost:not(.hidden)) .shell { height:100dvh; min-height:0; padding:12px clamp(14px,2vw,28px); overflow:hidden; }
-      body:has(#viewHost:not(.hidden)) #globalHeader { flex:0 0 auto; margin-bottom:10px !important; }
-      body:has(#viewHost:not(.hidden)) #viewHost { flex:1 1 auto; min-height:0; overflow:hidden; gap:10px; }
-      #viewHost .host-brand-lockup, #viewHost #btnHostTheme { display:none !important; }
-      #viewHost .host-lobby-header { flex:0 0 auto; min-height:48px; padding:6px 12px; justify-content:flex-end; }
-      #viewHost .host-header-actions { width:100%; }
+      body:has(#viewHostSetup:not(.hidden)) { height:100dvh; min-height:0; overflow:hidden; }
+      body:has(#viewHostSetup:not(.hidden)) .shell { height:100dvh; min-height:0; padding:12px clamp(14px,2vw,28px); overflow:hidden; }
+      body:has(#viewHostSetup:not(.hidden)) #globalHeader { flex:0 0 auto; margin-bottom:10px !important; }
+      body:has(#viewHostSetup:not(.hidden)) #viewHostSetup { flex:1 1 auto; min-height:0; overflow:hidden; gap:10px; }
+      #viewHostSetup .host-brand-lockup, #viewHostSetup #btnHostTheme { display:none !important; }
+      #viewHostSetup .host-lobby-header { flex:0 0 auto; min-height:48px; padding:6px 12px; justify-content:flex-end; }
+      #viewHostSetup .host-header-actions { width:100%; }
       #hostLobby { flex:1 1 auto; min-height:0; height:100%; overflow:hidden; }
       #hostLobby > .panel { height:100%; max-height:none; min-height:0 !important; overflow:hidden; }
       #hostLobby > .panel:last-child { display:flex; flex-direction:column; }
