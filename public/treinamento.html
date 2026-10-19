@@ -1599,6 +1599,16 @@
       min-width: 44px;
       text-align: right;
     }
+    .monitor-fc-badge.no-pulse .fc-value {
+      font-family: inherit;
+      font-size: 12px;
+      min-width: 0;
+      color: #fca5a5;
+      letter-spacing: .02em;
+    }
+    .monitor-fc-badge.no-pulse .fc-label {
+      color: #fca5a5;
+    }
     .theme-light .monitor-fc-badge .fc-value {
       color: #15803d;
     }
@@ -7489,6 +7499,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(!show){sendToAll({type:'STUDENT_FC',show:false});return;}
 
       const rhythmId=state.currentRhythm?.id;
+      badge?.classList.toggle('no-pulse',rhythmId==='vf');
       let bpmText='--';
       if(rhythmId==='vf'){
         if(label)label.textContent='RITMO';
@@ -8184,6 +8195,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const s=ecgEngine.advance(0.04);
         if(s.length>0){chunks.push(s);totalSamples+=s.length;}
       }
+      // Consome os batimentos do sinal pré-carregado para não tocar uma sequência atrasada ao iniciar a animação.
+      ecgEngine.takeBeats();
       const initialSamples=new Float32Array(totalSamples);
       let offset=0;
       for(const chunk of chunks){
