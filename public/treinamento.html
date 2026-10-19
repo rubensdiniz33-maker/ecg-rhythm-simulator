@@ -8516,6 +8516,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       };
 
       state.currentSamples=initialSamples;
+      // Arena ECG: manter a forma de onda fixa durante a varredura visual.
+      state.ecgSweepSamples=initialSamples.slice();
       state.sampleOffset=totalSamples;
       frameLast=0;
       cancelAnimationFrame(ecgFrame);
@@ -8627,7 +8629,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       for(let y=0;y<=h;y+=stepLarge){ctx.moveTo(0,y);ctx.lineTo(w,y);}
       ctx.stroke();
 
-      const data=state.currentSamples;
+      const data=state.ecgSweepSamples||state.currentSamples;
       const dataLen=data.length;
       if(dataLen<2)return;
 
@@ -8668,6 +8670,27 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
       ctx.stroke();
       ctx.shadowBlur=0;
+
+      // Feixe de varredura do monitor: a forma de onda permanece imóvel.
+      if(state.ecgAnimated){
+        const sweepPeriod=4200;
+        const sweepX=((performance.now()%sweepPeriod)/sweepPeriod)*w;
+        const trailW=Math.max(24,w*0.035);
+        const trail=ctx.createLinearGradient(Math.max(0,sweepX-trailW),0,sweepX,0);
+        trail.addColorStop(0,'rgba(84,231,168,0)');
+        trail.addColorStop(1,state.theme==='light'?'rgba(16,185,129,.10)':'rgba(84,231,168,.16)');
+        ctx.fillStyle=trail;
+        ctx.fillRect(Math.max(0,sweepX-trailW),0,trailW,h);
+        ctx.beginPath();
+        ctx.strokeStyle=state.theme==='light'?'rgba(5,150,105,.65)':'rgba(110,255,190,.95)';
+        ctx.lineWidth=2;
+        ctx.shadowColor=state.theme==='light'?'rgba(5,150,105,.25)':'rgba(84,231,168,.8)';
+        ctx.shadowBlur=state.theme==='light'?2:10;
+        ctx.moveTo(sweepX,0);
+        ctx.lineTo(sweepX,h);
+        ctx.stroke();
+        ctx.shadowBlur=0;
+      }
     }
 
     function applyExplanationMode(mode){
