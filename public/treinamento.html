@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=4" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
     :root {
@@ -6615,11 +6616,31 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(!response.ok)throw new Error(data.error||'Falha na sincronização da Arena.');
       return data;
     }
+    let arenaRealtimeClient=null,arenaHostRealtimeChannel=null,arenaRealtimeReady=false;
+    function getArenaRealtimeClient(){
+      if(!window.supabase?.createClient)throw new Error('Biblioteca de comunicação em tempo real indisponível.');
+      if(!arenaRealtimeClient)arenaRealtimeClient=window.supabase.createClient(ARENA_SUPABASE_URL,ARENA_SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false},realtime:{params:{eventsPerSecond:100}}});
+      return arenaRealtimeClient;
+    }
+    async function subscribeArenaHostRealtime(topic){
+      const client=getArenaRealtimeClient();
+      if(arenaHostRealtimeChannel){try{await client.removeChannel(arenaHostRealtimeChannel)}catch(e){}arenaHostRealtimeChannel=null}
+      arenaRealtimeReady=false;
+      return await new Promise((resolve,reject)=>{
+        let settled=false;
+        const channel=client.channel(topic,{config:{private:true}})
+          .on('broadcast',{event:'answer_received'},message=>handleArenaRealtimeAnswer(message?.payload))
+          .subscribe(status=>{
+            if(status==='SUBSCRIBED'){arenaHostRealtimeChannel=channel;arenaRealtimeReady=true;if(!settled){settled=true;resolve(true)}}
+            else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){arenaRealtimeReady=false;if(!settled){settled=true;reject(new Error('Não foi possível conectar o canal de respostas em tempo real.'))}}
+          });
+      });
+    }
     function arenaSnapshot(){return {schemaVersion:2,savedAt:Date.now(),selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,roundQueue:Array.isArray(state.roundQueue)?state.roundQueue:[],currentRhythmId:state.currentRhythm?.id||null,currentChoices:Array.isArray(state.currentChoices)?state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})):[],chosenRate:Number(state.chosenRate)||null,roundStartTime:Number(state.roundStartTime)||null,roundDeadline:Number(state.roundDeadline)||null,timeLeft:Number(state.timeLeft)||0,answersReceived:Array.from(state.answersReceived.entries()).map(([id,a])=>[String(id),{choiceId:a.choiceId,answeredAt:a.answeredAt}]),isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,roundLocked:!!state.roundLocked,sessionFinished:!!state.sessionFinished,sessionClosed:!!state.sessionClosed,sessionStats:state.sessionStats||{}}}
     function registerArenaHostRoom(pin){
       state.sessionFinished=false;
       state.sessionClosed=false;
-      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;queueArenaHostSync();return data}).catch(error=>{console.warn('Arena Supabase:',error);showToast('Não foi possível registrar a sala no servidor. Confira a conexão antes de iniciar.');return null});
+      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(async data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;await subscribeArenaHostRealtime(data.hostChannelTopic);queueArenaHostSync();return data}).catch(error=>{arenaRealtimeReady=false;console.warn('Arena Supabase:',error);showToast('Não foi possível conectar a sala ao servidor em tempo real. Confira a conexão antes de iniciar.');return null});
       return arenaHostCreatePromise;
     }
     function queueArenaHostSync(){
@@ -7376,7 +7397,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       registerArenaHostRoom(state.pin);
     }
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=Array.from(state.participants.values()).find(x=>x.conn===conn);if(!p)return;p.conn=null;if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=setTimeout(()=>{if(state.participants.get(p.id)===p&&!p.conn)removeParticipant(p.id)},300000)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
-    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();queueArenaHostSync();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){return}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
     function sendParticipant(p, msg) {
       let sentPeer = false;
       if (p?.conn?.open) {
@@ -7461,7 +7482,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
     function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
     function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
-    function startRoundForRhythm(id){
+    async function startRoundForRhythm(id){
+      if(state.roundOpenInProgress)return;
       const baseRhythm=rhythmById(id);
       if(!baseRhythm)return;
 
@@ -7535,9 +7557,24 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       setProjectionVisible(true);
       state.roundDeadline=Date.now()+state.roundDuration*1000;
       const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
-      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
-      startTimer();
-      queueArenaHostSync();
+      state.roundOpenInProgress=true;
+      try{
+        const created=arenaHostCreatePromise?await arenaHostCreatePromise:null;
+        if(!created||!state.arenaHostToken||!arenaRealtimeReady)throw new Error('A sala não está conectada ao servidor em tempo real.');
+        const opened=await arenaApi({action:'open_round',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber,durationSeconds:state.roundDuration,gameState:arenaSnapshot()});
+        state.roundStartTime=Number(opened.startedAtMs)||state.roundStartTime;
+        state.roundDeadline=Number(opened.deadlineAtMs)||state.roundDeadline;
+        state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));
+        sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
+        startTimer(false);
+        queueArenaHostSync();
+      }catch(error){
+        console.error('Arena round open:',error);
+        state.roundLocked=true;
+        showToast('A rodada não iniciou porque o servidor não confirmou a sincronização em tempo real. Tente novamente.');
+      }finally{
+        state.roundOpenInProgress=false;
+      }
     }
     function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
@@ -7622,10 +7659,15 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const btnRev=$('btnRevealNow');
       if(btnRev)btnRev.classList.add('hidden');
     }
-    function revealRound(){
-      if(state.isRevealed||!state.currentRhythm)return;
+    async function revealRound(){
+      if(state.isRevealed||!state.currentRhythm||state.revealInProgress)return;
+      state.revealInProgress=true;
+      const reconciled=await reconcileArenaRoundAnswers();
+      if(state.isRevealed||!state.currentRhythm){state.revealInProgress=false;return;}
+      if(!reconciled)showToast('Aviso: não foi possível confirmar todas as respostas salvas no servidor.');
       state.roundLocked=true;
       state.isRevealed=true;
+      state.revealInProgress=false;
       state.isExplaining=false;
       clearInterval(state.timerHandle);
       // Mantenha o traçado congelado até o professor continuar:
@@ -8806,6 +8848,63 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         setTimeout(()=>{el.textContent=messages[studentLobbyMessageIndex];el.style.opacity='1'},250);
       },4200);
     }
+    async function submitArenaStudentAnswer(roundNumber,choiceId,grid,button){
+      let lastError=null;
+      for(let attempt=0;attempt<3;attempt++){
+        try{
+          const result=await arenaApi({action:'submit_answer',pin:state.pin,participantKey:state.studentId,sessionToken:state.arenaSessionToken,roundNumber,choiceId});
+          if(result?.ok&&result?.recorded)return true;
+          throw new Error('O servidor não confirmou o registro da resposta.');
+        }catch(error){
+          lastError=error;
+          if(attempt<2)await new Promise(resolve=>setTimeout(resolve,250*(attempt+1)));
+        }
+      }
+      console.error('Arena answer submit:',lastError);
+      if(state.role==='student'&&state.roundNumber===roundNumber&&!state.isRevealed){
+        state.roundLocked=false;
+        grid?.classList.remove('answered');
+        grid?.querySelectorAll('button').forEach(item=>{item.disabled=false;item.classList.remove('opacity-35','ring-4','ring-white')});
+        button?.classList.remove('ring-4','ring-white');
+        showToast('Não foi possível confirmar sua resposta. Verifique a conexão e tente novamente.');
+      }
+      return false;
+    }
+    function handleArenaRealtimeAnswer(answer){
+      if(!answer||Number(answer.roundNumber)!==Number(state.roundNumber)||state.isRevealed)return;
+      const id=String(answer.participantKey||'');
+      const participant=state.participants.get(id);
+      if(!participant)return;
+      const existing=state.answersReceived.get(id);
+      if(existing&&Number.isFinite(Number(existing.receivedOrder)))return;
+      const answeredAt=Date.parse(answer.answeredAt);
+      if(!Number.isFinite(answeredAt))return;
+      state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0});
+      participant.lastAnswer=String(answer.choiceId);
+      updateAnswerProgress();
+      updateLeaderboard();
+      queueArenaHostSync();
+      if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd();
+    }
+    async function reconcileArenaRoundAnswers(){
+      if(!state.arenaHostToken||!state.pin||!state.roundNumber)return false;
+      try{
+        const result=await arenaApi({action:'host_answers',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber});
+        for(const answer of result.answers||[]){
+          const id=String(answer.participantKey||'');
+          if(!state.participants.has(id))continue;
+          const answeredAt=Date.parse(answer.answeredAt);
+          if(!Number.isFinite(answeredAt))continue;
+          const existing=state.answersReceived.get(id);
+          if(!existing||!Number.isFinite(Number(existing.receivedOrder))){
+            state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0});
+            const participant=state.participants.get(id);if(participant)participant.lastAnswer=String(answer.choiceId);
+          }
+        }
+        updateAnswerProgress();updateLeaderboard();
+        return true;
+      }catch(error){console.error('Arena answer reconciliation:',error);return false}
+    }
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
     window.addEventListener('offline',()=>{if(state.role==='student'&&state.studentId)setStudentReconnectStatus(true)});
     window.addEventListener('online',()=>{if(state.role==='student'&&state.studentId)scheduleStudentReconnect()});
@@ -8906,12 +9005,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         btn.classList.add('ring-4', 'ring-white');
         try { navigator.vibrate?.(40); } catch(e) {}
         beep(760, 0.05);
-        studentSend({
-          type: 'ANSWER',
-          studentId: state.studentId,
-          choiceId: btn.dataset.choice,
-          round: msg.round
-        });
+        void submitArenaStudentAnswer(msg.round,btn.dataset.choice,grid,btn);
       }));
 
       clearInterval(window.studentTimer);
