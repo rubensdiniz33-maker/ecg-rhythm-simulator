@@ -5221,7 +5221,63 @@
     body.theme-light #viewHostSetup .mobile-setup-bar .text-white { color:#0f172a!important; }
     body.theme-light #viewHostSetup .summary-rhythm-chip { background:#f1f5f9; color:#0f172a; border-color:#cbd5e1; }
     @media (max-width:640px) { #viewHostSetup .setup-stage-actions { align-items:stretch; flex-direction:column; } #viewHostSetup .setup-next-button { width:100%; min-height:44px; } #viewHostSetup .setup-stage-hint { text-align:center; } }
-</style>
+ 
+    /* Fase 1: identidade da Home */
+    body:has(#viewHome:not(.hidden)) #globalHeader { position:absolute; top:max(12px,env(safe-area-inset-top)); right:clamp(12px,2.5vw,28px); z-index:40; width:auto; margin:0!important; justify-content:flex-end; }
+    body:has(#viewHome:not(.hidden)) #globalHeader > a { display:none!important; }
+    body:has(#viewHome:not(.hidden)) #globalHeader .header-toolbar { margin-left:auto; }
+    #viewHome .arena-home-heading { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:clamp(8px,1.2vh,14px); }
+    #viewHome .arena-home-brand-kicker { margin:0; color:#91a5b5; font-size:clamp(9px,.85vw,12px); font-weight:800; letter-spacing:.2em; text-align:center; }
+    #viewHome .arena-home-brand-name { display:inline-block; font-size:clamp(3rem,8vw,6.8rem); line-height:.92; letter-spacing:-.075em; font-weight:950; color:#f7fafc; text-shadow:0 8px 36px rgba(0,0,0,.32); text-decoration:none!important; }
+    #viewHome .arena-home-brand-name > span { color:#c5f36a!important; text-decoration:none!important; text-shadow:0 0 28px rgba(197,243,106,.14)!important; }
+    #viewHome .arena-home-heading h1 { margin:0!important; line-height:1!important; }
+    #viewHome .arena-home-tagline { margin:0; color:#d4e0e9; font-size:clamp(13px,1.45vw,19px); font-weight:600; text-align:center; }
+    #viewHome .arena-home-content { position:relative; z-index:2; }
+    #viewHome .arena-monitor-live-dot { display:none!important; }
+    #viewHome .arena-home-ecg-corner { position:fixed!important; left:0!important; right:0!important; bottom:0!important; width:100vw!important; max-width:none!important; height:clamp(54px,10vh,112px)!important; opacity:.24!important; overflow:hidden; pointer-events:none!important; z-index:1!important; }
+    #viewHome .arena-home-ecg-corner svg { display:block; width:100%!important; height:100%!important; }
+    #viewHome .arena-home-ecg-corner path { fill:none!important; stroke:#c5f36a!important; stroke-width:1.7!important; filter:drop-shadow(0 0 5px rgba(197,243,106,.28)); stroke-dasharray:220 8; animation:arenaHomeTrace 8s linear infinite; }
+    @keyframes arenaHomeTrace { to { stroke-dashoffset:-456; } }
+
+    /* Fase 1: barra fixa de navegação */
+    #viewHostSetup { padding-bottom:108px!important; }
+    #viewHostSetup .setup-action-bar { position:fixed; left:50%; bottom:max(14px,env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:150; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); gap:10px; width:min(760px,calc(100vw - 36px)); padding:10px; border:1px solid var(--line-strong); border-radius:18px; background:color-mix(in srgb,var(--panel-solid) 92%,transparent); box-shadow:0 16px 44px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.04); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+    #viewHostSetup .setup-action-button { display:inline-flex; align-items:center; justify-content:center; min-width:0; min-height:46px; padding:10px 14px; border:1px solid var(--line-strong); border-radius:12px; color:var(--text-title); background:var(--panel-card); font-size:13px; font-weight:850; white-space:nowrap; transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease; }
+    #viewHostSetup .setup-action-button:not(:disabled):hover { transform:translateY(-1px); border-color:var(--cyan); }
+    #viewHostSetup .setup-action-button:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+    #viewHostSetup .setup-action-button:disabled { cursor:not-allowed; opacity:.42; }
+    #viewHostSetup .setup-action-next { border-color:rgba(84,210,231,.42); background:rgba(84,210,231,.10); }
+    #viewHostSetup .setup-action-create { border-color:rgba(197,243,106,.5); background:var(--lime); color:#10180a; box-shadow:0 5px 18px rgba(197,243,106,.13); }
+    #viewHostSetup .setup-action-create:not(:disabled):hover { border-color:var(--lime); background:#d5ff82; }
+    #viewHostSetup .setup-stage-actions, #viewHostSetup .mobile-setup-bar, #viewHostSetup #btnCreateRoom, #viewHostSetup #mobileCreateRoomButton, #viewHostSetup #btnCreateRoomFromReview, #viewHostSetup #btnSetupBack { display:none!important; }
+    #viewHostSetup #sectionSetupReview:not(.hidden) { width:100%; min-width:0; }
+    #viewHostSetup #sectionSetupReview:not(.hidden) ~ #sectionSetupSummary { display:none!important; }
+    #viewHostSetup #reviewSummaryContent { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:start; gap:12px; }
+    #viewHostSetup #reviewSummaryContent > :first-child { grid-column:1/-1; }
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(2) { grid-column:1; }
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) { grid-column:1/-1; }
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(4) { grid-column:2; grid-row:2; }
+    #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3) > .flex.flex-wrap { max-height:92px; overflow:auto; scrollbar-width:thin; }
+    #viewHostSetup #reviewSummaryContent > :last-child { display:none; }
+    body.theme-light #viewHostSetup .setup-action-bar { background:rgba(255,255,255,.94); border-color:#cbd5e1; box-shadow:0 12px 36px rgba(15,23,42,.16); }
+    body.theme-light #viewHostSetup .setup-action-button { background:#fff; color:#0f172a; border-color:#cbd5e1; }
+    body.theme-light #viewHostSetup .setup-action-next { background:#e0f2fe; border-color:#7dd3fc; color:#075985; }
+    body.theme-light #viewHostSetup .setup-action-create { background:#c5f36a; border-color:#a3cf49; color:#17220a; }
+    @media (min-width:1024px) { #viewHostSetup:has(#sectionSetupReview:not(.hidden)) .setup-workspace { display:block!important; } #viewHostSetup #sectionSetupReview:not(.hidden) { min-height:min(620px,calc(100dvh - 240px)); } }
+    @media (max-width:640px) {
+      #viewHome .arena-home-brand-kicker { max-width:90%; font-size:8px; letter-spacing:.14em; }
+      #viewHome .arena-home-brand-name { font-size:clamp(2.7rem,13vw,4.2rem); }
+      #viewHome .arena-home-tagline { font-size:13px; }
+      #viewHostSetup { padding-bottom:96px!important; }
+      #viewHostSetup .setup-action-bar { bottom:max(8px,env(safe-area-inset-bottom)); width:calc(100vw - 16px); gap:6px; padding:7px; border-radius:15px; }
+      #viewHostSetup .setup-action-button { min-height:44px; padding:9px 5px; border-radius:10px; font-size:11px; }
+      #viewHostSetup #reviewSummaryContent { grid-template-columns:minmax(0,1fr); }
+      #viewHostSetup #reviewSummaryContent > :first-child, #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(2), #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(3), #viewHostSetup #reviewSummaryContent .setup-review-card:nth-child(4) { grid-column:1; grid-row:auto; }
+      #viewHostSetup #sectionSetupReview:not(.hidden) { min-height:0; }
+    }
+    @media (prefers-reduced-motion:reduce) { #viewHome .arena-home-ecg-corner path { animation:none!important; } #viewHostSetup .setup-action-button { transition:none!important; } }
+
+  </style>
 </head>
 <body>
 
@@ -5246,11 +5302,13 @@
 
     <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
       <div class="arena-lobby-topbar" aria-hidden="true"></div>
-      <div class="arena-home-ecg-corner" aria-hidden="true"><svg viewBox="0 0 220 64" role="presentation"><path d="M2 34 H42 L53 32 L62 35 H82 L94 26 L104 42 L117 9 L130 54 L143 28 L153 34 H218"/></svg></div>
+      <div class="arena-home-ecg-corner" aria-hidden="true"><svg viewBox="0 0 220 64" preserveAspectRatio="none" role="presentation"><path d="M2 34 H42 L53 32 L62 35 H82 L94 26 L104 42 L117 9 L130 54 L143 28 L153 34 H218"/></svg></div>
 
       <div class="arena-home-content">
         <div class="arena-home-heading">
-          <h1>Seu conhecimento entra em jogo.</h1>
+          <p class="arena-home-brand-kicker">SIMULADOR INTERATIVO DE ELETROCARDIOGRAMA</p>
+          <h1><span class="arena-home-brand-name">ARENA <span>ECG</span></span></h1>
+          <p class="arena-home-tagline">Seu conhecimento entra em jogo.</p>
         </div>
 
         <div class="arena-home-visuals" aria-label="Elementos visuais da Arena ECG">
@@ -5725,6 +5783,11 @@
     <div class="flex flex-wrap gap-2 mt-3"><button type="button" class="muted-btn text-xs" data-go-step="model">Editar modelo</button><button type="button" class="muted-btn text-xs" data-go-step="rhythms">Editar ritmos</button><button type="button" class="muted-btn text-xs" data-go-step="rules">Editar regras</button></div>
   </div>
 </div>
+      <div id="setupActionBar" class="setup-action-bar" role="group" aria-label="Navegação da configuração">
+        <button id="setupActionBack" type="button" class="setup-action-button setup-action-back">← Voltar</button>
+        <button id="setupActionNext" type="button" class="setup-action-button setup-action-next">Próximo →</button>
+        <button id="setupActionCreate" type="button" class="setup-action-button setup-action-create">Criar sala</button>
+      </div>
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
@@ -7552,6 +7615,36 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if($('showFcSelect'))state.config.showBpmDuringQuestion=($('showFcSelect').value==='yes');
       state.config.roundDuration = state.roundDuration || 25;
       try{localStorage.setItem('arena_config',JSON.stringify(state.config))}catch(e){}
+      saveSetupPreferences();
+    }
+    const ARENA_SETUP_PREFERENCES_KEY='arena_setup_preferences_v1';
+    const ARENA_SETUP_FIELD_IDS=['gameMode','roundDurationInput','roundCountSelect','difficultySelect','ecgModeSelect','showFcSelect','revealExplanationSelect','rankingFrequencySelect','studentShowsPositionCheck'];
+    function saveSetupPreferences(){
+      try{
+        const fields={};ARENA_SETUP_FIELD_IDS.forEach(id=>{const el=$(id);if(el)fields[id]=el.type==='checkbox'?el.checked:el.value;});
+        const selectedRhythmIds=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(input=>input.value);
+        const activePreset=document.querySelector('.preset-card.active')?.dataset.preset||null;
+        const advancedRules=$('viewHostSetup')?.querySelector('details.advanced-rules');
+        const answerOrder=Array.isArray(state.answerOrder)?state.answerOrder.filter(id=>selectedRhythmIds.includes(id)):[];
+        localStorage.setItem(ARENA_SETUP_PREFERENCES_KEY,JSON.stringify({version:1,fields,selectedRhythmIds,activePreset,answerOrder,advancedRulesOpen:!!advancedRules?.open}));
+      }catch(e){}
+    }
+    function restoreSetupPreferences(){
+      let prefs;try{prefs=JSON.parse(localStorage.getItem(ARENA_SETUP_PREFERENCES_KEY)||'null')}catch(e){return}
+      if(!prefs||prefs.version!==1)return;
+      const fields=prefs.fields&&typeof prefs.fields==='object'?prefs.fields:{};
+      ARENA_SETUP_FIELD_IDS.forEach(id=>{const el=$(id);if(!el||!Object.prototype.hasOwnProperty.call(fields,id))return;if(el.type==='checkbox')el.checked=!!fields[id];else if(typeof fields[id]==='string'||typeof fields[id]==='number')el.value=String(fields[id]);});
+      const validIds=new Set(ECG_RHYTHMS.map(r=>r.id));
+      const selectedIds=Array.isArray(prefs.selectedRhythmIds)?prefs.selectedRhythmIds.filter(id=>validIds.has(id)):[];
+      document.querySelectorAll('#rhythmLibrary input').forEach(input=>{const selected=selectedIds.includes(input.value);input.checked=selected;input.closest('.rhythm-card')?.classList.toggle('selected',selected);});
+      document.querySelectorAll('.preset-card').forEach(card=>card.classList.toggle('active',!!prefs.activePreset&&card.dataset.preset===prefs.activePreset));
+      if($('undoPresetBox'))$('undoPresetBox').classList.toggle('hidden',!prefs.activePreset);
+      const orderedIds=Array.isArray(prefs.answerOrder)?prefs.answerOrder.filter(id=>selectedIds.includes(id)):[];
+      state.answerOrder=orderedIds;const orderList=$('selectedRhythmOrder');if(orderList)orderList.innerHTML=orderedIds.map(id=>'<li data-id="'+id+'"></li>').join('');
+      if($('roundDurationInput'))setRoundDuration(fields.roundDurationInput||25,false);
+      if($('gameMode'))state.gameMode=$('gameMode').value;if($('difficultySelect'))state.difficulty=$('difficultySelect').value;
+      const advancedRules=$('viewHostSetup')?.querySelector('details.advanced-rules');if(advancedRules&&typeof prefs.advancedRulesOpen==='boolean')advancedRules.open=prefs.advancedRulesOpen;
+      toggleSequenceEditor();renderSequence();updateSelectedCount();updateSetupActionBar();
     }
     function updateHostLobbySummary(){
       const ecgMap={static:'Traçado: Estático (8s)',animated:'Traçado: Animado'};
@@ -8729,6 +8822,7 @@ function animatePoints(points) {
     $('btnStartHost').onclick = () => {
       renderRhythmLibrary();
       loadStoredConfig();
+      restoreSetupPreferences();
       updateSessionSummary();
       showSetupTab('model');
       switchView('viewHostSetup');
@@ -9063,7 +9157,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       });
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
-    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
+    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();restoreSetupPreferences();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
   
     // Feedback de clique da Home: breve pulso antes de executar a ação existente.
     (() => {
