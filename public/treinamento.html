@@ -8536,11 +8536,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
     function toggleEcgAnimation(){
       if(!state.currentRhythm)return;
+      // O botão altera somente o estado da partida; a preferência salva permanece intacta.
       state.ecgAnimated = !state.ecgAnimated;
-      // Mantém o controle da tela de jogo sincronizado com a configuração inicial.
-      state.config.ecgMode = state.ecgAnimated ? 'animated' : 'static';
-      if($('ecgModeSelect'))$('ecgModeSelect').value=state.config.ecgMode;
-      saveStoredConfig();
       lastHeartSoundAt=0;
       if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
