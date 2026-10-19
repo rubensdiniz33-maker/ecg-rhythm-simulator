@@ -5279,6 +5279,92 @@
     }
     @media (prefers-reduced-motion:reduce) { #viewHome .arena-home-ecg-corner path { animation:none!important; } #viewHostSetup .setup-action-button { transition:none!important; } }
 
+  
+    /* FASE 2 · Lobby do professor: cabeçalho compacto, QR dominante e ação flutuante */
+    #viewHost:not(.hidden){min-height:100dvh;padding-bottom:88px;gap:12px}
+    .host-lobby-header{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;padding:10px 16px;min-height:64px;border-radius:18px}
+    .host-brand-lockup{display:flex;align-items:center;gap:11px;min-width:0}
+    .host-brand-lockup .brand-mark{width:38px;height:38px;border-radius:12px;font-size:20px;flex:none}
+    .host-brand-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+    .host-brand-copy strong{font-size:14px;line-height:1;font-weight:950;letter-spacing:.12em;color:var(--text-title)}
+    .host-brand-copy #hostNetBadge{font-size:11px;line-height:1.25;font-weight:750;color:var(--muted);overflow-wrap:anywhere}
+    .host-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+    .host-header-actions .muted-btn{padding:8px 11px;min-height:36px;font-size:11px;white-space:nowrap}
+    .host-header-actions .host-end-button{color:#fda4af}
+    .host-lobby-layout{grid-template-columns:minmax(300px,390px) minmax(0,1fr);gap:16px;max-width:1500px;margin:0 auto;align-items:stretch}
+    #hostLobby > .panel{min-height:0!important;height:calc(100dvh - 190px);max-height:780px;padding:clamp(14px,1.6vw,24px)}
+    #hostLobby > .panel:first-child{justify-content:center;gap:8px}
+    .host-qr-frame{width:min(100%,350px)!important;height:auto!important;aspect-ratio:1;padding:10px!important;border-radius:22px!important}
+    #qrCodeContainer,#qrCodeContainer canvas,#qrCodeContainer img{width:100%!important;height:100%!important;max-width:100%;object-fit:contain}
+    #hostPinDisplay{max-width:360px}
+    .host-participants-toolbar{padding-bottom:12px!important;gap:12px!important}
+    #participantCountBig{font-size:clamp(30px,3vw,48px)!important;line-height:1}
+    #lobbyStatusText{font-size:11px!important}
+    #hostLobby > .panel:last-child > div:last-child{display:none!important}
+    #participantsEmpty{padding:20px 12px!important}
+    #participantsList{overflow-y:auto;align-content:start}
+
+    /* Cabeçalho único da sala: marca à esquerda e controles à direita. */
+    .unified-host-actions { display:none; }
+    .host-net-status { display:block; color:var(--muted); font-size:11px; font-weight:750; }
+    body:has(#viewHost:not(.hidden)) #globalHeader { width:100%; margin-bottom:10px!important; align-items:center; }
+    body:has(#viewHost:not(.hidden)) #globalHeader > a { display:flex!important; }
+    body:has(#viewHost:not(.hidden)) #globalHeader .unified-host-actions { display:flex; margin-left:auto; }
+    body:has(#viewHost:not(.hidden)) #viewHost { min-height:0; padding-bottom:0; gap:10px; }
+    body:has(#viewHost:not(.hidden)) .host-lobby-header { padding:0 4px; min-height:18px; }
+    body:has(#viewHost:not(.hidden)) #hostLobby { margin-top:0; }
+    @media (min-width: 901px) {
+      body:has(#viewHost:not(.hidden)) { height:100dvh; min-height:0; overflow:hidden; }
+      body:has(#viewHost:not(.hidden)) .shell { height:100dvh; min-height:0; padding:12px clamp(14px,2vw,28px); overflow:hidden; }
+      body:has(#viewHost:not(.hidden)) #globalHeader { flex:0 0 auto; }
+      body:has(#viewHost:not(.hidden)) #viewHost { flex:1 1 auto; min-height:0; overflow:hidden; }
+      #viewHost .host-brand-lockup { display:none !important; }
+      #hostLobby { flex:1 1 auto; min-height:0; height:100%; overflow:hidden; }
+      #hostLobby > .panel { height:100%; max-height:none; min-height:0 !important; overflow:hidden; }
+      #hostLobby > .panel:last-child { display:flex; flex-direction:column; }
+      #hostLobby > .panel:last-child > div:nth-child(2) { flex:1 1 auto; min-height:0; }
+      #participantsList { min-height:0; max-height:100%; overflow-y:auto; overscroll-behavior:contain; }
+      #participantsEmpty { flex:1 1 auto; min-height:0; }
+      #btnStartGame { position:static !important; left:auto !important; bottom:auto !important; transform:none !important; flex:0 0 auto; margin-top:12px; }
+      #btnStartGame:hover { transform:translateY(-2px) !important; }
+      #btnStartGame:active { transform:scale(.98) !important; }
+    }
+
+    #btnStartGame{position:fixed!important;left:50%!important;bottom:max(14px,env(safe-area-inset-bottom))!important;transform:translateX(-50%);z-index:100;min-width:min(320px,calc(100vw - 28px));justify-content:center;padding:15px 28px!important;border-radius:16px!important;box-shadow:0 12px 42px rgba(0,0,0,.5),0 0 28px var(--primary-shadow)!important}
+    #btnStartGame:hover{transform:translateX(-50%) translateY(-2px)!important}
+    #btnStartGame:active{transform:translateX(-50%) scale(.98)!important}
+    @media(max-width:900px){
+      #viewHost:not(.hidden){padding-bottom:86px}
+      .host-lobby-header{align-items:flex-start;padding:10px 12px;gap:10px}
+      .host-brand-lockup .brand-mark{display:none}
+      .host-header-actions{gap:5px}
+      .host-header-actions .muted-btn{padding:7px 8px;font-size:10px}
+      .host-lobby-layout{grid-template-columns:minmax(0,1fr);gap:12px}
+      #hostLobby > .panel{height:auto;max-height:none;padding:14px}
+      #hostLobby > .panel:first-child{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.7fr);align-items:center;gap:10px}
+      #hostLobby > .panel:first-child > div{min-width:0}
+      #hostLobby > .panel:first-child .host-qr-frame{grid-row:1 / span 4;grid-column:2;width:min(100%,210px)!important;justify-self:center}
+      #hostLobby > .panel:first-child h3{font-size:16px;margin-bottom:4px}
+      #hostLobby > .panel:first-child .host-pin-digits{gap:4px}
+      #hostLobby > .panel:first-child .host-pin-digit{font-size:clamp(1rem,4vw,1.6rem)}
+      #hostLobby > .panel:last-child{min-height:190px!important}
+      #participantsEmpty{padding:8px!important}
+      .lobby-empty-ecg{height:44px;margin-bottom:6px}
+      #participantsList{grid-template-columns:repeat(2,minmax(0,1fr))}
+      #participantCountBig{font-size:34px!important}
+      .host-participants-toolbar{padding-bottom:10px!important}
+    }
+    @media(max-width:480px){
+      .host-lobby-header{flex-direction:column;align-items:stretch}
+      .host-header-actions{justify-content:space-between}
+      .host-header-actions .muted-btn{flex:1;padding:7px 5px;font-size:10px}
+      #hostLobby > .panel:first-child{grid-template-columns:minmax(0,1fr) 112px}
+      #hostLobby > .panel:first-child .host-qr-frame{width:160px!important;padding:6px!important;border-radius:14px!important}
+      #hostLobby > .panel:first-child .host-qr-frame canvas,#hostLobby > .panel:first-child .host-qr-frame img{width:100%!important;height:100%!important}
+      #hostLobby > .panel:first-child .host-pin-digit{font-size:1rem;max-width:34px}
+      #hostDirectUrl{font-size:9px;overflow-wrap:anywhere}
+    }
+
   </style>
 </head>
 <body>
@@ -5293,12 +5379,11 @@
         </span>
       </a>
 
-      <!-- BARRA DE FERRAMENTAS DO CABEÇALHO (Botão de tema integrado) -->
-      <div class="header-toolbar">
-        <button id="themeToggleFloating" class="header-theme-btn" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema claro/escuro">
-          <span id="themeToggleFloatingIcon">☀️</span>
-          <span id="themeToggleFloatingText" class="header-theme-label text-xs font-bold hidden sm:inline">Claro</span>
-        </button>
+      <div class="host-header-actions unified-host-actions" aria-label="Controles da sala">
+        <button id="btnToggleSound" type="button" class="muted-btn" title="Alternar som">🔊 Som</button>
+        <button id="btnFullscreen" type="button" class="muted-btn" title="Abrir projeção">⛶ Projeção</button>
+        <button id="btnHostTheme" type="button" class="muted-btn" title="Alternar modo claro/escuro">☀️ Claro</button>
+        <button id="btnLeaveHost" type="button" class="muted-btn host-end-button" title="Encerrar sala">Encerrar</button>
       </div>
     </header>
 
@@ -5793,19 +5878,11 @@
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 panel px-5 py-3">
-        <div class="flex items-center gap-3">
-          <span class="status-dot"></span>
-          <span id="hostNetBadge" class="text-sm font-bold">Abrindo sala...</span>
-        </div>
-        <div class="flex gap-2">
-          <button id="btnToggleSound" type="button" class="muted-btn text-xs" title="Alternar som">🔊 Som</button>
-          <button id="btnFullscreen" type="button" class="muted-btn text-xs">⛶ Projeção</button>
-          <button id="btnLeaveHost" type="button" class="muted-btn text-xs text-rose-300">Encerrar</button>
-        </div>
+      <div class="host-lobby-header" aria-live="polite">
+        <span id="hostNetBadge" class="host-net-status" role="status">Abrindo sala...</span>
       </div>
 
-      <div id="hostLobby" class="grid lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr] gap-6 my-auto items-stretch w-full max-w-7xl mx-auto">
+      <div id="hostLobby" class="host-lobby-layout grid lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr] gap-6 my-auto items-stretch w-full max-w-7xl mx-auto">
         <!-- Card de Conexão Telão (QR Code e PIN Gigantes) -->
         <div class="panel p-6 sm:p-8 text-center flex flex-col justify-between items-center shadow-2xl relative border-2 border-lime-400/25">
           <div class="w-full">
@@ -5815,7 +5892,7 @@
             <h3 class="text-xl sm:text-2xl font-black mb-3" style="color:var(--text-title);">Escaneie para entrar</h3>
 
             <!-- QR Code Grande para Projeção -->
-            <div class="relative mx-auto my-2 p-3.5 bg-white rounded-3xl shadow-2xl flex items-center justify-center w-[290px] h-[290px] sm:w-[320px] sm:h-[320px]">
+            <div class="host-qr-frame relative mx-auto my-2 p-3.5 bg-white rounded-3xl shadow-2xl flex items-center justify-center w-[300px] h-[300px] sm:w-[350px] sm:h-[350px]">
               <div id="qrCodeContainer" class="w-full h-full flex items-center justify-center"></div>
             </div>
 
@@ -5836,7 +5913,7 @@
         <!-- Grade de Participantes & Contador Enorme -->
         <div class="panel p-5 sm:p-7 flex flex-col min-h-[520px] lg:min-h-[640px] shadow-2xl border-2 border-slate-800/80">
           <!-- Top Bar com Contador Enorme e Botão Iniciar -->
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div class="host-participants-toolbar flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
             <div class="flex items-center gap-4">
               <div class="flex items-baseline gap-3">
                 <span id="participantCountBig" class="text-6xl sm:text-8xl font-mono font-black tracking-tight" style="color:var(--lime); text-shadow:0 0 25px rgba(197,243,106,0.35);">0</span>
@@ -6436,6 +6513,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
+    let heartbeatPreviousSample=0, lastHeartbeatAt=0;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
     const ARENA_SUPABASE_URL='https://xrsoexottjoyyavzkqoh.supabase.co';
@@ -6497,6 +6575,36 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');const isStudentScreen=['studentLobby','studentGame','studentReveal'].includes(view);if(isStudentScreen){$('globalHeader')?.classList.add('hidden')}else{$('globalHeader')?.classList.remove('hidden')}const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
     function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
     function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
+    function playHeartSound(){
+      if(!soundOn)return;
+      try{
+        const c=getAudio();if(!c)return;
+        const start=c.currentTime;
+        [[92,0,.045],[66,.105,.055]].forEach(([frequency,delay,duration])=>{
+          const oscillator=c.createOscillator(),gain=c.createGain();
+          oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,start+delay);
+          gain.gain.setValueAtTime(.0001,start+delay);
+          gain.gain.exponentialRampToValueAtTime(.035,start+delay+.008);
+          gain.gain.exponentialRampToValueAtTime(.0001,start+delay+duration);
+          oscillator.connect(gain);gain.connect(c.destination);
+          oscillator.start(start+delay);oscillator.stop(start+delay+duration);
+        });
+      }catch(e){}
+    }
+    function detectHeartbeats(samples){
+      if(!samples||!samples.length)return;
+      const rhythmId=state.currentRhythm?.id;
+      const canBeat=!['vf','asystole'].includes(rhythmId)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
+      const now=performance.now(),threshold=.48;
+      for(let i=0;i<samples.length;i++){
+        const value=Number(samples[i])||0;
+        const abs=Math.abs(value),previousAbs=Math.abs(heartbeatPreviousSample);
+        if(canBeat&&abs>=threshold&&previousAbs<threshold&&now-lastHeartbeatAt>=280){
+          lastHeartbeatAt=now;playHeartSound();
+        }
+        heartbeatPreviousSample=value;
+      }
+    }
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
     function playJoinChime() {
       if (!soundOn) return;
@@ -6607,6 +6715,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if (floatText) floatText.textContent = isLight ? 'Escuro' : 'Claro';
       const hostToggle = $('btnThemeToggle');
       if (hostToggle) hostToggle.textContent = isLight ? '🌙 Escuro' : '☀️ Claro';
+      const lobbyThemeToggle = $('btnHostTheme');
+      if (lobbyThemeToggle) lobbyThemeToggle.textContent = isLight ? '🌙 Escuro' : '☀️ Claro';
       const projToggle = $('btnThemeProjection');
       if (projToggle) projToggle.textContent = isLight ? '🌙' : '☀️';
       if (state.currentRhythm) drawEcgFrame();
@@ -7187,7 +7297,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('hostDirectUrl').textContent=url;
       const qr=$('qrCodeContainer');
       qr.innerHTML='';
-      if(window.QRCode)new QRCode(qr,{text:url,width:280,height:280,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+      if(window.QRCode)new QRCode(qr,{text:url,width:320,height:320,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
       const listEl = $('participantsList');
       if(listEl) listEl.innerHTML = '';
       updateParticipants();
@@ -7384,28 +7494,21 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function updateFcBadge(){
       const show=!!state.config.showBpmDuringQuestion;
-      const badge=$('monitorFcBadge');
-      const projBadge=$('projectionFcBadge');
+      const badge=$('monitorFcBadge'),projBadge=$('projectionFcBadge');
       if(badge)badge.classList.toggle('hidden',!show);
-      // A FC deve aparecer somente sobre o monitor de ECG, nunca no cabeçalho.
       if(projBadge)projBadge.classList.add('hidden');
-      if(!show){
-        sendToAll({type:'STUDENT_FC',show:false});
-        return;
-      }
+      if(!show){sendToAll({type:'STUDENT_FC',show:false});return;}
       let bpmText='--';
-      if(state.currentRhythm?.id==='asystole'){
-        bpmText='0';
-      }else if(state.currentRhythm?.id==='vf'){
-        bpmText='---';
-      }else if(ecgEngine){
+      if(state.currentRhythm?.id==='asystole')bpmText='0';
+      else if(state.currentRhythm?.id==='vf')bpmText='---';
+      else if(ecgEngine){
         const measured=ecgEngine.measuredBpm();
-        if(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0){
-          bpmText=String(measured);
-        }else if(state.chosenRate){
-          bpmText=String(state.chosenRate);
-        }else if(state.currentRhythm?.defaultRate){
-          bpmText=String(state.currentRhythm.defaultRate);
+        const base=(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0)
+          ? measured
+          : (state.currentRhythm?.rateKey==='atrialRate'?null:(state.chosenRate||state.currentRhythm?.defaultRate||null));
+        if(base){
+          const variation=(Math.random()<.5?-1:1)*(3+Math.floor(Math.random()*3));
+          bpmText=String(Math.max(1,Math.round(base+variation)));
         }
       }
       if($('monitorFcValue'))$('monitorFcValue').textContent=bpmText;
@@ -8064,6 +8167,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       frameLast=0;
       cancelAnimationFrame(ecgFrame);
 
+      heartbeatPreviousSample=0;
+      lastHeartbeatAt=0;
       state.ecgAnimated = (state.config.ecgMode === 'animated');
       updateAnimationButtonUI();
 
@@ -8109,6 +8214,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         frameLast=timestamp;
         const samples=ecgEngine.advance(dt);
         if(samples.length){
+          detectHeartbeats(samples);
           const maxSamples=20000;
           const combined=new Float32Array(Math.min(maxSamples,state.currentSamples.length+samples.length));
           const keep=Math.min(state.currentSamples.length,combined.length-samples.length);
@@ -9094,7 +9200,7 @@ function animatePoints(points) {
     if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
-    if ($('btnStartGame')) $('btnStartGame').onclick = () => { buildRoundQueue(); startNextRound(); };
+    if ($('btnStartGame')) $('btnStartGame').onclick = () => { getAudio(); buildRoundQueue(); startNextRound(); };
     if ($('btnToggleAnimation')) $('btnToggleAnimation').onclick = toggleEcgAnimation;
     if ($('btnPause')) $('btnPause').onclick = toggleEcgAnimation;
     if ($('btnReveal')) $('btnReveal').onclick = revealRound;
@@ -9136,6 +9242,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
     if ($('btnMoreConfetti')) $('btnMoreConfetti').onclick = () => launchConfetti(5000);
     if ($('podiumBack')) $('podiumBack').onclick = () => switchView('viewHome');
 
+    if ($('btnHostTheme')) $('btnHostTheme').onclick = toggleTheme;
     if ($('btnToggleSound')) $('btnToggleSound').onclick = toggleSound;
     if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').onclick = toggleSound;
 
@@ -9186,7 +9293,6 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
         }catch(err){}
       });
     }
-    $('themeToggleFloating')?.addEventListener('click', toggleTheme);
     const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();restoreSetupPreferences();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
   
     // Feedback de clique da Home: breve pulso antes de executar a ação existente.
