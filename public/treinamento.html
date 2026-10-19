@@ -6628,7 +6628,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       arenaRealtimeReady=false;
       return await new Promise((resolve,reject)=>{
         let settled=false;
-        const channel=client.channel(topic,{config:{private:true}})
+        const channel=client.channel(topic,{config:{private:false}})
           .on('broadcast',{event:'answer_received'},message=>handleArenaRealtimeAnswer(message?.payload))
           .subscribe(status=>{
             if(status==='SUBSCRIBED'){arenaHostRealtimeChannel=channel;arenaRealtimeReady=true;if(!settled){settled=true;resolve(true)}}
