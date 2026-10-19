@@ -2148,6 +2148,143 @@
       color: var(--text);
     }
 
+    /* Sala de espera do aluno: tela cheia, adaptável aos dois temas */
+    #studentLobby.student-lobby-screen:not(.hidden) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      overflow: hidden;
+      padding: max(24px, env(safe-area-inset-top)) 22px max(82px, env(safe-area-inset-bottom));
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(16,185,129,.11), transparent 54%),
+        var(--bg);
+      box-sizing: border-box;
+    }
+    .student-lobby-content {
+      width: min(100%, 440px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin: auto;
+      position: relative;
+      z-index: 1;
+    }
+    .student-lobby-avatar-ring {
+      width: clamp(132px, 34vw, 176px);
+      height: clamp(132px, 34vw, 176px);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      margin-bottom: 30px;
+      border: 1px solid rgba(52,211,153,.42);
+      background: rgba(16,185,129,.07);
+      box-shadow: 0 0 0 9px rgba(16,185,129,.045), 0 0 45px rgba(16,185,129,.12);
+      animation: studentAvatarPulse 3s ease-in-out infinite;
+    }
+    #studentAvatarDisplay {
+      font-size: clamp(76px, 21vw, 104px);
+      line-height: 1;
+      filter: drop-shadow(0 8px 20px rgba(16,185,129,.16));
+    }
+    @keyframes studentAvatarPulse {
+      0%,100% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16,185,129,.04), 0 0 28px rgba(16,185,129,.08); }
+      50% { transform: scale(1.025); box-shadow: 0 0 0 13px rgba(16,185,129,.075), 0 0 48px rgba(16,185,129,.16); }
+    }
+    .student-lobby-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .student-lobby-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #34d399; box-shadow: 0 0 12px rgba(52,211,153,.65);
+    }
+    .student-lobby-greeting {
+      color: var(--text-title);
+      font-size: clamp(27px, 7vw, 36px);
+      font-weight: 950;
+      letter-spacing: -.045em;
+      line-height: 1.12;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+    .student-lobby-pin {
+      margin-top: 13px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: .04em;
+    }
+    .student-lobby-pin strong {
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .14em;
+      margin-left: 5px;
+    }
+    .student-lobby-message {
+      min-height: 24px;
+      margin-top: 36px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+      transition: opacity .3s ease;
+    }
+    .student-lobby-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 17px;
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--panel-subtle);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .student-lobby-count svg { width: 15px; height: 15px; color: #10b981; }
+    .student-lobby-ecg {
+      position: absolute;
+      bottom: max(17px, env(safe-area-inset-bottom));
+      left: 0;
+      width: 100%;
+      height: 58px;
+      opacity: .72;
+      pointer-events: none;
+    }
+    .student-lobby-ecg .ecg-track {
+      fill: none; stroke: rgba(16,185,129,.16); stroke-width: 1;
+    }
+    .student-lobby-ecg .ecg-line {
+      fill: none; stroke: #10b981; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 420; stroke-dashoffset: 420;
+      animation: studentEcgTrace 3.6s linear infinite;
+    }
+    @keyframes studentEcgTrace { to { stroke-dashoffset: 0; } }
+    .theme-light #studentLobby.student-lobby-screen {
+      background: radial-gradient(ellipse at 50% 42%, rgba(16,185,129,.10), transparent 55%), var(--bg);
+    }
+    .theme-light .student-lobby-avatar-ring {
+      background: rgba(16,185,129,.045);
+      border-color: rgba(5,150,105,.34);
+      box-shadow: 0 0 0 9px rgba(16,185,129,.035), 0 0 38px rgba(16,185,129,.08);
+    }
+    .theme-light .student-lobby-ecg { opacity: .62; }
+    @media (prefers-reduced-motion: reduce) {
+      .student-lobby-avatar-ring, .student-lobby-ecg .ecg-line { animation: none; }
+      .student-lobby-ecg .ecg-line { stroke-dashoffset: 0; }
+    }
+
     #studentWaitMessage {
       background: var(--wait-overlay-bg);
       color: var(--text);
@@ -5299,16 +5436,24 @@
     </div>
   </section>
 
-  <section id="studentLobby" class="hidden fixed inset-0 z-10 grid place-items-center p-6 text-center">
-    <div class="panel p-8 max-w-md w-full">
-      <div id="studentAvatarDisplay" class="text-6xl mb-3">🩺</div>
-      <span class="text-xs font-black text-emerald-300">● CONECTADO</span>
-      <h1 class="text-3xl font-black mt-3">Aguarde, <span id="studentNameDisplay"></span></h1>
-      <div class="mt-6 text-xs text-slate-400">
-        PONTOS <b id="studentScoreLobby" class="text-2xl text-lime-300 block">0</b>
-        <span id="studentRankLobby" class="text-sm text-cyan-300">Posição: —</span>
+  <section id="studentLobby" class="hidden fixed inset-0 z-10 student-lobby-screen text-center">
+    <div class="student-lobby-content">
+      <div class="student-lobby-avatar-ring">
+        <div id="studentAvatarDisplay" aria-hidden="true">🩺</div>
+      </div>
+      <div class="student-lobby-status"><span class="student-lobby-status-dot"></span> CONECTADO À SALA</div>
+      <h1 class="student-lobby-greeting">Você está dentro,<br><span id="studentNameDisplay"></span>!</h1>
+      <div class="student-lobby-pin">PIN DA SALA <strong id="studentLobbyPin">------</strong></div>
+      <p id="studentLobbyMessage" class="student-lobby-message" aria-live="polite">O professor vai iniciar em breve</p>
+      <div class="student-lobby-count">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span id="studentLobbyCount">0 colegas conectados</span>
       </div>
     </div>
+    <svg class="student-lobby-ecg" viewBox="0 0 420 58" preserveAspectRatio="none" aria-hidden="true">
+      <path class="ecg-track" d="M0 30 H420"/>
+      <path class="ecg-line" d="M0 30 H72 L82 28 L90 32 L100 30 H142 L151 30 L159 8 L170 49 L181 20 L190 30 H253 L262 28 L271 32 L280 30 H320 L329 30 L337 8 L348 49 L359 20 L368 30 H420"/>
+    </svg>
   </section>
 
   <section id="studentGame" class="student-fullscreen hidden">
@@ -6204,6 +6349,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function removeParticipant(id){if(state.participants.delete(id)){state.answersReceived.delete(id);updateParticipants();updateAnswerProgress();updateLeaderboard()}}
     function updateParticipants(){
       const n=state.participants.size;
+      // Contagem de presença para a tela de espera do aluno, sem alterar o fluxo do jogo.
+      state.participants.forEach(p=>sendParticipant(p,{type:'LOBBY_COUNT',count:n}));
       if($('participantCount'))$('participantCount').textContent=String(n);
       if($('participantCountBig'))$('participantCountBig').textContent=String(n);
       if($('totalStudents'))$('totalStudents').textContent=String(n);
@@ -7305,13 +7452,32 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
     function renderAvatarPicker(){const picker=$('avatarPicker');picker.innerHTML=AVATARS.map((a,i)=>`<button type="button" class="avatar-option ${i===0?'selected':''}" data-avatar="${a.id}" title="${a.label}" aria-label="${a.label}">${a.emoji}</button>`).join('');picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{picker.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');state.studentAvatar=btn.dataset.avatar}))}
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
-    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
+    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);if($('studentLobbyPin'))$('studentLobbyPin').textContent=state.pin||pin;startStudentLobbyMessages();switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
+    let studentLobbyMessageTimer=null, studentLobbyMessageIndex=0;
+    function startStudentLobbyMessages(){
+      const messages=['O professor vai iniciar em breve','Fique atento ao traçado','Prepare-se para identificar o ritmo'];
+      const el=$('studentLobbyMessage');
+      if(!el)return;
+      if(studentLobbyMessageTimer)clearInterval(studentLobbyMessageTimer);
+      studentLobbyMessageIndex=0;
+      el.textContent=messages[0];
+      studentLobbyMessageTimer=setInterval(()=>{
+        studentLobbyMessageIndex=(studentLobbyMessageIndex+1)%messages.length;
+        el.style.opacity='0';
+        setTimeout(()=>{el.textContent=messages[studentLobbyMessageIndex];el.style.opacity='1'},250);
+      },4200);
+    }
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
     function handleStudentMessage(msg) {
       if (!msg?.type) return;
       if (msg.targetStudentId && state.studentId && msg.targetStudentId !== state.studentId) return;
       if (msg.studentId && msg.type === 'ROUND_REVEAL' && state.studentId && msg.studentId !== state.studentId) return;
-      if (msg.type === 'ROUND_QUESTION') showStudentQuestion(msg);
+      if (msg.type === 'LOBBY_COUNT') {
+        const colleagues = Math.max(0, (Number(msg.count) || 0) - 1);
+        const countEl = $('studentLobbyCount');
+        if (countEl) countEl.textContent = colleagues + (colleagues === 1 ? ' colega conectado' : ' colegas conectados');
+      }
+      else if (msg.type === 'ROUND_QUESTION') showStudentQuestion(msg);
       else if (msg.type === 'ROUND_PAUSE') {
         /* No-op: o relógio e as respostas nunca param */
       }
