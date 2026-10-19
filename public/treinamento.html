@@ -6366,7 +6366,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
       isExplaining:false,config: { ecgMode: 'static',
-      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:true},
+      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
@@ -7529,7 +7529,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           if(c.revealExplanation)state.config.revealExplanation=c.revealExplanation;
           if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
           if(typeof c.studentShowsPosition==='boolean')state.config.studentShowsPosition=c.studentShowsPosition;
-          if(typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;
+          if(c.setupFcDefaultV2===true&&typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;else{state.config.showBpmDuringQuestion=true;state.config.setupFcDefaultV2=true;try{localStorage.setItem('arena_config',JSON.stringify({...c,showBpmDuringQuestion:true,setupFcDefaultV2:true}))}catch(e){}}
           if(typeof c.roundDuration==='number' && c.roundDuration>=5 && c.roundDuration<=180){
             setRoundDuration(c.roundDuration, false);
           }
