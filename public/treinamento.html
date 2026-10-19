@@ -4808,7 +4808,334 @@
         min-height: 74px;
       }
     }
-</style>
+
+    /* ============================================================
+       HOME ARENA ECG · layout aprovado
+       ============================================================ */
+    body:has(#viewHome:not(.hidden)) {
+      background: #07111d !important;
+      color: #f4f8fb !important;
+      min-height: 100dvh !important;
+    }
+    body:has(#viewHome:not(.hidden)) .shell {
+      width: min(100%, 1440px) !important;
+      max-width: 1440px !important;
+      min-height: 100dvh !important;
+      height: auto !important;
+      margin: 0 auto !important;
+      padding: clamp(16px, 3vw, 38px) clamp(16px, 4vw, 56px) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0 !important;
+      overflow: visible !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      min-height: 28px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      flex: 0 0 auto !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader > a {
+      display: inline-flex !important;
+      gap: 0 !important;
+      align-items: center !important;
+      text-decoration: none !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader .brand-mark-3d,
+    body:has(#viewHome:not(.hidden)) #globalHeader > a > span > span:last-child {
+      display: none !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader > a > span {
+      display: inline-flex !important;
+      align-items: center !important;
+      font-size: .9rem !important;
+      line-height: 1 !important;
+      font-weight: 900 !important;
+      letter-spacing: .12em !important;
+      color: #f4f8fb !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader > a > span > span:first-child {
+      display: inline !important;
+      font-size: inherit !important;
+      color: #55d6d2 !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader .header-toolbar {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 8px !important;
+      min-height: 8px !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader #themeToggleFloating {
+      display: none !important;
+    }
+    body:has(#viewHome:not(.hidden)) #globalHeader .header-toolbar::after {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(85,214,210,.78);
+      box-shadow: 0 0 7px rgba(85,214,210,.24);
+    }
+    #viewHome.arena-home-v2 {
+      --home-mint: #55d6d2;
+      --home-cyan: #55d6d2;
+      position: relative !important;
+      isolation: isolate !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 0 !important;
+      flex: 1 1 auto !important;
+      margin: 0 !important;
+      padding: clamp(24px, 5vh, 64px) 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: clamp(24px, 4.5vh, 48px) !important;
+      overflow: hidden !important;
+      background: transparent !important;
+    }
+    #viewHome.arena-home-v2::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: .38 !important;
+      background-image:
+        linear-gradient(rgba(85,214,210,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(85,214,210,.035) 1px, transparent 1px);
+      background-size: 48px 48px !important;
+      mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+    }
+    #viewHome.arena-home-v2::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 0% 0%, rgba(29,105,143,.18), transparent 38%),
+        radial-gradient(ellipse at 100% 100%, rgba(28,134,143,.13), transparent 36%);
+      opacity: 1 !important;
+      transform: none !important;
+      width: auto !important;
+      border-radius: 0 !important;
+    }
+    #viewHome .arena-lobby-topbar { display: none !important; }
+    #viewHome .arena-home-visuals { display: none !important; }
+    #viewHome .arena-home-content {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 920px !important;
+      min-width: 0 !important;
+      gap: clamp(28px, 5vh, 48px) !important;
+      margin: auto !important;
+      position: relative;
+      z-index: 1;
+    }
+    #viewHome .arena-home-heading {
+      width: 100% !important;
+      text-align: center !important;
+      margin: 0 !important;
+    }
+    #viewHome .arena-home-heading h1 {
+      margin: 0 !important;
+      color: #f4f8fb !important;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+      font-size: clamp(1.08rem, 3.4vw, 3rem) !important;
+      line-height: 1.12 !important;
+      font-weight: 800 !important;
+      letter-spacing: -.045em !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      text-wrap: nowrap !important;
+      overflow: visible !important;
+    }
+    #viewHome .arena-home-heading h1 span { color: #55d6d2 !important; }
+    #viewHome .arena-home-ecg-corner {
+      position: absolute;
+      right: clamp(4px, 2vw, 24px);
+      bottom: clamp(8px, 2vh, 22px);
+      width: clamp(100px, 13vw, 170px);
+      height: auto;
+      opacity: .26;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #viewHome .arena-home-ecg-corner svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    #viewHome .arena-home-ecg-corner path {
+      fill: none;
+      stroke: #55d6d2;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 260;
+      stroke-dashoffset: 260;
+      animation: arenaHomeTrace 8s linear infinite;
+    }
+    @keyframes arenaHomeTrace {
+      to { stroke-dashoffset: 0; }
+    }
+    #viewHome .arena-home-actions {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      align-items: stretch !important;
+      gap: clamp(14px, 2vw, 24px) !important;
+      width: min(100%, 760px) !important;
+      margin: 0 auto !important;
+      position: relative;
+      z-index: 1;
+    }
+    #viewHome .arena-action-card {
+      min-width: 0 !important;
+      min-height: clamp(158px, 20vh, 190px) !important;
+      padding: clamp(20px, 3vh, 30px) 18px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 13px !important;
+      border: 1px solid rgba(85,214,210,.38) !important;
+      border-radius: 18px !important;
+      background: linear-gradient(145deg, rgba(14,31,46,.96), rgba(7,19,31,.98)) !important;
+      color: #f4f8fb !important;
+      text-align: center !important;
+      box-shadow: 0 0 22px rgba(85,214,210,.09), inset 0 1px rgba(255,255,255,.035) !important;
+      cursor: pointer;
+      overflow: hidden;
+      isolation: isolate;
+      transform: translateY(0);
+      transition: transform .22s cubic-bezier(.16,1,.3,1), border-color .22s ease, box-shadow .22s ease, background .22s ease !important;
+      will-change: auto !important;
+    }
+    #viewHome .arena-action-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(85,214,210,.17), transparent 68%);
+      transition: opacity .22s ease;
+    }
+    #viewHome .arena-action-card:hover {
+      transform: translateY(-4px) !important;
+      border-color: rgba(85,214,210,.78) !important;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28), 0 0 28px rgba(85,214,210,.16), inset 0 1px rgba(255,255,255,.06) !important;
+    }
+    #viewHome .arena-action-card:hover::before { opacity: 1; }
+    #viewHome .arena-action-card:active { transform: translateY(0) scale(.995) !important; }
+    #viewHome .arena-action-card:focus-visible {
+      outline: 2px solid #55d6d2 !important;
+      outline-offset: 4px !important;
+    }
+    #viewHome .arena-action-card.is-launching {
+      animation: arenaCardLaunchPulse .18s ease-out both !important;
+    }
+    @keyframes arenaCardLaunchPulse {
+      0%, 100% { box-shadow: 0 0 22px rgba(85,214,210,.09), inset 0 1px rgba(255,255,255,.035); }
+      45% { box-shadow: 0 0 0 2px rgba(85,214,210,.42), 0 0 34px rgba(85,214,210,.35), inset 0 0 24px rgba(85,214,210,.16); border-color: rgba(143,250,244,.95); }
+    }
+    #viewHome .arena-action-icon {
+      width: 50px !important;
+      height: 50px !important;
+      flex: 0 0 50px !important;
+      display: grid !important;
+      place-items: center !important;
+      border: 0 !important;
+      border-radius: 13px !important;
+      color: #55d6d2 !important;
+      background: rgba(85,214,210,.10) !important;
+      box-shadow: 0 0 18px rgba(85,214,210,.12) !important;
+    }
+    #viewHome .arena-action-icon svg { width: 34px !important; height: 34px !important; display: block; }
+    #viewHome .arena-action-copy {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 5px !important;
+      min-width: 0;
+    }
+    #viewHome .arena-action-copy strong {
+      color: #f4f8fb !important;
+      font-size: clamp(1rem, 1.4vw, 1.2rem) !important;
+      line-height: 1.25 !important;
+      font-weight: 800 !important;
+      letter-spacing: -.02em !important;
+    }
+    #viewHome .arena-action-role {
+      display: block !important;
+      color: #9eb4c3 !important;
+      font-size: .82rem !important;
+      line-height: 1.3 !important;
+      font-weight: 600 !important;
+      letter-spacing: .025em !important;
+    }
+    #viewHome .arena-action-bottom,
+    #viewHome .arena-action-index,
+    #viewHome .arena-lobby-actions-wrap,
+    #viewHome .arena-actions-heading,
+    #viewHome .arena-lobby-security,
+    #viewHome .arena-lobby-bottomline {
+      display: none !important;
+    }
+    @media (max-width: 640px) {
+      body:has(#viewHome:not(.hidden)) .shell {
+        padding: 16px 18px 22px !important;
+      }
+      #viewHome.arena-home-v2 {
+        padding: 36px 0 !important;
+        gap: 26px !important;
+        min-height: 0 !important;
+      }
+      #viewHome .arena-home-content { gap: 32px !important; }
+      #viewHome .arena-home-heading h1 {
+        font-size: clamp(1.08rem, 4.8vw, 1.55rem) !important;
+        white-space: nowrap !important;
+        letter-spacing: -.05em !important;
+      }
+      #viewHome .arena-home-actions {
+        grid-template-columns: minmax(0, 1fr) !important;
+        width: min(100%, 420px) !important;
+        gap: 12px !important;
+      }
+      #viewHome .arena-action-card {
+        min-height: 136px !important;
+        padding: 20px 16px !important;
+      }
+      #viewHome .arena-action-icon { width: 44px !important; height: 44px !important; flex-basis: 44px !important; }
+      #viewHome .arena-action-icon svg { width: 30px !important; height: 30px !important; }
+      #viewHome .arena-home-ecg-corner { width: 96px; opacity: .17; bottom: 4px; }
+    }
+    @media (max-width: 360px) {
+      #viewHome .arena-home-heading h1 { font-size: 1rem !important; }
+      #viewHome .arena-action-copy strong { font-size: .96rem !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #viewHome .arena-home-ecg-corner path,
+      #viewHome .arena-action-card,
+      #viewHome .arena-action-card::before {
+        animation: none !important;
+        transition: none !important;
+      }
+      #viewHome .arena-action-card.is-launching { animation: none !important; }
+    }
+
+  </style>
 </head>
 <body>
 
@@ -4833,10 +5160,11 @@
 
     <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
       <div class="arena-lobby-topbar" aria-hidden="true"></div>
+      <div class="arena-home-ecg-corner" aria-hidden="true"><svg viewBox="0 0 220 64" role="presentation"><path d="M2 34 H42 L53 32 L62 35 H82 L94 26 L104 42 L117 9 L130 54 L143 28 L153 34 H218"/></svg></div>
 
       <div class="arena-home-content">
         <div class="arena-home-heading">
-          <h1>Leia o traçado.<br><span>Acerte em equipe.</span></h1>
+          <h1>Seu conhecimento entra em jogo.</h1>
         </div>
 
         <div class="arena-home-visuals" aria-label="Elementos visuais da Arena ECG">
@@ -4872,13 +5200,13 @@
         </div>
 
         <div class="arena-home-actions" aria-label="Escolha como participar">
-          <button id="btnStartHost" class="arena-action-card arena-action-teacher" type="button" aria-label="Criar sala da Arena e configurar a sessão">
-            <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 10h3l2-3 2 6 2-3h1"/></svg></span><span class="arena-action-copy"><strong>Configure a sessão</strong><span>Defina os ritmos e as regras.</span></span></span>
-            <span class="arena-action-bottom"><span>CRIAR SALA DA ARENA</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
+          <button id="btnStartHost" class="arena-action-card arena-action-teacher" type="button" aria-label="Criar uma sala para o professor">
+            <span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" role="presentation"><rect x="5" y="7" width="38" height="27" rx="4" fill="currentColor"/><path d="M11 15h8l4-5 5 15 4-8h5" fill="none" stroke="#07131f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 40h12M24 34v6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg></span>
+            <span class="arena-action-copy"><strong>Criar uma sala</strong><span class="arena-action-role">Professor</span></span>
           </button>
-          <button id="btnGoToJoin" class="arena-action-card arena-action-student" type="button" aria-label="Entrar com PIN pelo celular">
-            <span class="arena-action-main"><span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 5h4M11 18h2"/><path d="M9 10h6"/></svg></span><span class="arena-action-copy"><strong>Entre pelo celular</strong><span>Entre na sala com o PIN.</span></span></span>
-            <span class="arena-action-bottom"><span>ENTRAR COM PIN</span><span class="arena-action-arrow" aria-hidden="true">↗</span></span>
+          <button id="btnGoToJoin" class="arena-action-card arena-action-student" type="button" aria-label="Acesso pelo celular para o aluno">
+            <span class="arena-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" role="presentation"><rect x="11" y="3" width="26" height="42" rx="5" fill="currentColor"/><rect x="15" y="9" width="18" height="27" rx="1.5" fill="#07131f"/><rect x="21" y="39" width="6" height="2" rx="1" fill="#07131f"/></svg></span>
+            <span class="arena-action-copy"><strong>Acesso pelo celular</strong><span class="arena-action-role">Aluno</span></span>
           </button>
         </div>
       </div>
@@ -8568,6 +8896,33 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
     const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('rhythms');switchView('viewHostSetup')}else switchView('viewHome');
+  
+    // Feedback de clique da Home: breve pulso antes de executar a ação existente.
+    (() => {
+      const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      ['btnStartHost', 'btnGoToJoin'].forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) return;
+        button.addEventListener('click', (event) => {
+          if (button.dataset.arenaReplay === '1') {
+            delete button.dataset.arenaReplay;
+            return;
+          }
+          if (reducedMotion()) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          button.classList.remove('is-launching');
+          void button.offsetWidth;
+          button.classList.add('is-launching');
+          window.setTimeout(() => {
+            button.classList.remove('is-launching');
+            button.dataset.arenaReplay = '1';
+            button.click();
+          }, 180);
+        }, true);
+      });
+    })();
+
   </script>
 </body>
 </html>
