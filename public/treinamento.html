@@ -6632,11 +6632,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           .on('broadcast',{event:'answer_received'},message=>handleArenaRealtimeAnswer(message?.payload))
           .subscribe(status=>{
             if(status==='SUBSCRIBED'){arenaHostRealtimeChannel=channel;arenaRealtimeReady=true;if(!settled){settled=true;resolve(true)}}
-            else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){arenaRealtimeReady=false;if(!settled){settled=true;reject(new Error('Não foi possível conectar o canal de respostas em tempo real.'))}}
+            else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){if(arenaHostRealtimeChannel===channel)arenaRealtimeReady=false;if(!settled){settled=true;reject(new Error('Não foi possível conectar o canal de respostas em tempo real.'))}}
           });
       });
     }
-    function arenaSnapshot(){return {schemaVersion:2,savedAt:Date.now(),selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,roundQueue:Array.isArray(state.roundQueue)?state.roundQueue:[],currentRhythmId:state.currentRhythm?.id||null,currentChoices:Array.isArray(state.currentChoices)?state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})):[],chosenRate:Number(state.chosenRate)||null,roundStartTime:Number(state.roundStartTime)||null,roundDeadline:Number(state.roundDeadline)||null,timeLeft:Number(state.timeLeft)||0,answersReceived:Array.from(state.answersReceived.entries()).map(([id,a])=>[String(id),{choiceId:a.choiceId,answeredAt:a.answeredAt}]),isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,roundLocked:!!state.roundLocked,sessionFinished:!!state.sessionFinished,sessionClosed:!!state.sessionClosed,sessionStats:state.sessionStats||{}}}
+    function arenaSnapshot(){return {schemaVersion:2,savedAt:Date.now(),selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,roundQueue:Array.isArray(state.roundQueue)?state.roundQueue:[],currentRhythmId:state.currentRhythm?.id||null,currentChoices:Array.isArray(state.currentChoices)?state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})):[],chosenRate:Number(state.chosenRate)||null,roundStartTime:Number(state.roundStartTime)||null,roundDeadline:Number(state.roundDeadline)||null,timeLeft:Number(state.timeLeft)||0,answersReceived:Array.from(state.answersReceived.entries()).map(([id,a])=>[String(id),{choiceId:a.choiceId,answeredAt:a.answeredAt,receivedOrder:a.receivedOrder??null,elapsedMs:a.elapsedMs??null}]),isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,roundLocked:!!state.roundLocked,sessionFinished:!!state.sessionFinished,sessionClosed:!!state.sessionClosed,sessionStats:state.sessionStats||{}}}
     function registerArenaHostRoom(pin){
       state.sessionFinished=false;
       state.sessionClosed=false;
@@ -7706,7 +7706,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       for(const [id,p] of state.participants){
         const answer=state.answersReceived.get(id);
         const isCorrect=!!answer&&answer.choiceId===correct.id;
-        const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,answer.answeredAt-state.roundStartTime)):state.roundDuration*1000;
+        const rawElapsed=answer&&Number.isFinite(Number(answer.elapsedMs))?Number(answer.elapsedMs):(answer?answer.answeredAt-state.roundStartTime:state.roundDuration*1000);const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,rawElapsed)):state.roundDuration*1000;
         const remaining=answer?Math.max(0,1-elapsed/(state.roundDuration*1000)):0;
         const points=isCorrect?500+Math.round(500*remaining):0;
         p.streak=isCorrect?p.streak+1:0;
@@ -8891,7 +8891,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(existing&&Number.isFinite(Number(existing.receivedOrder)))return;
       const answeredAt=Date.parse(answer.answeredAt);
       if(!Number.isFinite(answeredAt))return;
-      state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0});
+      state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0,elapsedMs:Number(answer.elapsedMs)});
       participant.lastAnswer=String(answer.choiceId);
       updateAnswerProgress();
       updateLeaderboard();
@@ -8909,7 +8909,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           if(!Number.isFinite(answeredAt))continue;
           const existing=state.answersReceived.get(id);
           if(!existing||!Number.isFinite(Number(existing.receivedOrder))){
-            state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0});
+            state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0,elapsedMs:Number(answer.elapsedMs)});
             const participant=state.participants.get(id);if(participant)participant.lastAnswer=String(answer.choiceId);
           }
         }
