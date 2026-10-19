@@ -7344,6 +7344,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sectionSetupSequence')?.classList.toggle('hidden',!show);$('sequenceEditor')?.classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.add('hidden');if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
     function initHost(recovery=null){
+      $('btnStartGame')?.classList.remove('hidden');
       state.role='host';
       if(recovery){
         state.pin=recovery.session.pin;
@@ -7733,7 +7734,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         state.lastRankChanges.set(r.p.id,{from:old,to:i+1,delta:r.rankDelta});
         state.previousRank.set(r.p.id,i+1);
       });
-      updateLeaderboard(true);
+      // O gabarito precisa aparecer primeiro. O ranking será revelado depois,
+      // para separar visualmente e sonoramente as duas etapas.
+      hideLiveCompetitionPanel();
+      const revealRoundNumber = state.roundNumber;
       const resultById=new Map(results.map(r=>[r.p.id,r]));
       // 1. Revela apenas o diagnóstico; a FC permanece exclusivamente no monitor.
       const qHeader = document.querySelector('.projection-question');
@@ -7837,6 +7841,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         sendParticipant(p,payload);
       }
       fanfare();
+      const rankingRevealTimer = setTimeout(() => {
+        if (state.roundNumber !== revealRoundNumber || !state.isRevealed || state.sessionFinished) return;
+        updateLeaderboard(true);
+      }, 1800);
+      if (window.podiumTimers) window.podiumTimers.push(rankingRevealTimer);
     }
     function loadStoredConfig(){
       try{
@@ -8049,6 +8058,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('revealPanel')?.classList.add('hidden');
       $('btnNextFixed')?.classList.add('hidden');
       $('explainOverlay')?.classList.add('hidden');
+      // Esconde a sala de espera inteira: o botão fixo "INICIAR PARTIDA"
+      // não deve ficar sobreposto ao pódio final.
+      $('viewHost')?.classList.add('hidden');
+      $('btnStartGame')?.classList.add('hidden');
+      hideLiveCompetitionPanel();
       $('hostPodium')?.classList.remove('hidden');
 
       const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
