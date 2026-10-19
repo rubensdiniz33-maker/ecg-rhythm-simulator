@@ -7338,40 +7338,6 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
     function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sectionSetupSequence')?.classList.toggle('hidden',!show);$('sequenceEditor')?.classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.add('hidden');if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
-    function restoreRecoveredHostRound(gs){
-      if(!gs||!Array.isArray(gs.roundQueue))return false;
-      state.roundQueue=gs.roundQueue.filter(id=>typeof id==='string'&&rhythmById(id));
-      state.queueIndex=Math.max(0,Math.min(state.roundQueue.length,Number(gs.queueIndex)||0));
-      if(!gs.currentRhythmId&&!Number(gs.roundNumber))return true;
-      if(gs.isRevealed){
-        // Esta rodada já foi pontuada antes da interrupção. Nunca calcular os pontos novamente.
-        state.currentRhythm=null;state.currentChoices=[];state.isRevealed=false;state.roundLocked=false;
-        showToast('Rodada anterior já contabilizada. Continuando sem duplicar pontos.');
-        startNextRound();
-        return true;
-      }
-      const rhythm=rhythmById(gs.currentRhythmId);
-      const choices=Array.isArray(gs.currentChoices)?gs.currentChoices.filter(c=>c&&typeof c.id==='string'&&rhythmById(c.id)).map(c=>({id:c.id,label:String(c.label||rhythmById(c.id).name),color:c.color,shape:c.shape})):[];
-      if(!rhythm||!choices.length||!state.roundNumber)return false;
-      state.currentRhythm=rhythm;state.currentChoices=choices;state.chosenRate=Number(gs.chosenRate)||rhythm.defaultRate||0;
-      state.roundStartTime=Number(gs.roundStartTime)||Date.now();
-      state.answersReceived.clear();
-      if(Array.isArray(gs.answersReceived))for(const entry of gs.answersReceived){if(Array.isArray(entry)&&entry.length===2&&state.participants.has(String(entry[0]))&&entry[1]&&typeof entry[1].choiceId==='string')state.answersReceived.set(String(entry[0]),{choiceId:entry[1].choiceId,answeredAt:Number(entry[1].answeredAt)||Date.now()});}
-      state.isRevealed=false;state.isPaused=false;state.roundLocked=false;state.pauseReasons.clear();
-      $('roundNumber').textContent=String(state.roundNumber);$('roundTotal').textContent=state.roundLimit?' / '+state.roundLimit:'';
-      $('projectionOptions').innerHTML=choices.map(c=>`<div class="answer-tile ${c.color}"><div class="answer-tile-content"><span class="shape">${c.shape}</span><span class="answer-label">${escapeHTML(c.label)}</span></div></div>`).join('');
-      const qHeader=document.querySelector('.projection-question');if(qHeader){qHeader.classList.remove('is-revealed');qHeader.textContent=rhythm.id==='aesp'?'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?':'QUE RITMO É ESSE?'}
-      $('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');updateExplainStateUI(false);updateAnimationButtonUI();
-      initRealEcg(rhythm.id,state.chosenRate);setProjectionVisible(true);updateAnswerProgress();
-      const savedDeadline=Number(gs.roundDeadline)||0;const savedAt=Number(gs.savedAt)||Date.now();
-      const remainingAtSave=Number(gs.timeLeft)||Math.max(0,Math.ceil((savedDeadline-savedAt)/1000));
-      state.roundDeadline=savedDeadline>0?savedDeadline:(savedAt+remainingAtSave*1000);
-      state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));
-      const showPosition=state.config.studentShowsPosition&&state.config.rankingFrequency!=='never';
-      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:choices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,showPosition,showFc:!!state.config.showBpmDuringQuestion});
-      if(state.timeLeft<=0){handleRoundEnd()}else{startTimer(false);queueArenaHostSync()}
-      return true;
-    }
     function initHost(){
       $('btnStartGame')?.classList.remove('hidden');
       state.role='host';
