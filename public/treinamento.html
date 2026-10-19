@@ -5304,15 +5304,21 @@
     #participantsEmpty{padding:20px 12px!important}
     #participantsList{overflow-y:auto;align-content:start}
 
-    /* Lobby desktop: viewport fixo; rolagem restrita à lista de participantes. */
+    /* Cabeçalho único da sala: marca à esquerda e controles à direita. */
+    .unified-host-actions { display:none; }
+    .host-net-status { display:block; color:var(--muted); font-size:11px; font-weight:750; }
+    body:has(#viewHost:not(.hidden)) #globalHeader { width:100%; margin-bottom:10px!important; align-items:center; }
+    body:has(#viewHost:not(.hidden)) #globalHeader > a { display:flex!important; }
+    body:has(#viewHost:not(.hidden)) #globalHeader .unified-host-actions { display:flex; margin-left:auto; }
+    body:has(#viewHost:not(.hidden)) #viewHost { min-height:0; padding-bottom:0; gap:10px; }
+    body:has(#viewHost:not(.hidden)) .host-lobby-header { padding:0 4px; min-height:18px; }
+    body:has(#viewHost:not(.hidden)) #hostLobby { margin-top:0; }
     @media (min-width: 901px) {
-      body:has(#viewHostSetup:not(.hidden)) { height:100dvh; min-height:0; overflow:hidden; }
-      body:has(#viewHostSetup:not(.hidden)) .shell { height:100dvh; min-height:0; padding:12px clamp(14px,2vw,28px); overflow:hidden; }
-      body:has(#viewHostSetup:not(.hidden)) #globalHeader { flex:0 0 auto; margin-bottom:10px !important; }
-      body:has(#viewHostSetup:not(.hidden)) #viewHostSetup { flex:1 1 auto; min-height:0; overflow:hidden; gap:10px; }
-      #viewHostSetup .host-brand-lockup, #viewHostSetup #btnHostTheme { display:none !important; }
-      #viewHostSetup .host-lobby-header { flex:0 0 auto; min-height:48px; padding:6px 12px; justify-content:flex-end; }
-      #viewHostSetup .host-header-actions { width:100%; }
+      body:has(#viewHost:not(.hidden)) { height:100dvh; min-height:0; overflow:hidden; }
+      body:has(#viewHost:not(.hidden)) .shell { height:100dvh; min-height:0; padding:12px clamp(14px,2vw,28px); overflow:hidden; }
+      body:has(#viewHost:not(.hidden)) #globalHeader { flex:0 0 auto; }
+      body:has(#viewHost:not(.hidden)) #viewHost { flex:1 1 auto; min-height:0; overflow:hidden; }
+      #viewHost .host-brand-lockup { display:none !important; }
       #hostLobby { flex:1 1 auto; min-height:0; height:100%; overflow:hidden; }
       #hostLobby > .panel { height:100%; max-height:none; min-height:0 !important; overflow:hidden; }
       #hostLobby > .panel:last-child { display:flex; flex-direction:column; }
@@ -5373,7 +5379,12 @@
         </span>
       </a>
 
-      <!-- Marca principal única, sem controle de tema duplicado -->
+      <div class="host-header-actions unified-host-actions" aria-label="Controles da sala">
+        <button id="btnToggleSound" type="button" class="muted-btn" title="Alternar som">🔊 Som</button>
+        <button id="btnFullscreen" type="button" class="muted-btn" title="Abrir projeção">⛶ Projeção</button>
+        <button id="btnHostTheme" type="button" class="muted-btn" title="Alternar modo claro/escuro">☀️ Claro</button>
+        <button id="btnLeaveHost" type="button" class="muted-btn host-end-button" title="Encerrar sala">Encerrar</button>
+      </div>
     </header>
 
     <section id="viewHome" class="home-arena-hero arena-home-v2 my-auto" aria-label="Lobby inicial da Arena ECG">
@@ -5867,14 +5878,8 @@
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
-      <div class="host-lobby-header panel">
-        <div class="host-brand-lockup"><span class="brand-mark" aria-hidden="true">♥</span><div class="host-brand-copy"><strong>ARENA ECG</strong><span id="hostNetBadge" role="status" aria-live="polite">Abrindo sala...</span></div></div>
-        <div class="host-header-actions">
-
-          <button id="btnToggleSound" type="button" class="muted-btn" title="Alternar som">🔊 Som</button>
-          <button id="btnFullscreen" type="button" class="muted-btn" title="Abrir projeção">⛶ Projeção</button>
-          <button id="btnLeaveHost" type="button" class="muted-btn host-end-button" title="Encerrar sala">Encerrar</button>
-        </div>
+      <div class="host-lobby-header" aria-live="polite">
+        <span id="hostNetBadge" class="host-net-status" role="status">Abrindo sala...</span>
       </div>
 
       <div id="hostLobby" class="host-lobby-layout grid lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr] gap-6 my-auto items-stretch w-full max-w-7xl mx-auto">
