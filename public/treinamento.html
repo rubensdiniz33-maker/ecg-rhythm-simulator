@@ -4716,6 +4716,19 @@
       .answer-check-mark { animation: none; }
     }
 
+  
+    /* Confirmação interna do Arena ECG */
+    .arena-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(2,6,23,.76);backdrop-filter:blur(8px)}
+    .arena-confirm-backdrop.hidden{display:none}
+    .arena-confirm-card{width:min(100%,420px);padding:26px;border:1px solid rgba(148,163,184,.28);border-radius:22px;background:var(--panel,#101827);color:var(--text,#f8fafc);box-shadow:0 24px 80px rgba(0,0,0,.42)}
+    .arena-confirm-title{font-size:22px;font-weight:900;letter-spacing:-.03em;color:var(--text-title,#fff)}
+    .arena-confirm-message{margin-top:10px;font-size:14px;line-height:1.6;color:var(--text-muted,#cbd5e1)}
+    .arena-confirm-actions{display:flex;gap:10px;margin-top:24px}
+    .arena-confirm-actions button{flex:1;min-height:44px;border-radius:12px;font-weight:850}
+    #arenaConfirmCancel{border:1px solid rgba(148,163,184,.35);background:rgba(148,163,184,.1);color:var(--text,#f8fafc)}
+    #arenaConfirmAccept{background:#e11d48;color:white;box-shadow:0 8px 24px rgba(225,29,72,.22)}
+    #studentReconnectStatus{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:9999;padding:10px 16px;border:1px solid rgba(250,204,21,.35);border-radius:999px;background:rgba(15,23,42,.94);color:#fef3c7;font-size:13px;font-weight:900;box-shadow:0 8px 30px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none}
+    #studentReconnectStatus.hidden{display:none}
   </style>
 </head>
 <body>
@@ -5724,6 +5737,19 @@
   <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-[30]"></canvas>
   <div id="toast" class="toast"></div>
 
+
+  <div id="arenaConfirmModal" class="arena-confirm-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="arenaConfirmTitle" aria-describedby="arenaConfirmMessage">
+    <div class="arena-confirm-card">
+      <div class="text-3xl mb-3" aria-hidden="true">⚠️</div>
+      <h2 id="arenaConfirmTitle" class="arena-confirm-title">Confirmar ação</h2>
+      <p id="arenaConfirmMessage" class="arena-confirm-message"></p>
+      <div class="arena-confirm-actions">
+        <button id="arenaConfirmCancel" type="button">Cancelar</button>
+        <button id="arenaConfirmAccept" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+  <div id="studentReconnectStatus" class="hidden" role="status" aria-live="polite">Reconectando…</div>
   <script>
 
     // === MOTOR REAL DO SIMULADOR DE ECG (public/simulator.html) ===
@@ -5813,6 +5839,24 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
+    const STUDENT_SESSION_KEY='ecg-arena-student-session';
+    let studentReconnectTimer=null, studentReconnectAttempts=0, pendingConfirmAction=null;
+    function readStudentSession(){try{const x=JSON.parse(sessionStorage.getItem(STUDENT_SESSION_KEY)||'null');return x&&/^\d{6}$/.test(String(x.pin||''))&&x.studentId?x:null}catch(e){return null}}
+    function persistStudentSession(){if(state.role!=='student'||!state.studentId||!state.pin)return;try{sessionStorage.setItem(STUDENT_SESSION_KEY,JSON.stringify({pin:state.pin,studentId:state.studentId,name:state.studentName||'',avatar:state.studentAvatar||'stetho',score:Number(state.studentScore)||0,streak:Number(state.studentStreak)||0}))}catch(e){}}
+    function setStudentReconnectStatus(active){const el=$('studentReconnectStatus');if(!el)return;el.classList.toggle('hidden',!active);if(active)el.textContent='Reconectando…'}
+    function scheduleStudentReconnect(){if(state.role!=='student'||!state.studentId||!state.pin||!navigator.onLine)return;setStudentReconnectStatus(true);if(studentReconnectTimer)return;studentReconnectTimer=setTimeout(()=>{studentReconnectTimer=null;connectStudentTransport(true)},2200)}
+    function handleStudentAck(m){if(m?.type!=='JOIN_ACK'||m.studentId!==state.studentId)return;if(m.targetStudentId&&m.targetStudentId!==state.studentId)return;state.studentName=m.studentName||state.studentName;state.studentAvatar=m.avatar||state.studentAvatar;if(typeof m.totalScore==='number')state.studentScore=m.totalScore;if(typeof m.streak==='number')state.studentStreak=m.streak;state.studentConnected=true;studentReconnectAttempts=0;if(studentReconnectTimer){clearTimeout(studentReconnectTimer);studentReconnectTimer=null}setStudentReconnectStatus(false);if($('studentNameDisplay'))$('studentNameDisplay').textContent=state.studentName||'';if($('studentAvatarDisplay'))$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);if($('studentLobbyPin'))$('studentLobbyPin').textContent=state.pin||'------';if($('studentScore'))$('studentScore').textContent=String(state.studentScore||0);if($('studentScoreLobby'))$('studentScoreLobby').textContent=String(state.studentScore||0);persistStudentSession();if(!$('viewStudentJoin')?.classList.contains('hidden')){startStudentLobbyMessages();switchView('studentLobby')}}
+    function connectStudentTransport(isReconnect=false){if(state.role!=='student'||!state.pin||!state.studentId)return;state.studentConnected=false;setStudentReconnectStatus(isReconnect||studentReconnectAttempts>0);studentReconnectAttempts++;
+      try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')handleStudentAck(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name:state.studentName,avatar:state.studentAvatar})}catch(e){}
+      try{state.studentConn?.close();if(!state.peer||state.peer.destroyed){state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>openStudentPeerConnection());state.peer.on('disconnected',()=>{state.studentConnected=false;scheduleStudentReconnect()});state.peer.on('error',()=>scheduleStudentReconnect())}else openStudentPeerConnection()}catch(e){scheduleStudentReconnect()}
+      if(studentReconnectTimer){clearTimeout(studentReconnectTimer);studentReconnectTimer=null}studentReconnectTimer=setTimeout(()=>{studentReconnectTimer=null;if(!state.studentConnected)scheduleStudentReconnect()},8500);
+    }
+    function openStudentPeerConnection(){if(!state.peer||state.peer.destroyed||!state.pin)return;try{const conn=state.peer.connect('ecg-sim-room-'+state.pin,{reliable:true});state.studentConn=conn;conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name:state.studentName,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')handleStudentAck(m);else handleStudentMessage(m)});conn.on('close',()=>{if(state.studentConn===conn){state.studentConnected=false;scheduleStudentReconnect()}});conn.on('error',()=>{if(state.studentConn===conn)scheduleStudentReconnect()})}catch(e){scheduleStudentReconnect()}}
+    function showArenaConfirm(title,message,acceptLabel,onAccept){$('arenaConfirmTitle').textContent=title;$('arenaConfirmMessage').textContent=message;$('arenaConfirmAccept').textContent=acceptLabel||'Confirmar';pendingConfirmAction=onAccept;$('arenaConfirmModal').classList.remove('hidden');$('arenaConfirmAccept').focus()}
+    function closeArenaConfirm(){$('arenaConfirmModal').classList.add('hidden');pendingConfirmAction=null}
+    $('arenaConfirmCancel')?.addEventListener('click',closeArenaConfirm);
+    $('arenaConfirmAccept')?.addEventListener('click',()=>{const action=pendingConfirmAction;closeArenaConfirm();if(action)action()});
+    $('arenaConfirmModal')?.addEventListener('click',e=>{if(e.target===$('arenaConfirmModal'))closeArenaConfirm()});
 
     function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
     function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');const isStudentScreen=['studentLobby','studentGame','studentReveal'].includes(view);if(isStudentScreen){$('globalHeader')?.classList.add('hidden')}else{$('globalHeader')?.classList.remove('hidden')}const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
@@ -6472,8 +6516,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}
       setupPeer(state.pin);
     }
-    function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=state.participants.get(conn.peer);if(p)removeParticipant(p.id)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
-    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(conn)p.conn=conn;sendParticipant(p,{type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar});return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=Array.from(state.participants.values()).find(x=>x.conn===conn);if(!p)return;p.conn=null;if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=setTimeout(()=>{if(state.participants.get(p.id)===p&&!p.conn)removeParticipant(p.id)},45000)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
     function sendParticipant(p, msg) {
       let sentPeer = false;
       if (p?.conn?.open) {
@@ -6849,6 +6893,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           votes,
           showPosition:studentSeesPosition
         };
+        p.lastRevealPayload=payload;
         sendParticipant(p,payload);
       }
       fanfare();
@@ -7620,7 +7665,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
     function renderAvatarPicker(){const picker=$('avatarPicker');picker.innerHTML=AVATARS.map((a,i)=>`<button type="button" class="avatar-option ${i===0?'selected':''}" data-avatar="${a.id}" title="${a.label}" aria-label="${a.label}">${a.emoji}</button>`).join('');picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{picker.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');state.studentAvatar=btn.dataset.avatar}))}
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
-    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const name=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.pin=pin;state.studentName=name;state.studentId='std-'+Math.random().toString(36).slice(2,10);$('joinButton').disabled=true;$('joinButton').textContent='Conectando…';let joined=false;const ack=m=>{if(m?.type==='JOIN_ACK'&&m.studentId===state.studentId&&!joined){joined=true;state.studentName=m.studentName||name;$('studentNameDisplay').textContent=state.studentName;$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);if($('studentLobbyPin'))$('studentLobbyPin').textContent=state.pin||pin;startStudentLobbyMessages();switchView('studentLobby')}};try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+pin);state.channel.onmessage=e=>{if(e.data?.type==='JOIN_ACK')ack(e.data);else handleStudentMessage(e.data)};state.channel.postMessage({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar})}catch(e){}try{state.peer?.destroy();state.peer=new Peer(undefined,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});state.peer.on('open',()=>{const conn=state.peer.connect('ecg-sim-room-'+pin,{reliable:true});conn.on('open',()=>conn.send({type:'JOIN',studentId:state.studentId,name,avatar:state.studentAvatar}));conn.on('data',m=>{if(m?.type==='JOIN_ACK')ack(m);else handleStudentMessage(m)});state.studentConn=conn});state.peer.on('error',console.warn)}catch(e){}setTimeout(()=>{if(!joined){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden')}},9000)}
+    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const enteredName=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}const saved=readStudentSession();const reuse=saved&&saved.pin===pin;const name=reuse?(saved.name||enteredName):enteredName;if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.role='student';state.pin=pin;state.studentName=name;state.studentId=reuse?saved.studentId:'std-'+Math.random().toString(36).slice(2,10);if(reuse){state.studentAvatar=saved.avatar||state.studentAvatar;state.studentScore=Number(saved.score)||0;state.studentStreak=Number(saved.streak)||0;const avatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(avatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));avatarBtn.classList.add('selected')}}else{state.studentScore=0;state.studentStreak=0}persistStudentSession();$('joinButton').disabled=true;$('joinButton').textContent=reuse?'Reconectando…':'Conectando…';$('joinError').classList.add('hidden');if(reuse)setStudentReconnectStatus(true);connectStudentTransport(reuse);if(!reuse){setTimeout(()=>{if(!state.studentConnected&&state.studentId){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden');setStudentReconnectStatus(false)}},9000)}else{setTimeout(()=>{if(!state.studentConnected){$('joinButton').disabled=false;$('joinButton').textContent='TENTAR NOVAMENTE';}},9000)}}
     let studentLobbyMessageTimer=null, studentLobbyMessageIndex=0;
     function startStudentLobbyMessages(){
       const messages=['O professor vai iniciar em breve','Fique atento ao traçado','Prepare-se para identificar o ritmo'];
@@ -7636,6 +7681,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       },4200);
     }
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
+    window.addEventListener('offline',()=>{if(state.role==='student'&&state.studentId)setStudentReconnectStatus(true)});
+    window.addEventListener('online',()=>{if(state.role==='student'&&state.studentId)scheduleStudentReconnect()});
     function handleStudentMessage(msg) {
       if (!msg?.type) return;
       if (msg.targetStudentId && state.studentId && msg.targetStudentId !== state.studentId) return;
@@ -7758,6 +7805,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
 
       // 1. Placar: atualiza sempre na tela de jogo e no lobby
+      persistStudentSession();
       const scoreStr = String(state.studentScore ?? 0);
       if ($('studentScore')) $('studentScore').textContent = scoreStr;
       if ($('studentScoreLobby')) $('studentScoreLobby').textContent = scoreStr;
@@ -8222,24 +8270,11 @@ function animatePoints(points) {
       const current = state.roundNumber || 0;
       const remaining = Math.max(0, total - current);
       const msg = `Encerrar agora? Restam ${remaining} perguntas.`;
-      if (!confirm(msg)) return;
-      clearInterval(state.timerHandle);
-      cancelAnimationFrame(ecgFrame);
-      state.roundLocked = true;
-      state.isPaused = true;
-      showPodium();
+      showArenaConfirm('Encerrar jogo?',msg,'Encerrar jogo',()=>{clearInterval(state.timerHandle);cancelAnimationFrame(ecgFrame);state.roundLocked=true;state.isPaused=true;showPodium()});
     }
 
 if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
-    if ($('btnLeaveHost')) $('btnLeaveHost').onclick = () => {
-      if (confirm('Encerrar esta sala?')) {
-        state.peer?.destroy();
-        state.channel?.close();
-        state.syncChannel?.close();
-        cancelAnimationFrame(ecgFrame);
-        switchView('viewHome');
-      }
-    };
+    if ($('btnLeaveHost')) $('btnLeaveHost').onclick = () => showArenaConfirm('Encerrar sala?','Os participantes serão desconectados e você voltará ao início.','Encerrar sala',()=>{state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')});
     if ($('btnCopyPin')) $('btnCopyPin').onclick = () => navigator.clipboard?.writeText(state.pin).then(() => showToast('PIN copiado'));
     if ($('btnCopyLink')) $('btnCopyLink').onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname + '?pin=' + state.pin).then(() => showToast('Link copiado'));
     if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
@@ -8283,7 +8318,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
 
     if ($('projection')) $('projection').addEventListener('dblclick', () => toggleEcgAnimation());
     loadStoredConfig();
-    window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)studentSend({type:'LEAVE',studentId:state.studentId})});
+    window.addEventListener('resize',()=>drawEcgFrame(true));window.addEventListener('beforeunload',()=>{if(state.studentId)persistStudentSession()});
     function getInitialTheme(){
       try{
         const saved = localStorage.getItem('arena-theme');
@@ -8304,7 +8339,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       });
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
-    const params=new URLSearchParams(location.search);if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('rhythms');switchView('viewHostSetup')}else switchView('viewHome');
+    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin'))showJoin(params.get('pin'));else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('rhythms');switchView('viewHostSetup')}else switchView('viewHome');
   </script>
 </body>
 </html>
