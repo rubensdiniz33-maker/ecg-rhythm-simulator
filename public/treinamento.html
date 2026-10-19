@@ -1599,6 +1599,16 @@
       min-width: 44px;
       text-align: right;
     }
+    .monitor-fc-badge.no-pulse .fc-value {
+      font-family: inherit;
+      font-size: 12px;
+      min-width: 0;
+      color: #fca5a5;
+      letter-spacing: .02em;
+    }
+    .monitor-fc-badge.no-pulse .fc-label {
+      color: #fca5a5;
+    }
     .theme-light .monitor-fc-badge .fc-value {
       color: #15803d;
     }
@@ -5330,9 +5340,14 @@
       #btnStartGame:active { transform:scale(.98) !important; }
     }
 
-    #btnStartGame{position:fixed!important;left:50%!important;bottom:max(14px,env(safe-area-inset-bottom))!important;transform:translateX(-50%);z-index:100;min-width:min(320px,calc(100vw - 28px));justify-content:center;padding:15px 28px!important;border-radius:16px!important;box-shadow:0 12px 42px rgba(0,0,0,.5),0 0 28px var(--primary-shadow)!important}
-    #btnStartGame:hover{transform:translateX(-50%) translateY(-2px)!important}
-    #btnStartGame:active{transform:translateX(-50%) scale(.98)!important}
+    /* Botão de início estável: efeitos visuais não deslocam a área clicável sob o ponteiro. */
+    #btnStartGame{position:fixed!important;left:50%!important;bottom:max(14px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;transform-origin:center;z-index:100;min-width:min(320px,calc(100vw - 28px));justify-content:center;padding:15px 28px!important;border-radius:16px!important;box-shadow:0 12px 42px rgba(0,0,0,.5),0 0 28px var(--primary-shadow)!important;transition:box-shadow .18s ease,background-color .18s ease,border-color .18s ease!important}
+    #btnStartGame:hover,#btnStartGame:focus-visible{transform:translateX(-50%)!important;box-shadow:0 14px 46px rgba(0,0,0,.55),0 0 34px var(--primary-shadow)!important}
+    #btnStartGame:active{transform:translateX(-50%)!important;filter:brightness(.96)}
+    @media (min-width:901px){
+      #btnStartGame{transform:none!important}
+      #btnStartGame:hover,#btnStartGame:focus-visible,#btnStartGame:active{transform:none!important}
+    }
     @media(max-width:900px){
       #viewHost:not(.hidden){padding-bottom:86px}
       .host-lobby-header{align-items:flex-start;padding:10px 12px;gap:10px}
@@ -6036,10 +6051,8 @@
           <!-- Cabeçalho da Gaveta -->
           <div class="reveal-drawer-header">
             <div class="reveal-drawer-title-box">
-              <span class="reveal-badge-tag">EXPLICAÇÃO</span>
               <h2 id="revealName" class="reveal-rhythm-name-drawer"></h2>
-              <span id="revealRate" class="reveal-rate-pill"></span>
-            </div>
+                    </div>
             <div class="reveal-drawer-actions">
               <div id="revealStatsBadge" class="reveal-stat-badge">
                 <span class="stat-lbl">ACERTO:</span>
@@ -6051,17 +6064,6 @@
 
           <!-- Cards Clínicos (Critérios Diagnósticos e Conduta) -->
           <div class="reveal-cards-container">
-            <!-- Card 1: Diagnóstico e Critérios (Explicação) -->
-            <div id="revealCardFeature" class="reveal-card reveal-card-feature">
-              <div class="reveal-card-header">
-                <span class="reveal-card-icon" aria-hidden="true">📋</span>
-                <h3 class="reveal-card-title">Critérios Diagnósticos no ECG</h3>
-              </div>
-              <div class="reveal-card-body">
-                <p id="revealFeature" class="reveal-body-text"></p>
-              </div>
-            </div>
-
             <!-- Card 2: Conduta Imediata & Manejo -->
             <div id="revealCardConduct" class="reveal-card reveal-card-conduct">
               <div class="reveal-card-header">
@@ -6512,8 +6514,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
-    let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
-    let heartbeatPreviousSample=0, lastHeartbeatAt=0;
+    let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null, lastHeartSoundAt=0;
+    let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
     const ARENA_SUPABASE_URL='https://xrsoexottjoyyavzkqoh.supabase.co';
@@ -6573,7 +6575,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
     function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2300)}
     function switchView(view){['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));$('projection').classList.add('hidden');$('revealPanel')?.classList.add('hidden');$('btnNextFixed')?.classList.add('hidden');const isStudentScreen=['studentLobby','studentGame','studentReveal'].includes(view);if(isStudentScreen){$('globalHeader')?.classList.add('hidden')}else{$('globalHeader')?.classList.remove('hidden')}const el=$(view);if(el){el.classList.remove('hidden');if(view==='viewHost')el.classList.add('flex')}}
-    function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx}
+    function getAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C()}if(audioCtx?.state==='suspended')audioCtx.resume().catch(()=>{});return audioCtx}
     function beep(freq=650,duration=.07,type='sine'){if(!soundOn)return;try{const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);g.gain.setValueAtTime(.055,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+duration);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+duration)}catch(e){}}
     function playHeartSound(){
       if(!soundOn)return;
@@ -6584,25 +6586,27 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           const oscillator=c.createOscillator(),gain=c.createGain();
           oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,start+delay);
           gain.gain.setValueAtTime(.0001,start+delay);
-          gain.gain.exponentialRampToValueAtTime(.035,start+delay+.008);
+          gain.gain.exponentialRampToValueAtTime(.085,start+delay+.008);
           gain.gain.exponentialRampToValueAtTime(.0001,start+delay+duration);
           oscillator.connect(gain);gain.connect(c.destination);
           oscillator.start(start+delay);oscillator.stop(start+delay+duration);
         });
       }catch(e){}
     }
-    function detectHeartbeats(samples){
-      if(!samples||!samples.length)return;
+    function playSynchronizedBeats(){
+      if(!ecgEngine)return;
       const rhythmId=state.currentRhythm?.id;
-      const canBeat=!['vf','asystole'].includes(rhythmId)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
-      const now=performance.now(),threshold=.48;
-      for(let i=0;i<samples.length;i++){
-        const value=Number(samples[i])||0;
-        const abs=Math.abs(value),previousAbs=Math.abs(heartbeatPreviousSample);
-        if(canBeat&&abs>=threshold&&previousAbs<threshold&&now-lastHeartbeatAt>=280){
-          lastHeartbeatAt=now;playHeartSound();
-        }
-        heartbeatPreviousSample=value;
+      const canPlay=soundOn&&state.ecgAnimated&&!['vf','asystole'].includes(rhythmId);
+      if(!canPlay){lastHeartSoundAt=0;return;}
+
+      // O som acompanha o ritmo da animação e a FC medida/configurada.
+      // O primeiro som começa ao ativar a animação; ao congelá-la, o ciclo é interrompido.
+      const bpm=Number(ecgEngine.measuredBpm())||Number(state.chosenRate)||Number(ecgEngine.params?.rate)||75;
+      const intervalMs=60000/Math.max(30,Math.min(220,bpm));
+      const now=performance.now();
+      if(!lastHeartSoundAt||now-lastHeartSoundAt>=intervalMs){
+        playHeartSound();
+        lastHeartSoundAt=now;
       }
     }
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
@@ -7497,21 +7501,44 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const badge=$('monitorFcBadge'),projBadge=$('projectionFcBadge');
       if(badge)badge.classList.toggle('hidden',!show);
       if(projBadge)projBadge.classList.add('hidden');
+      const label=badge?.querySelector('.fc-label');
+      const unit=badge?.querySelector('.fc-unit');
+      const value=$('monitorFcValue');
       if(!show){sendToAll({type:'STUDENT_FC',show:false});return;}
+
+      const rhythmId=state.currentRhythm?.id;
+      badge?.classList.toggle('no-pulse',rhythmId==='vf');
       let bpmText='--';
-      if(state.currentRhythm?.id==='asystole')bpmText='0';
-      else if(state.currentRhythm?.id==='vf')bpmText='---';
-      else if(ecgEngine){
-        const measured=ecgEngine.measuredBpm();
-        const base=(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0)
-          ? measured
-          : (state.currentRhythm?.rateKey==='atrialRate'?null:(state.chosenRate||state.currentRhythm?.defaultRate||null));
-        if(base){
-          const variation=(Math.random()<.5?-1:1)*(3+Math.floor(Math.random()*3));
-          bpmText=String(Math.max(1,Math.round(base+variation)));
+      if(rhythmId==='vf'){
+        if(label)label.textContent='RITMO';
+        if(unit)unit.textContent='';
+        bpmText='SEM PULSO';
+      }else if(rhythmId==='asystole'){
+        if(label)label.textContent='FC';
+        if(unit)unit.textContent='bpm';
+        bpmText='0';
+      }else if(ecgEngine){
+        if(label)label.textContent='FC';
+        if(unit)unit.textContent='bpm';
+        const now=performance.now();
+        const rhythm=state.currentRhythm;
+        const configured=Number(state.chosenRate||rhythm?.defaultRate||0);
+        if(!state.isRevealed&&!state.roundLocked&&!state.isPaused&&rhythm?.rateKey==='rate'&&configured>0&&Number.isFinite(ecgEngine.params?.rate)){
+          if(now-lastRateVariationAt>=4000){
+            const delta=(Math.random()<.5?-1:1)*(3+Math.floor(Math.random()*3));
+            const range=Array.isArray(rhythm.rateRange)?rhythm.rateRange:[configured-5,configured+5];
+            currentRateTarget=Math.max(range[0],Math.min(range[1],configured+delta));
+            ecgEngine.setParams({...ecgEngine.params,rate:currentRateTarget});
+            lastRateVariationAt=now;
+          }
         }
+        const measured=ecgEngine.measuredBpm();
+        const actual=(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0)
+          ? measured
+          : (currentRateTarget||configured||(rhythm?.rateKey==='atrialRate'?null:null));
+        if(actual)bpmText=String(Math.round(actual));
       }
-      if($('monitorFcValue'))$('monitorFcValue').textContent=bpmText;
+      if(value)value.textContent=bpmText;
       if($('projectionFcValue'))$('projectionFcValue').textContent=bpmText;
       sendToAll({type:'STUDENT_FC',show:true,value:bpmText});
     }
@@ -7544,9 +7571,17 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const now=Date.now();
       const results=[];
       if(!state.sessionStats){
-        state.sessionStats = { totalRounds: 0, totalAnswers: 0, totalCorrect: 0, fastestAnswer: null, highestStreak: null };
+        state.sessionStats = { totalRounds: 0, totalAnswers: 0, totalCorrect: 0, fastestAnswer: null, highestStreak: null, byRhythm: {} };
       }
+      if(!state.sessionStats.byRhythm || typeof state.sessionStats.byRhythm !== 'object') state.sessionStats.byRhythm = {};
       state.sessionStats.totalRounds++;
+      const rhythmKey = String(correct.id);
+      const rhythmReport = state.sessionStats.byRhythm[rhythmKey] || (state.sessionStats.byRhythm[rhythmKey] = {
+        id: rhythmKey,
+        name: correct.shortName || correct.name || 'Ritmo sem nome',
+        answers: 0,
+        correct: 0
+      });
       for(const [id,p] of state.participants){
         const answer=state.answersReceived.get(id);
         const isCorrect=!!answer&&answer.choiceId===correct.id;
@@ -7559,7 +7594,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
         if(answer){
           state.sessionStats.totalAnswers++;
+          rhythmReport.answers++;
           if(isCorrect){
+            rhythmReport.correct++;
             state.sessionStats.totalCorrect++;
             const elapsedSec = (elapsed / 1000).toFixed(1);
             if(!state.sessionStats.fastestAnswer || elapsed < state.sessionStats.fastestAnswer.elapsedMs){
@@ -7592,18 +7629,16 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       });
       updateLeaderboard();
       const resultById=new Map(results.map(r=>[r.p.id,r]));
-      const fcText = (correct.id === 'asystole' ? 'FC 0 bpm' : (state.chosenRate ? `FC ${state.chosenRate} bpm` : (correct.rateKey === 'freq' ? '' : `FC ${correct.defaultRate || ''} bpm`)));
-
-      // 1. Atualiza cabeçalho da projeção com nome do ritmo e FC (NUNCA cobre o traçado de ECG)
+      // 1. Revela apenas o diagnóstico; a FC permanece exclusivamente no monitor.
       const qHeader = document.querySelector('.projection-question');
       if (qHeader) {
         qHeader.classList.add('is-revealed');
-        qHeader.innerHTML = `<span class="reveal-lead-tag">GABARITO</span> <span class="reveal-lead-name">${escapeHTML(correct.name)}</span> <span class="reveal-lead-fc">${escapeHTML(fcText)}</span>`;
+        qHeader.innerHTML = `<span class="reveal-lead-tag">GABARITO</span> <span class="reveal-lead-name">${escapeHTML(correct.name)}</span>`;
       }
 
-      // Preenche dados do ritmo para caso o professor abra a explicação
+      // Preenche os dados clínicos sem duplicar a frequência cardíaca.
       if($('revealName')) $('revealName').textContent = correct.name;
-      if($('revealRate')) $('revealRate').textContent = '· ' + fcText;
+      if($('revealRate')) $('revealRate').textContent = '';
       if($('revealFeature')) $('revealFeature').textContent = CLINICAL[correct.id]?.points || 'Critérios em análise.';
       if($('revealConduct')) $('revealConduct').textContent = CLINICAL[correct.id]?.conduct || 'Manter monitorização e suporte avançado.';
 
@@ -8070,6 +8105,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             <span class="text-xl">📊</span>
             <h3 class="text-base sm:text-lg font-black uppercase tracking-wide" style="color:var(--text-title);">Resumo da Sessão</h3>
           </div>
+
+
           <span class="text-xs font-bold text-slate-400">${totalRounds} ${totalRounds === 1 ? 'rodada realizada' : 'rodadas realizadas'}</span>
         </div>
 
@@ -8118,6 +8155,32 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             <div class="text-[11px] text-slate-400 mt-1">Alunos na sala</div>
           </div>
         </div>
+
+        <section class="mt-6 pt-5 border-t border-slate-800" aria-labelledby="rhythmReviewTitle">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h4 id="rhythmReviewTitle" class="text-sm font-black uppercase tracking-wide" style="color:var(--text-title);">Pontos para revisar</h4>
+            <span class="text-[11px] text-slate-400">Acerto por ritmo, com base nas respostas recebidas</span>
+          </div>
+          ${(() => {
+            const byRhythm = Object.values(state.sessionStats?.byRhythm || {})
+              .filter(item => item && item.answers > 0)
+              .sort((a,b) => (a.correct / a.answers) - (b.correct / b.answers) || b.answers - a.answers);
+            if (!byRhythm.length) return '<p class="text-sm text-slate-400">Ainda não há respostas suficientes para identificar temas de revisão.</p>';
+            const weakest = byRhythm.slice(0,3);
+            return '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">' + weakest.map(item => {
+              const pct = Math.round((item.correct / item.answers) * 100);
+              const label = escapeHTML(item.name || 'Ritmo');
+              const tone = pct < 60 ? '#fb7185' : pct < 80 ? '#fbbf24' : '#86efac';
+              return '<article class="p-3 rounded-xl border border-slate-800" style="background:var(--btn);">' +
+                '<div class="flex items-start justify-between gap-3"><strong class="text-sm leading-snug" style="color:var(--text-title);">' + label + '</strong>' +
+                '<span class="text-sm font-black font-mono" style="color:' + tone + ';">' + pct + '%</span></div>' +
+                '<div class="h-2 rounded-full overflow-hidden mt-3" style="background:var(--btn-border);"><div class="h-full rounded-full" style="width:' + pct + '%;background:' + tone + ';"></div></div>' +
+                '<p class="text-[11px] text-slate-400 mt-2">' + item.correct + ' de ' + item.answers + ' respostas certas</p>' +
+                (pct < 80 ? '<p class="text-xs font-bold mt-2" style="color:var(--muted);">Sugestão: retomar os achados do traçado e o diagnóstico diferencial.</p>' : '<p class="text-xs mt-2" style="color:var(--muted);">Bom domínio neste tema. Continue praticando.</p>') +
+                '</article>';
+            }).join('') + '</div>';
+          })()}
+        </section>
       `;
     }
     // REAL ECG WAVEFORM RENDERER (Autêntico do simulador)
@@ -8140,6 +8203,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const s=ecgEngine.advance(0.04);
         if(s.length>0){chunks.push(s);totalSamples+=s.length;}
       }
+      // Consome os batimentos do sinal pré-carregado para não tocar uma sequência atrasada ao iniciar a animação.
+      ecgEngine.takeBeats();
       const initialSamples=new Float32Array(totalSamples);
       let offset=0;
       for(const chunk of chunks){
@@ -8167,9 +8232,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       frameLast=0;
       cancelAnimationFrame(ecgFrame);
 
-      heartbeatPreviousSample=0;
-      lastHeartbeatAt=0;
+      currentRateTarget=(rhythm.rateKey==='rate'&&Number.isFinite(Number(defs.rate)))?Number(defs.rate):null;
+      lastRateVariationAt=performance.now();
       state.ecgAnimated = (state.config.ecgMode === 'animated');
+      lastHeartSoundAt=0;
+      if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
 
       if(state.ecgAnimated){
@@ -8182,6 +8249,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function toggleEcgAnimation(){
       if(!state.currentRhythm)return;
       state.ecgAnimated = !state.ecgAnimated;
+      lastHeartSoundAt=0;
+      if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
       if(state.ecgAnimated){
         frameLast=0;
@@ -8213,8 +8282,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const dt=frameLast?Math.min(.08,(timestamp-frameLast)/1000):.016;
         frameLast=timestamp;
         const samples=ecgEngine.advance(dt);
+        playSynchronizedBeats();
         if(samples.length){
-          detectHeartbeats(samples);
           const maxSamples=20000;
           const combined=new Float32Array(Math.min(maxSamples,state.currentSamples.length+samples.length));
           const keep=Math.min(state.currentSamples.length,combined.length-samples.length);
@@ -9186,6 +9255,8 @@ function animatePoints(points) {
     }
     function toggleSound() {
       soundOn = !soundOn;
+      if(soundOn&&state.ecgAnimated)getAudio();
+      if(!soundOn)lastHeartSoundAt=0;
       if ($('btnToggleSound')) $('btnToggleSound').textContent = soundOn ? '🔊 Som' : '🔇 Mudo';
       if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').textContent = soundOn ? '🔊' : '🔇';
       showToast(soundOn ? 'Som ativado' : 'Som desativado');
