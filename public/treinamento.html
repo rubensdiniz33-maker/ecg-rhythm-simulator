@@ -5135,7 +5135,93 @@
       #viewHome .arena-action-card.is-launching { animation: none !important; }
     }
 
-  </style>
+      /* Arena ECG setup wizard: escala consistente e adaptação desktop/mobile */
+    #viewHostSetup .setup-progress { position:sticky; top:0; z-index:100; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(4px,1vw,12px); background:var(--panel-solid); border:1px solid var(--line-strong); box-shadow:0 12px 28px rgba(0,0,0,.28); isolation:isolate; }
+    #viewHostSetup .setup-progress-track { display:none!important; }
+    #viewHostSetup .setup-progress-track span { display:none!important; }
+    body:has(#viewHostSetup:not(.hidden)) #globalHeader { display:none!important; }
+    #viewHostSetup .setup-progress { margin-top:0!important; margin-bottom:18px!important; padding-top:9px!important; padding-bottom:9px!important; background:var(--panel-solid)!important; }
+    #viewHostSetup .setup-nav-pill { background:var(--panel-solid); }
+    #viewHostSetup #sectionSetupReview:not(.hidden) ~ #sectionSetupSummary { display:none!important; }
+    #viewHostSetup #sectionSetupReview:not(.hidden) .setup-review-card { min-width:0; }
+    #viewHostSetup #reviewSummaryContent .global-rhythm-result { display:flex; width:100%; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:11px; background:var(--panel-card); text-align:left; color:var(--text); }
+    #viewHostSetup #reviewSummaryContent .global-rhythm-result[disabled] { opacity:.55; cursor:default; }
+    #viewHostSetup #reviewSummaryContent .global-rhythm-result:not([disabled]):hover { border-color:var(--cyan); background:rgba(84,210,231,.08); }
+    @media (max-width:1023px) { #viewHostSetup .setup-progress { top:0; margin-left:-2px; margin-right:-2px; } }
+    body.theme-light #viewHostSetup .setup-progress { background:#fff!important; }
+    body.theme-light #viewHostSetup .setup-nav-pill { background:#fff; }
+    #viewHostSetup .setup-nav-pill { position:relative; z-index:1; display:flex; align-items:center; justify-content:center; gap:clamp(5px,.8vw,10px); min-width:0; padding:9px clamp(4px,1vw,14px); border:1px solid transparent; border-radius:12px; background:transparent; color:var(--muted); font-size:clamp(10px,.85vw,13px); font-weight:800; line-height:1.2; }
+    #viewHostSetup .setup-nav-pill.active { background:rgba(84,210,231,.10); border-color:var(--cyan); color:var(--text-title); box-shadow:0 0 0 1px rgba(84,210,231,.12) inset,0 0 18px rgba(84,210,231,.08); }
+    #viewHostSetup .setup-step-num { flex:none; display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:8px; background:var(--panel-subtle); color:var(--cyan); font-size:11px; }
+    #viewHostSetup .setup-nav-pill.active .setup-step-num { background:var(--cyan); color:#061219; }
+    #viewHostSetup .setup-step-icon { flex:none; display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:34px; padding:0 8px; border:1px solid rgba(84,210,231,.35); border-radius:11px; background:rgba(84,210,231,.10); color:var(--cyan); font:900 13px ui-monospace,monospace; }
+    #viewHostSetup .setup-step-icon-small { min-width:0; height:26px; font-size:9px; }
+    #viewHostSetup .preset-card { min-height:122px; border-color:var(--line-strong); background:var(--panel-card); box-shadow:var(--shadow-card); }
+    #viewHostSetup .preset-card { position:relative; }
+    #viewHostSetup .preset-card.active { border-color:var(--cyan)!important; background:linear-gradient(145deg,rgba(84,210,231,.12),var(--panel-card))!important; box-shadow:0 0 0 1px var(--cyan) inset,0 0 18px rgba(84,210,231,.12)!important; }
+    #viewHostSetup .preset-card.active::after { content:"✓"; position:absolute; right:10px; bottom:9px; width:19px; height:19px; display:grid; place-items:center; border-radius:6px; background:var(--cyan); color:#061219; font-size:12px; font-weight:900; }
+    #viewHostSetup .rhythm-card { padding:9px 11px; border-radius:11px; }
+    #viewHostSetup .rhythm-card.selected { border-color:var(--cyan); background:rgba(84,210,231,.08); box-shadow:0 0 0 1px var(--cyan) inset; }
+    #viewHostSetup .rhythm-card input { accent-color:var(--cyan); }
+    #viewHostSetup .category-group { border-color:var(--line); background:var(--panel-solid); }
+    #viewHostSetup .category-header { background:var(--panel-subtle); }
+    #viewHostSetup .setup-summary-panel { position:sticky; top:16px; max-height:calc(100vh - 32px); overflow:auto; }
+    #viewHostSetup #summaryRhythmsChips { max-height:130px; overflow:auto; }
+    #viewHostSetup .setup-review-card { border:1px solid var(--line); border-radius:13px; padding:14px; background:var(--panel-card); }
+    #viewHostSetup .setup-review-card h3 { font-size:12px; font-weight:900; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+    #viewHostSetup .setup-review-edit { color:var(--cyan); font-size:11px; font-weight:800; }
+    #viewHostSetup #globalRhythmSearchResults .global-rhythm-result { display:flex; width:100%; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:11px; background:var(--panel-card); text-align:left; color:var(--text); }
+    #viewHostSetup #globalRhythmSearchResults .global-rhythm-result[aria-pressed="true"] { border-color:var(--cyan); background:rgba(84,210,231,.08); }
+    #viewHostSetup .mobile-setup-bar { display:none; }
+    @media (max-width:1023px) {
+      #viewHostSetup { padding-bottom:130px!important; }
+      #viewHostSetup .setup-workspace { display:block; }
+      #viewHostSetup .setup-summary-panel { display:none!important; }
+      #viewHostSetup .setup-progress { gap:3px; padding:7px; }
+      #viewHostSetup .setup-progress-track { left:9%; right:9%; top:18px; }
+      #viewHostSetup .setup-nav-pill { flex-direction:column; gap:4px; padding:6px 2px; font-size:10px; }
+      #viewHostSetup .setup-step-num { width:22px; height:22px; }
+      #viewHostSetup .setup-step-icon { min-width:30px; height:30px; }
+      #viewHostSetup .mobile-setup-bar { display:block; background:rgba(5,9,14,.97); border-top:1px solid var(--line-strong); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+      #viewHostSetup .mobile-setup-bar.is-expanded { box-shadow:0 -12px 32px rgba(0,0,0,.32); }
+      #viewHostSetup #mobileSummaryDetails.hidden { display:none; }
+      #viewHostSetup .panel { border-radius:17px; }
+      #viewHostSetup .panel.p-5 { padding:clamp(13px,3.5vw,20px); }
+      #viewHostSetup h1 { font-size:clamp(23px,5.5vw,34px); line-height:1.12; }
+      #viewHostSetup h2 { line-height:1.25; }
+    }
+    @media (max-width:420px) { #viewHostSetup .setup-nav-pill { font-size:9px; } #viewHostSetup .setup-nav-pill .setup-step-num { width:20px; height:20px; font-size:10px; } #viewHostSetup .category-header { padding:10px; } #viewHostSetup .category-header p { display:none; } #viewHostSetup .category-header h3 { font-size:11px; } #viewHostSetup .rhythm-card { padding:9px; } }
+    body.theme-light #viewHostSetup .setup-nav-pill.active { color:#06212a!important; background:rgba(2,132,199,.10)!important; border-color:#0284c7!important; }
+    body.theme-light #viewHostSetup .setup-step-icon { color:#036b8b!important; background:#e0f2fe!important; border-color:#7dd3fc!important; }
+    body.theme-light #viewHostSetup .rhythm-card.selected { background:#e0f2fe!important; border-color:#0284c7!important; }
+    body.theme-light #viewHostSetup .preset-card.active { border-color:#0284c7!important; background:#f0f9ff!important; box-shadow:0 0 0 1px #0284c7 inset!important; }
+
+    #viewHostSetup .advanced-rules[open] summary { border-bottom:1px solid var(--line); }
+    #viewHostSetup .advanced-rules summary::-webkit-details-marker { display:none; }
+    #viewHostSetup .advanced-rules summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    #viewHostSetup .setup-stage-actions { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:18px; padding-top:16px; border-top:1px solid var(--line); }
+    #viewHostSetup .setup-stage-hint { color:var(--muted); font-size:11px; line-height:1.5; }
+    #viewHostSetup .setup-next-button { display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:42px; padding:10px 15px; border-radius:12px; font-size:12px; white-space:nowrap; }
+    #viewHostSetup .preset-card { text-align:left; transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease; }
+    #viewHostSetup .preset-card:hover { transform:translateY(-2px); border-color:rgba(84,210,231,.65); box-shadow:0 10px 24px rgba(0,0,0,.18); }
+    #viewHostSetup .category-group { transition:border-color .18s ease,box-shadow .18s ease; }
+    #viewHostSetup .category-group:focus-within { border-color:rgba(84,210,231,.55); }
+    #viewHostSetup .category-header { transition:background .18s ease; }
+    #viewHostSetup .category-header:hover { background:rgba(84,210,231,.06); }
+    #viewHostSetup .rhythm-card { display:flex; align-items:center; gap:10px; border:1px solid var(--line); background:var(--panel-card); cursor:pointer; transition:border-color .16s ease,background .16s ease,box-shadow .16s ease; }
+    #viewHostSetup .rhythm-card:hover { border-color:rgba(84,210,231,.5); }
+    #viewHostSetup .rhythm-card.selected { color:var(--text-title); }
+    #viewHostSetup .summary-rhythm-chip { display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:4px 7px 4px 9px; border:1px solid var(--line-strong); border-radius:8px; background:var(--panel-subtle); color:var(--text); font-size:10px; font-weight:800; transition:border-color .16s ease,background .16s ease; }
+    #viewHostSetup .summary-rhythm-chip:hover { border-color:var(--cyan); background:rgba(84,210,231,.08); }
+    #viewHostSetup .summary-rhythm-chip:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    #viewHostSetup .summary-rhythm-remove { color:var(--muted); font-size:14px; line-height:1; }
+    #viewHostSetup .summary-rhythm-chip:hover .summary-rhythm-remove { color:var(--cyan); }
+    #viewHostSetup .field:focus-visible, #viewHostSetup button:focus-visible, #viewHostSetup summary:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    body.theme-light #viewHostSetup .mobile-setup-bar { background:rgba(248,250,252,.97); border-color:#cbd5e1; }
+    body.theme-light #viewHostSetup .mobile-setup-bar .text-white { color:#0f172a!important; }
+    body.theme-light #viewHostSetup .summary-rhythm-chip { background:#f1f5f9; color:#0f172a; border-color:#cbd5e1; }
+    @media (max-width:640px) { #viewHostSetup .setup-stage-actions { align-items:stretch; flex-direction:column; } #viewHostSetup .setup-next-button { width:100%; min-height:44px; } #viewHostSetup .setup-stage-hint { text-align:center; } }
+</style>
 </head>
 <body>
 
@@ -5231,46 +5317,29 @@
       </div>
 
       <!-- Barra de Navegação Rápida entre as 4 Áreas (Guia Visual) -->
-      <nav id="setupTabs" class="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 p-2 rounded-2xl bg-slate-900/60 border border-slate-800" aria-label="Etapas de configuração">
-        <button type="button" class="setup-nav-pill active" data-setup-tab="rhythms" aria-selected="true"><span class="setup-step-num font-mono">1</span><span>Ritmos</span></button>
-        <button type="button" class="setup-nav-pill" data-setup-tab="rules" aria-selected="false"><span class="setup-step-num font-mono">2</span><span>Regras</span></button>
-        <button type="button" class="setup-nav-pill" data-setup-tab="summary" aria-selected="false"><span class="setup-step-num font-mono">3</span><span>Início</span></button>
+      <nav id="setupTabs" class="setup-progress mb-5 p-2 sm:p-3 rounded-2xl bg-slate-900/60 border border-slate-800" aria-label="Etapas de configuração">
+        <button type="button" class="setup-nav-pill active" data-setup-tab="model" aria-selected="true"><span class="setup-step-num font-mono">1</span><span>Modelo</span></button>
+        <button type="button" class="setup-nav-pill" data-setup-tab="rhythms" aria-selected="false"><span class="setup-step-num font-mono">2</span><span>Ritmos</span></button>
+        <button type="button" class="setup-nav-pill" data-setup-tab="rules" aria-selected="false"><span class="setup-step-num font-mono">3</span><span>Regras</span></button>
+        <button type="button" class="setup-nav-pill" data-setup-tab="summary" aria-selected="false"><span class="setup-step-num font-mono">4</span><span>Revisão</span></button>
       </nav>
 
       <!-- Layout Principal em 2 Colunas no Desktop -->
-      <div class="grid grid-cols-1 gap-6 items-start">
+      <div class="setup-workspace grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4 lg:gap-6 items-start">
 
         <!-- Coluna da Esquerda: Ritmos, Regras e Sequência -->
         <div class="space-y-6">
 
-          <!-- ========================================== -->
-          <!-- ÁREA 1: RITMOS (Modelos & Biblioteca)     -->
-          <!-- ========================================== -->
-          <section id="sectionSetupRhythms" data-setup-panel="rhythms" class="panel p-5 sm:p-6 space-y-6" aria-labelledby="rhythmsSectionHeading">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
-              <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-xl bg-lime-400/15 border border-lime-400/30 text-lime-300 flex items-center justify-center font-black text-sm font-mono">1</span>
-                <div>
-                  <h2 id="rhythmsSectionHeading" class="font-black text-lg text-white flex items-center gap-2">
-                    <span>🫀</span> Ritmos Clínicos & Modelos
-                  </h2>
-                  
-                </div>
-              </div>
-
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
-                <span class="text-slate-400">Selecionados:</span>
-                <span id="selectedCount" class="font-mono font-black text-lime-400 text-sm">0</span>
-                <span class="text-slate-500 font-mono text-[11px]">/ 18</span>
-              </div>
+          <section id="sectionSetupModel" data-setup-panel="model" class="panel p-5 sm:p-6 space-y-5" aria-labelledby="modelSectionHeading">
+            <div class="flex items-center gap-3 border-b border-slate-800/80 pb-4">
+              <span class="setup-step-icon">1</span><div><h2 id="modelSectionHeading" class="font-black text-lg text-white">Modelo da partida</h2><p class="text-xs text-slate-400 mt-1">Escolha um ponto de partida. Você poderá personalizar os ritmos e as regras nas próximas etapas.</p></div>
             </div>
-
             <!-- 1.1 MODELOS PEDAGÓGICOS (PRESETS) -->
             <div>
               <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div class="flex items-center gap-2">
                   <span id="presetsHeading" class="text-xs font-black uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
-                    <span>📋</span> Modelos Pedagógicos Recomendados
+                    <span>📋</span> Escolha um modelo para começar
                   </span>
                   <span class="text-[10px] text-slate-500 hidden sm:inline">· Clique para preencher automaticamente</span>
                 </div>
@@ -5323,6 +5392,30 @@
                 </button>
               </div>
             </div>
+                      <div class="setup-stage-actions"><span class="setup-stage-hint">Você poderá ajustar os ritmos depois.</span><button type="button" class="primary setup-next-button" data-go-step="rhythms">Continuar para ritmos <span aria-hidden="true">→</span></button></div>
+          </section>
+          <!-- ========================================== -->
+          <!-- ÁREA 2: RITMOS CLÍNICOS                  -->
+          <!-- ========================================== -->
+          <section id="sectionSetupRhythms" data-setup-panel="rhythms" class="hidden panel p-5 sm:p-6 space-y-6" aria-labelledby="rhythmsSectionHeading">
+            <div id="rhythmSetupError" class="hidden text-xs text-rose-300 bg-rose-950/60 border border-rose-800 rounded-xl p-3" role="alert">Selecione pelo menos um ritmo para continuar e criar a sala.</div>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+              <div class="flex items-center gap-3">
+                <span class="setup-step-icon">2</span>
+                <div>
+                  <h2 id="rhythmsSectionHeading" class="font-black text-lg text-white flex items-center gap-2">
+                    <span>🫀</span> Biblioteca de ritmos
+                  </h2>
+                  
+                </div>
+              </div>
+
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs">
+                <span class="text-slate-400">Selecionados:</span>
+                <span id="selectedCount" class="font-mono font-black text-cyan-300 text-sm">0</span>
+                <span class="text-slate-500 font-mono text-[11px]">/ <span id="selectedCountTotal">18</span></span>
+              </div>
+            </div>
 
             <!-- 1.2 BARRA DE BUSCA E CONTROLES GLOBAIS -->
             <div class="space-y-3 pt-2">
@@ -5347,10 +5440,12 @@
                 <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1 cursor-pointer" aria-label="Limpar busca">✕</button>
               </div>
               <p id="searchResultNotice" class="hidden text-[11px] text-cyan-300 font-semibold"></p>
+              <div id="globalRhythmSearchResults" class="hidden space-y-2" aria-live="polite"></div>
             </div>
 
             <!-- 1.3 CATEGORIAS EXPANSÍVEIS (Renderizadas dinamicamente em #rhythmLibrary) -->
             <div id="rhythmLibrary" class="space-y-3"></div>
+                      <div class="setup-stage-actions"><span class="setup-stage-hint"><strong id="stageRhythmCount">0</strong> ritmos selecionados. Você pode combinar categorias livremente.</span><button type="button" class="primary setup-next-button" data-go-step="rules">Configurar regras <span aria-hidden="true">→</span></button></div>
           </section>
 
           <!-- ========================================== -->
@@ -5358,7 +5453,7 @@
           <!-- ========================================== -->
           <section id="sectionSetupRules" data-setup-panel="rules" class="hidden panel p-5 sm:p-6 space-y-5" aria-labelledby="settingsHeading">
             <div class="flex items-center gap-3 border-b border-slate-800/80 pb-4">
-              <span class="w-8 h-8 rounded-xl bg-cyan-400/15 border border-cyan-400/30 text-cyan-300 flex items-center justify-center font-black text-sm font-mono">2</span>
+              <span class="setup-step-icon">3</span>
               <div>
                 <h2 id="settingsHeading" class="font-black text-lg text-white flex items-center gap-2">
                   <span>⚙️</span> Regras da Partida & Dinâmica
@@ -5429,7 +5524,10 @@
                   </select>
                 </label>
 
-                <label class="block">
+                <details class="advanced-rules mt-4 rounded-xl border border-slate-800/80 bg-slate-950/20 overflow-hidden">
+                  <summary class="cursor-pointer select-none px-3.5 py-3 text-xs font-black text-cyan-300 flex items-center justify-between gap-3">Opções avançadas <span class="text-[10px] text-slate-500 font-semibold">Traçado, FC, explicações e ranking</span></summary>
+                  <div class="p-3.5 pt-0 space-y-3.5">
+<label class="block">
                   <span class="text-xs font-bold text-slate-300">Traçado do ECG</span>
                   <select id="ecgModeSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="static" selected>Estático (padrão · faixa fixa de ~8s)</option>
@@ -5440,8 +5538,8 @@
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Mostrar FC durante pergunta</span>
                   <select id="showFcSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
-                    <option value="no" selected>Não</option>
-                    <option value="yes">Sim (selo no monitor)</option>
+                    <option value="no">Não</option>
+                    <option value="yes" selected>Sim (selo no monitor)</option>
                   </select>
                 </label>
 
@@ -5472,7 +5570,11 @@
                   </label>
                   <p class="text-[10px] text-slate-500 mt-1 pl-6.5">Exibe a posição individual no resultado de cada rodada no celular.</p>
               </div>
+                  </div>
+                </details>
             </div>
+            </div>
+                      <div class="setup-stage-actions"><span class="setup-stage-hint">As opções avançadas são opcionais.</span><button type="button" class="primary setup-next-button" data-go-step="summary">Revisar partida <span aria-hidden="true">→</span></button></div>
           </section>
 
           <!-- ========================================== -->
@@ -5511,19 +5613,26 @@
                 </p>
               </div>
             </div>
+                      <div class="setup-stage-actions"><span class="setup-stage-hint">Confira a ordem das questões antes de criar a sala.</span><button type="button" class="primary setup-next-button" data-go-step="summary">Revisar partida <span aria-hidden="true">→</span></button></div>
           </section>
 
         </div>
 
+<section id="sectionSetupReview" data-setup-panel="summary" class="hidden panel p-5 sm:p-6 space-y-5" aria-labelledby="reviewHeading">
+            <div class="flex items-center gap-3 border-b border-slate-800/80 pb-4"><span class="setup-step-icon">4</span><div><h2 id="reviewHeading" class="font-black text-lg text-white">Revise sua partida</h2><p class="text-xs text-slate-400 mt-1">Confira os detalhes e edite qualquer etapa sem recomeçar.</p></div></div>
+            <div id="reviewSummaryContent" class="space-y-3"></div>
+            <button type="button" id="btnCreateRoomFromReview" class="primary w-full py-3 text-sm font-black">Validar e criar sala <span aria-hidden="true">→</span></button>
+          </section>
+
         <!-- ========================================== -->
         <!-- ÁREA 4: RESUMO DA SESSÃO & CRIAR SALA     -->
         <!-- ========================================== -->
-        <aside id="sectionSetupSummary" data-setup-panel="summary" class="hidden panel p-5 sm:p-6 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
+        <aside id="sectionSetupSummary" class="setup-summary-panel panel p-4 sm:p-5 self-start space-y-4 shadow-2xl border-slate-800" aria-labelledby="summaryHeading">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <div class="flex items-center gap-2.5">
-              <span class="w-7 h-7 rounded-lg bg-lime-400/15 border border-lime-400/30 text-lime-300 flex items-center justify-center font-black text-xs font-mono">4</span>
+              <span class="setup-step-icon setup-step-icon-small">RESUMO</span>
               <h2 id="summaryHeading" class="font-black text-base text-white flex items-center gap-2">
-                Resumo da Sessão
+                Resumo da partida
               </h2>
             </div>
             <span id="summaryBadgeStatus" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 font-mono">Pronto</span>
@@ -5535,7 +5644,7 @@
             <div>
               <div class="flex justify-between items-center text-xs mb-1.5">
                 <span class="text-slate-400 font-medium">Ritmos no jogo</span>
-                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300 text-sm">0</b> / 18</span>
+                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300 text-sm">0</b> / <span id="sumRhythmsTotal">0</span></span>
               </div>
               <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                 <div id="sumRhythmsBar" class="bg-lime-400 h-full transition-all duration-300" style="width: 0%"></div>
@@ -5557,7 +5666,7 @@
             </div>
 
             <!-- Badges das Regras Ativas -->
-            <div class="hidden pt-2 border-t border-slate-800/80">
+            <div class="pt-2 border-t border-slate-800/80">
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Regras Ativas</span>
               <div class="flex flex-wrap gap-1.5" id="summaryRulesBadges">
                 <span id="sumBadgeMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sorteio aleatório</span>
@@ -5570,8 +5679,8 @@
             </div>
 
             <!-- Lista compacta de ritmos selecionados (sem scroll interno desnecessário) -->
-            <div class="hidden pt-2 border-t border-slate-800/80">
-              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+            <div class="pt-2 border-t border-slate-800/80">
+              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5>
                 <span>Ritmos Selecionados</span>
                 <span id="sumRhythmsPreviewCount" class="text-slate-500 font-mono">0 itens</span>
               </div>
@@ -5608,16 +5717,14 @@
       </div>
 
       <!-- Barra de Ação Rápida Flutuante no Mobile (Fácil acesso ao Criar Sala) -->
-      <div class="mobile-setup-bar fixed bottom-0 left-0 right-0 p-3 flex items-center justify-between gap-3 z-30 shadow-2xl">
-        <div class="flex flex-col">
-          <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos no jogo</span>
-          <span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-lime-400 text-sm">0</b> / 18 ritmos</span>
-        </div>
-        <button type="button" onclick="$('btnCreateRoom').click()" class="primary py-2.5 px-5 text-xs font-black tracking-wider rounded-xl shadow-lg flex items-center gap-2 cursor-pointer">
-          <span>CRIAR SALA</span>
-          <span>→</span>
-        </button>
-      </div>
+      <div id="mobileSetupBar" class="mobile-setup-bar fixed bottom-0 left-0 right-0 p-3 z-30 shadow-2xl">
+  <div class="flex items-center justify-between gap-3"><div class="flex flex-col min-w-0"><span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos selecionados</span><span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-cyan-300 text-sm">0</b> / <span id="mobileSumTotal">0</span> ritmos</span></div>
+    <div class="flex items-center gap-2"><button id="mobileSummaryToggle" type="button" class="muted-btn py-2.5 px-3 text-xs font-bold" aria-expanded="false" aria-controls="mobileSummaryDetails">Resumo⌄</button><button type="button" id="mobileCreateRoomButton" class="primary py-2.5 px-4 text-xs font-black tracking-wider rounded-xl shadow-lg flex items-center gap-2 cursor-pointer"><span>Criar sala</span><span aria-hidden="true">→</span></button></div>
+  </div>
+  <div id="mobileSummaryDetails" class="hidden mt-3 pt-3 border-t border-slate-700/70"><div class="grid grid-cols-3 gap-2 text-xs"><div><span class="block text-slate-400 text-[10px]">Rodadas</span><b id="mobileSumRounds">0</b></div><div><span class="block text-slate-400 text-[10px]">Duração</span><b id="mobileSumDuration">0 min</b></div><div><span class="block text-slate-400 text-[10px]">Tempo/rodada</span><b id="mobileSumRoundDuration">25s</b></div></div>
+    <div class="flex flex-wrap gap-2 mt-3"><button type="button" class="muted-btn text-xs" data-go-step="model">Editar modelo</button><button type="button" class="muted-btn text-xs" data-go-step="rhythms">Editar ritmos</button><button type="button" class="muted-btn text-xs" data-go-step="rules">Editar regras</button></div>
+  </div>
+</div>
     </section>
 
     <section id="viewHost" class="hidden flex-col gap-4">
@@ -6259,7 +6366,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
       isExplaining:false,config: { ecgMode: 'static',
-      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:false},
+      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
@@ -6468,8 +6575,14 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateSelectedCount(){
       const n = document.querySelectorAll('#rhythmLibrary input:checked').length;
       if ($('selectedCount')) $('selectedCount').textContent = String(n);
+      if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
+      if ($('sumRhythmsTotal')) $('sumRhythmsTotal').textContent = String(ECG_RHYTHMS.length);
       if ($('mobileSumCount')) $('mobileSumCount').textContent = String(n);
+      if ($('stageRhythmCount')) $('stageRhythmCount').textContent = String(n);
+      if ($('mobileSumTotal')) $('mobileSumTotal').textContent = String(ECG_RHYTHMS.length);
+      renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value || '');
       if (n && $('setupError')) $('setupError').classList.add('hidden');
+      if (n && $('rhythmSetupError')) $('rhythmSetupError').classList.add('hidden');
 
       // Update each category badge count
       document.querySelectorAll('.category-group').forEach(grp => {
@@ -6477,7 +6590,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const total = grp.querySelectorAll('input').length;
         const checked = grp.querySelectorAll('input:checked').length;
         const countSpan = grp.querySelector('.cat-selected-count');
-        if (countSpan) countSpan.textContent = String(checked);
+        if (countSpan) countSpan.textContent = `${checked}/${total}`;
         const badge = grp.querySelector('.category-badge');
         if (badge) {
           badge.classList.toggle('text-lime-300', checked > 0);
@@ -6509,11 +6622,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
               </div>
               <div class="flex items-center gap-2">
                 <span class="category-badge text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 transition-colors">
-                  <span class="cat-selected-count">0</span> / ${rhythms.length}
+                  <span class="cat-selected-count">0/${rhythms.length}</span>
                 </span>
                 <div class="flex items-center gap-1">
-                  <button type="button" class="btn-cat-all muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Todos</button>
-                  <button type="button" class="btn-cat-none muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Nenhum</button>
+                  <button type="button" class="btn-cat-all muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Selecionar todos</button>
+                  <button type="button" class="btn-cat-none muted-btn text-[10px] py-1 px-2 font-bold" data-cat="${cat}">Desmarcar todos</button>
                 </div>
               </div>
             </div>
@@ -6614,7 +6727,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateSessionSummary(){
       const checkedInputs = document.querySelectorAll('#rhythmLibrary input:checked');
       const count = checkedInputs.length;
-      const totalRhythms = 18;
+      const totalRhythms = ECG_RHYTHMS.length;
 
       // 1. Rhythms count & progress bar
       if ($('sumRhythms')) $('sumRhythms').textContent = String(count);
@@ -6647,6 +6760,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const duration = Number($('roundDurationSelect')?.value) || 25;
       if ($('sumRoundDuration')) $('sumRoundDuration').textContent = `${duration}s por rodada`;
 
+      if ($('mobileSumRounds')) $('mobileSumRounds').textContent = String(effectiveRounds);
+      if ($('mobileSumDuration')) $('mobileSumDuration').textContent = `${effectiveRounds > 0 ? Math.max(1, Math.round((effectiveRounds * (duration + 5)) / 60)) : 0} min`;
+      if ($('mobileSumRoundDuration')) $('mobileSumRoundDuration').textContent = `${duration}s`;
       const totalSeconds = effectiveRounds * (duration + 5);
       const estMinutes = effectiveRounds > 0 ? Math.max(1, Math.round(totalSeconds / 60)) : 0;
       if ($('sumEstimatedTime')) $('sumEstimatedTime').textContent = `${estMinutes} min`;
@@ -6684,11 +6800,31 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           if (countPreview) countPreview.textContent = `${count} itens`;
           chipsContainer.innerHTML = [...checkedInputs].map(i => {
             const r = rhythmById(i.value);
-            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700/80">${r?.shortName || i.value}</span>`;
+            const shortName = escapeHTML(r?.shortName || i.value);
+            const fullName = escapeHTML(r?.name || i.value);
+            return `<button type="button" class="summary-rhythm-chip" data-remove-rhythm="${escapeHTML(i.value)}" aria-label="Remover ${fullName}" title="Remover ${fullName}"><span>${shortName}</span><span class="summary-rhythm-remove" aria-hidden="true">×</span></button>`;
           }).join('');
         }
       }
 
+      // Revisão da etapa 4, sincronizada com a configuração atual.
+      const review=$('reviewSummaryContent');
+      if(review){
+        const activePreset=document.querySelector('.preset-card.active');
+        const presetName=activePreset?.querySelector('.font-black')?.textContent?.trim()||'Personalizada';
+        const names=[...checkedInputs].map(input=>rhythmById(input.value)?.name||input.value);
+        const chips=names.length?names.map(name=>`<span class="inline-flex text-[10px] sm:text-xs px-2 py-1 rounded-lg border border-slate-700 bg-slate-900/70">${escapeHTML(name)}</span>`).join(''):'<span class="text-xs text-rose-300">Nenhum ritmo selecionado.</span>';
+        const gameMode=$('gameMode')?.value||'random', diff=$('difficultySelect')?.value||'easy', ecgMode=$('ecgModeSelect')?.value||'static';
+        const reviewSearchQuery=review.querySelector('[data-review-rhythm-search]')?.value||'';
+        const reviewResults=reviewSearchQuery.trim()?ECG_RHYTHMS.filter(r=>[r.name,r.shortName,r.id,r.teaching?.keyFeature,CLINICAL_CATEGORIES[r.category]?.label].join(' ').toLowerCase().includes(reviewSearchQuery.trim().toLowerCase())).slice(0,8):[];
+        const reviewResultMarkup=reviewResults.length?reviewResults.map(r=>{const selected=!!document.querySelector(`#rhythmLibrary input[value="${r.id}"]:checked`);return `<button type="button" class="global-rhythm-result" data-add-review-rhythm="${escapeHTML(r.id)}" aria-pressed="${selected}" ${selected?'disabled':''}><span class="font-mono text-[10px] text-cyan-300">${escapeHTML(r.shortName||r.id)}</span><span class="min-w-0 flex-1 text-xs font-bold">${escapeHTML(r.name)}</span><span class="text-[10px] text-slate-400">${selected?'Adicionado':'Adicionar +'}</span></button>`}).join(''):'';
+        const showFc=$('showFcSelect')?.value||'yes';
+        review.innerHTML=`<div class="rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-4"><div class="flex items-center justify-between gap-3"><div><p class="text-[10px] font-black uppercase tracking-widest text-cyan-300">Resumo da partida</p><p class="mt-1 text-sm font-bold">${count} ritmos · ${effectiveRounds} rodadas · ${duration}s por rodada</p></div><div class="text-right"><p class="text-xl font-black text-cyan-300">${estMinutes} min</p><p class="text-[10px] text-slate-400">tempo estimado</p></div></div></div>
+          <div class="setup-review-card"><h3>Modelo da partida</h3><p class="font-bold text-sm mt-1">${escapeHTML(presetName)}</p><p class="text-[11px] text-slate-400 mt-1">O modelo é a base usada para preencher esta configuração. A seleção atual pode ser ajustada nesta revisão.</p></div>
+          <div class="setup-review-card"><div class="flex items-center justify-between gap-3"><h3>Ritmos · ${count} selecionados</h3><span class="text-[10px] text-slate-400">Toque em × para remover</span></div><div class="flex flex-wrap gap-1.5 mt-2">${chips}</div><label class="block mt-4"><span class="text-xs font-bold text-slate-300">Adicionar ritmo sem sair da revisão</span><input class="field mt-1.5 text-xs" type="search" data-review-rhythm-search placeholder="Buscar ritmo, sigla ou categoria..." value="${escapeHTML(reviewSearchQuery)}" autocomplete="off"></label><div class="mt-2 space-y-1.5" data-review-rhythm-results>${reviewResultMarkup}</div>${reviewSearchQuery.trim()&&!reviewResults.length?'<p class="mt-2 text-xs text-slate-400">Nenhum ritmo encontrado.</p>':''}</div>
+          <div class="setup-review-card"><h3>Regras principais</h3><p class="text-xs mt-2 text-slate-300">${gameMode==='sequence'?'Sequência personalizada':'Sorteio aleatório'} · ${diff==='hard'?'Dificuldade alta':'Dificuldade fácil'}</p><p class="text-xs mt-1 text-slate-400">${ecgMode==='animated'?'Traçado animado':'Traçado estático'} · ${duration}s por rodada · ${effectiveRounds} rodadas</p><label class="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-slate-700"><span class="text-xs font-bold text-slate-300">Mostrar frequência cardíaca durante a pergunta</span><select class="field max-w-[150px] text-xs" data-review-setting="showFc"><option value="yes" ${showFc==='yes'?'selected':''}>Sim</option><option value="no" ${showFc==='no'?'selected':''}>Não</option></select></label></div>
+          <div class="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 text-xs text-slate-300">As alterações feitas aqui atualizam a configuração da partida imediatamente. A sala só será criada após a validação.</div>`;
+      }
       // 5. Status badge
       if ($('summaryBadgeStatus')) {
         if (count === 0) {
@@ -6753,42 +6889,27 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       renderSequence();
     }
 
-    function filterRhythms(query){
-      const q = (query || '').trim().toLowerCase();
-      if ($('btnClearSearch')) $('btnClearSearch').classList.toggle('hidden', !q);
-      let matchedTotal = 0;
-
-      document.querySelectorAll('.category-group').forEach(grp => {
-        let groupMatches = 0;
-        grp.querySelectorAll('.rhythm-card').forEach(card => {
-          const name = card.dataset.name || '';
-          const shortName = card.dataset.short || '';
-          const feature = card.dataset.feature || '';
-          const matches = !q || name.includes(q) || shortName.includes(q) || feature.includes(q);
-          card.classList.toggle('hidden', !matches);
-          if (matches) groupMatches++;
-        });
-
-        if (q) {
-          grp.classList.toggle('hidden', groupMatches === 0);
-          if (groupMatches > 0) grp.classList.remove('collapsed');
-        } else {
-          grp.classList.remove('hidden');
-        }
-        matchedTotal += groupMatches;
-      });
-
-      const notice = $('searchResultNotice');
-      if (notice) {
-        if (q) {
-          notice.classList.remove('hidden');
-          notice.textContent = `${matchedTotal} ritmo(s) encontrado(s) para "${query}"`;
-        } else {
-          notice.classList.add('hidden');
-        }
-      }
+    function renderGlobalRhythmSearchResults(query){
+      const container=$('globalRhythmSearchResults'); if(!container)return;
+      const q=(query||'').trim().toLowerCase();
+      if(!q){container.classList.add('hidden');container.innerHTML='';return;}
+      const results=ECG_RHYTHMS.filter(r=>[r.name,r.shortName,r.teaching?.keyFeature,CLINICAL_CATEGORIES[r.category]?.label,r.id].join(' ').toLowerCase().includes(q));
+      container.classList.remove('hidden');
+      container.innerHTML=results.length?results.map(r=>{
+        const selected=!!document.querySelector(`#rhythmLibrary input[value="${r.id}"]:checked`);
+        const category=CLINICAL_CATEGORIES[r.category]?.label||'Outros';
+        return `<button type="button" class="global-rhythm-result" data-search-rhythm="${escapeHTML(r.id)}" aria-pressed="${selected}"><span class="flex-none w-5 h-5 rounded-md border flex items-center justify-center text-xs font-black ${selected?'border-cyan-300 bg-cyan-300/15 text-cyan-200':'border-slate-600 text-transparent'}">${selected?'✓':'·'}</span><span class="min-w-0 flex-1"><span class="block text-xs sm:text-sm font-bold">${escapeHTML(r.name)}</span><span class="block text-[10px] text-slate-400 mt-0.5">${escapeHTML(category)} · ${escapeHTML(r.shortName||'')}</span></span><span class="text-[10px] font-bold text-cyan-300">${selected?'Selecionado':'Selecionar'}</span></button>`;
+      }).join(''):'<p class="text-xs text-slate-400 p-3">Nenhum ritmo encontrado. Tente outra sigla ou termo clínico.</p>';
     }
-
+    function filterRhythms(query){
+      const q=(query||'').trim().toLowerCase();
+      if($('btnClearSearch'))$('btnClearSearch').classList.toggle('hidden',!q);
+      $('rhythmLibrary')?.classList.toggle('hidden',!!q);
+      renderGlobalRhythmSearchResults(q);
+      const total=q?ECG_RHYTHMS.filter(r=>[r.name,r.shortName,r.teaching?.keyFeature,CLINICAL_CATEGORIES[r.category]?.label,r.id].join(' ').toLowerCase().includes(q)).length:0;
+      const notice=$('searchResultNotice');
+      if(notice){notice.classList.toggle('hidden',!q);notice.textContent=q?`${total} ritmo(s) encontrado(s) para "${query}"`:'';}
+    }
     // === PREVIEW MODAL LOGIC ===
     let previewEngine = window.previewEngine = null;
     window.getPreviewEngine = () => previewEngine;
@@ -7408,7 +7529,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           if(c.revealExplanation)state.config.revealExplanation=c.revealExplanation;
           if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
           if(typeof c.studentShowsPosition==='boolean')state.config.studentShowsPosition=c.studentShowsPosition;
-          if(typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;
+          if(c.setupFcDefaultV2===true&&typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;else{state.config.showBpmDuringQuestion=true;state.config.setupFcDefaultV2=true;try{localStorage.setItem('arena_config',JSON.stringify({...c,showBpmDuringQuestion:true,setupFcDefaultV2:true}))}catch(e){}}
           if(typeof c.roundDuration==='number' && c.roundDuration>=5 && c.roundDuration<=180){
             setRoundDuration(c.roundDuration, false);
           }
@@ -8609,7 +8730,7 @@ function animatePoints(points) {
       renderRhythmLibrary();
       loadStoredConfig();
       updateSessionSummary();
-      showSetupTab('rhythms');
+      showSetupTab('model');
       switchView('viewHostSetup');
     };
     $('btnSetupBack').onclick = () => switchView('viewHome');
@@ -8677,20 +8798,64 @@ function animatePoints(points) {
       };
     }
 
-    // Abas da configuração: exibe uma etapa por vez.
-    function showSetupTab(tab){
-      if(!['rhythms','rules','summary'].includes(tab))tab='rhythms';
-      document.querySelectorAll('[data-setup-panel]').forEach(panel=>panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab));
-      document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{
-        const active=button.dataset.setupTab===tab;
-        button.classList.toggle('active',active);
-        button.setAttribute('aria-selected',String(active));
-      });
-      if(tab==='rules')toggleSequenceEditor();
-      if(tab==='summary')updateSessionSummary();
+    $('globalRhythmSearchResults')?.addEventListener('click',(event)=>{
+      const button=event.target.closest('[data-search-rhythm]'); if(!button)return;
+      const input=document.querySelector(`#rhythmLibrary input[value="${button.dataset.searchRhythm}"]`); if(!input)return;
+      input.checked=!input.checked; input.closest('.rhythm-card')?.classList.toggle('selected',input.checked);
+      document.querySelectorAll('.preset-card').forEach(p=>p.classList.remove('active'));
+      updateSelectedCount(); renderSequence(); renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value||'');
+    });
+    $('summaryRhythmsChips')?.addEventListener('click',(event)=>{
+      const button=event.target.closest('[data-remove-rhythm]'); if(!button)return;
+      const input=document.querySelector(`#rhythmLibrary input[value="${button.dataset.removeRhythm}"]`); if(!input)return;
+      input.checked=false; input.closest('.rhythm-card')?.classList.remove('selected');
+      document.querySelectorAll('.preset-card').forEach(card=>card.classList.remove('active'));
+      updateSelectedCount(); renderSequence();
+    });
+    // Navegação do assistente: quatro etapas clicáveis; resumo lateral persistente.
+    function showSetupTab(tab, scrollToPanel = false){
+      if(!['model','rhythms','rules','summary'].includes(tab))tab='model';
+      document.querySelectorAll('[data-setup-panel]').forEach(panel=>{if(panel.id!=='sectionSetupSummary')panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab);});
+      document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{const active=button.dataset.setupTab===tab;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});
+      const index=['model','rhythms','rules','summary'].indexOf(tab); if($('setupProgressFill'))$('setupProgressFill').style.width=`${Math.max(0,index)/3*100}%`;
+      if(tab==='rules')toggleSequenceEditor(); if(tab==='summary')updateSessionSummary();
+      if(scrollToPanel){const panel=document.querySelector(`[data-setup-panel="${tab}"]`);if(panel){const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;panel.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});}}
+      if(window.innerWidth<=1023&&tab==='summary'){ $('mobileSummaryDetails')?.classList.remove('hidden'); $('mobileSetupBar')?.classList.add('is-expanded'); $('mobileSummaryToggle')?.setAttribute('aria-expanded','true'); if($('mobileSummaryToggle'))$('mobileSummaryToggle').textContent='Fechar resumo⌃'; }
     }
-    document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab)));
-
+    document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab,true)));
+    document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep,true)));
+    $('reviewSummaryContent')?.addEventListener('click',(event)=>{
+      const remove=event.target.closest('[data-remove-rhythm]');
+      const add=event.target.closest('[data-add-review-rhythm]');
+      const rhythmId=remove?.dataset.removeRhythm||add?.dataset.addReviewRhythm;
+      if(rhythmId){
+        const input=[...document.querySelectorAll('#rhythmLibrary input')].find(item=>item.value===rhythmId);
+        if(!input)return;
+        input.checked=!!add;
+        input.closest('.rhythm-card')?.classList.toggle('selected',!!add);
+        document.querySelectorAll('.preset-card').forEach(card=>card.classList.remove('active'));
+        updateSelectedCount(); renderSequence(); updateSessionSummary();
+        return;
+      }
+    });
+    $('reviewSummaryContent')?.addEventListener('input',(event)=>{
+      if(event.target.matches('[data-review-rhythm-search]')){
+        const query=event.target.value;
+        const cursor=event.target.selectionStart;
+        updateSessionSummary();
+        const refreshed=$('reviewSummaryContent')?.querySelector('[data-review-rhythm-search]');
+        refreshed?.focus(); refreshed?.setSelectionRange(cursor,cursor);
+      }
+    });
+    $('reviewSummaryContent')?.addEventListener('change',(event)=>{
+      if(event.target.matches('[data-review-setting="showFc"]')){
+        $('showFcSelect').value=event.target.value;
+        saveStoredConfig(); updateSessionSummary();
+      }
+    });
+    $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
+    $('mobileCreateRoomButton')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
+    $('btnCreateRoomFromReview')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
     // Settings listeners
     $('gameMode').onchange = () => { toggleSequenceEditor(); updateSessionSummary(); };
     $('difficultySelect').onchange = () => { state.difficulty = $('difficultySelect').value; updateSessionSummary(); };
@@ -8753,10 +8918,13 @@ function animatePoints(points) {
     $('btnCreateRoom').onclick = () => {
       state.selectedRhythmIds = [...document.querySelectorAll('#rhythmLibrary input:checked')].map(x => x.value);
       if (!state.selectedRhythmIds.length) {
-        $('setupError').classList.remove('hidden');
-        $('setupError').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        $('setupError')?.classList.remove('hidden');
+        $('rhythmSetupError')?.classList.remove('hidden');
+        showSetupTab('rhythms');
+        $('rhythmSetupError')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+      $('rhythmSetupError')?.classList.add('hidden');
       state.gameMode = $('gameMode').value;
       state.difficulty = $('difficultySelect').value;
       state.roundDuration = state.roundDuration || Number($('roundDurationSelect')?.value) || 25;
@@ -8895,7 +9063,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       });
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
-    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('rhythms');switchView('viewHostSetup')}else switchView('viewHome');
+    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
   
     // Feedback de clique da Home: breve pulso antes de executar a ação existente.
     (() => {
