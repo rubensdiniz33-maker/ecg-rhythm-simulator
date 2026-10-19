@@ -6041,10 +6041,8 @@
           <!-- Cabeçalho da Gaveta -->
           <div class="reveal-drawer-header">
             <div class="reveal-drawer-title-box">
-              <span class="reveal-badge-tag">EXPLICAÇÃO</span>
               <h2 id="revealName" class="reveal-rhythm-name-drawer"></h2>
-              <span id="revealRate" class="reveal-rate-pill"></span>
-            </div>
+                    </div>
             <div class="reveal-drawer-actions">
               <div id="revealStatsBadge" class="reveal-stat-badge">
                 <span class="stat-lbl">ACERTO:</span>
@@ -6056,17 +6054,6 @@
 
           <!-- Cards Clínicos (Critérios Diagnósticos e Conduta) -->
           <div class="reveal-cards-container">
-            <!-- Card 1: Diagnóstico e Critérios (Explicação) -->
-            <div id="revealCardFeature" class="reveal-card reveal-card-feature">
-              <div class="reveal-card-header">
-                <span class="reveal-card-icon" aria-hidden="true">📋</span>
-                <h3 class="reveal-card-title">Critérios Diagnósticos no ECG</h3>
-              </div>
-              <div class="reveal-card-body">
-                <p id="revealFeature" class="reveal-body-text"></p>
-              </div>
-            </div>
-
             <!-- Card 2: Conduta Imediata & Manejo -->
             <div id="revealCardConduct" class="reveal-card reveal-card-conduct">
               <div class="reveal-card-header">
@@ -6518,7 +6505,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
-    let heartbeatPreviousSample=0, lastHeartbeatAt=0;
+    let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
     const ARENA_SUPABASE_URL='https://xrsoexottjoyyavzkqoh.supabase.co';
@@ -6596,19 +6583,13 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         });
       }catch(e){}
     }
-    function detectHeartbeats(samples){
-      if(!samples||!samples.length)return;
-      const rhythmId=state.currentRhythm?.id;
-      const canBeat=!['vf','asystole'].includes(rhythmId)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
-      const now=performance.now(),threshold=.48;
-      for(let i=0;i<samples.length;i++){
-        const value=Number(samples[i])||0;
-        const abs=Math.abs(value),previousAbs=Math.abs(heartbeatPreviousSample);
-        if(canBeat&&abs>=threshold&&previousAbs<threshold&&now-lastHeartbeatAt>=280){
-          lastHeartbeatAt=now;playHeartSound();
-        }
-        heartbeatPreviousSample=value;
-      }
+    function playSynchronizedBeats(){
+      if(!ecgEngine)return;
+      // O próprio motor informa os instantes dos complexos organizados, evitando
+      // inferir batimentos por limiar de amplitude e evitando pulso fictício em FV/assistolia.
+      const beats=ecgEngine.takeBeats();
+      const canPlay=soundOn&&!['vf','asystole'].includes(state.currentRhythm?.id)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
+      if(canPlay&&beats.length)beats.forEach(()=>playHeartSound());
     }
     function fanfare(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.13,'triangle'),i*100))}
     function playJoinChime() {
@@ -7502,21 +7483,43 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const badge=$('monitorFcBadge'),projBadge=$('projectionFcBadge');
       if(badge)badge.classList.toggle('hidden',!show);
       if(projBadge)projBadge.classList.add('hidden');
+      const label=badge?.querySelector('.fc-label');
+      const unit=badge?.querySelector('.fc-unit');
+      const value=$('monitorFcValue');
       if(!show){sendToAll({type:'STUDENT_FC',show:false});return;}
+
+      const rhythmId=state.currentRhythm?.id;
       let bpmText='--';
-      if(state.currentRhythm?.id==='asystole')bpmText='0';
-      else if(state.currentRhythm?.id==='vf')bpmText='---';
-      else if(ecgEngine){
-        const measured=ecgEngine.measuredBpm();
-        const base=(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0)
-          ? measured
-          : (state.currentRhythm?.rateKey==='atrialRate'?null:(state.chosenRate||state.currentRhythm?.defaultRate||null));
-        if(base){
-          const variation=(Math.random()<.5?-1:1)*(3+Math.floor(Math.random()*3));
-          bpmText=String(Math.max(1,Math.round(base+variation)));
+      if(rhythmId==='vf'){
+        if(label)label.textContent='RITMO';
+        if(unit)unit.textContent='';
+        bpmText='SEM PULSO';
+      }else if(rhythmId==='asystole'){
+        if(label)label.textContent='FC';
+        if(unit)unit.textContent='bpm';
+        bpmText='0';
+      }else if(ecgEngine){
+        if(label)label.textContent='FC';
+        if(unit)unit.textContent='bpm';
+        const now=performance.now();
+        const rhythm=state.currentRhythm;
+        const configured=Number(state.chosenRate||rhythm?.defaultRate||0);
+        if(rhythm?.rateKey==='rate'&&configured>0&&Number.isFinite(ecgEngine.params?.rate)){
+          if(now-lastRateVariationAt>=4000){
+            const delta=(Math.random()<.5?-1:1)*(3+Math.floor(Math.random()*3));
+            const range=Array.isArray(rhythm.rateRange)?rhythm.rateRange:[configured-5,configured+5];
+            currentRateTarget=Math.max(range[0],Math.min(range[1],configured+delta));
+            ecgEngine.setParams({...ecgEngine.params,rate:currentRateTarget});
+            lastRateVariationAt=now;
+          }
         }
+        const measured=ecgEngine.measuredBpm();
+        const actual=(measured!==null&&measured!==undefined&&!isNaN(measured)&&measured>0)
+          ? measured
+          : (currentRateTarget||configured||(rhythm?.rateKey==='atrialRate'?null:null));
+        if(actual)bpmText=String(Math.round(actual));
       }
-      if($('monitorFcValue'))$('monitorFcValue').textContent=bpmText;
+      if(value)value.textContent=bpmText;
       if($('projectionFcValue'))$('projectionFcValue').textContent=bpmText;
       sendToAll({type:'STUDENT_FC',show:true,value:bpmText});
     }
@@ -7607,18 +7610,16 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       });
       updateLeaderboard();
       const resultById=new Map(results.map(r=>[r.p.id,r]));
-      const fcText = (correct.id === 'asystole' ? 'FC 0 bpm' : (state.chosenRate ? `FC ${state.chosenRate} bpm` : (correct.rateKey === 'freq' ? '' : `FC ${correct.defaultRate || ''} bpm`)));
-
-      // 1. Atualiza cabeçalho da projeção com nome do ritmo e FC (NUNCA cobre o traçado de ECG)
+      // 1. Revela apenas o diagnóstico; a FC permanece exclusivamente no monitor.
       const qHeader = document.querySelector('.projection-question');
       if (qHeader) {
         qHeader.classList.add('is-revealed');
-        qHeader.innerHTML = `<span class="reveal-lead-tag">GABARITO</span> <span class="reveal-lead-name">${escapeHTML(correct.name)}</span> <span class="reveal-lead-fc">${escapeHTML(fcText)}</span>`;
+        qHeader.innerHTML = `<span class="reveal-lead-tag">GABARITO</span> <span class="reveal-lead-name">${escapeHTML(correct.name)}</span>`;
       }
 
-      // Preenche dados do ritmo para caso o professor abra a explicação
+      // Preenche os dados clínicos sem duplicar a frequência cardíaca.
       if($('revealName')) $('revealName').textContent = correct.name;
-      if($('revealRate')) $('revealRate').textContent = '· ' + fcText;
+      if($('revealRate')) $('revealRate').textContent = '';
       if($('revealFeature')) $('revealFeature').textContent = CLINICAL[correct.id]?.points || 'Critérios em análise.';
       if($('revealConduct')) $('revealConduct').textContent = CLINICAL[correct.id]?.conduct || 'Manter monitorização e suporte avançado.';
 
@@ -8210,8 +8211,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       frameLast=0;
       cancelAnimationFrame(ecgFrame);
 
-      heartbeatPreviousSample=0;
-      lastHeartbeatAt=0;
+      currentRateTarget=(rhythm.rateKey==='rate'&&Number.isFinite(Number(defs.rate)))?Number(defs.rate):null;
+      lastRateVariationAt=performance.now();
       state.ecgAnimated = (state.config.ecgMode === 'animated');
       updateAnimationButtonUI();
 
@@ -8256,8 +8257,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const dt=frameLast?Math.min(.08,(timestamp-frameLast)/1000):.016;
         frameLast=timestamp;
         const samples=ecgEngine.advance(dt);
+        playSynchronizedBeats();
         if(samples.length){
-          detectHeartbeats(samples);
           const maxSamples=20000;
           const combined=new Float32Array(Math.min(maxSamples,state.currentSamples.length+samples.length));
           const keep=Math.min(state.currentSamples.length,combined.length-samples.length);
