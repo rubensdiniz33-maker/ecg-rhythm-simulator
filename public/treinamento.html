@@ -7899,10 +7899,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const total=Math.max(1,Number(state.roundLimit)||Number(state.roundQueue?.length)||1);
       const completed=Math.max(0,Number(state.roundNumber)||0);
       const isLast=completed>=total;
-      if(freq==='never')return false;
-      if(freq==='end_only')return isLast;
-      if(freq==='every_question')return completed>0;
+      // O ranking final é obrigatório e independente da configuração do ranking parcial.
       if(isLast)return true;
+      if(freq==='never')return false;
+      if(freq==='end_only')return false;
+      if(freq==='every_question')return completed>0;
       if(freq==='every_5')return completed>0&&completed%5===0;
       const match=freq.match(/^every_(20|40|60|80)_percent$/);
       if(match){
