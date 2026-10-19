@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=4" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
     :root {
@@ -2742,6 +2743,29 @@
       height: 110px;
     }
 
+    .podium-winner-reveal .podium-card {
+      animation: podiumWinnerGlow 1.45s ease-in-out 2;
+    }
+    @keyframes podiumWinnerGlow {
+      0%, 100% { box-shadow: 0 0 35px rgba(245, 158, 11, .35); }
+      50% { box-shadow: 0 0 58px rgba(245, 158, 11, .78), 0 0 0 4px rgba(251, 191, 36, .18); }
+    }
+    .podium-countdown-label {
+      animation: podiumCountdownGlow 1.1s ease-in-out infinite;
+    }
+    @keyframes podiumCountdownGlow {
+      0%, 100% { opacity: .72; letter-spacing: .16em; }
+      50% { opacity: 1; letter-spacing: .2em; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .countdown-pulse, .podium-countdown-label, .podium-winner-reveal .podium-card {
+        animation: none !important;
+      }
+      .podium-card, .podium-pillar, .podium-column {
+        transition-duration: .01ms !important;
+      }
+    }
+
     /* Light Theme adjustments */
     body.theme-light .lobby-student-card {
       background: #ffffff;
@@ -4738,6 +4762,21 @@
     .is-correct.answer-yellow .answer-vote-bar-fill { background: #fde047; }
     .is-correct.answer-red .answer-vote-bar-fill { background: #fca5a5; }
     .is-correct.answer-blue .answer-vote-bar-fill { background: #93c5fd; }
+    .answer-tile.reveal-enter { animation: answerRevealIn .48s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--reveal-delay,0ms); }
+    .answer-tile.reveal-immersive { box-shadow: 0 0 0 1px rgba(84,231,168,.12); }
+    .answer-tile.reveal-simple { animation-duration: .22s; }
+    .answer-tile.reveal-immersive.is-correct { animation: answerCorrectPulse .85s ease-out both; animation-delay: var(--reveal-delay,0ms); }
+    .leaderboard-player { animation: leaderboardSlideIn .32s ease-out both; animation-delay: var(--rank-delay,0ms); }
+    .rank-movement { flex:none; border-radius:5px; padding:2px 4px; font-size:9px; font-weight:900; animation: rankMovementPop .42s cubic-bezier(.2,.8,.2,1) both; }
+    .rank-up { color:#6ee7b7; background:rgba(16,185,129,.15); }
+    .rank-down { color:#fca5a5; background:rgba(239,68,68,.13); }
+    .rank-streak { flex:none; color:#fde68a; font-size:10px; font-weight:900; white-space:nowrap; }
+    @keyframes answerRevealIn { from { opacity:.25; transform:translateY(12px) scale(.97); filter:brightness(.7); } to { opacity:1; transform:translateY(0) scale(1); filter:brightness(1); } }
+    @keyframes answerCorrectPulse { 0%,100% { filter:brightness(1); } 35% { filter:brightness(1.45); } 60% { filter:brightness(1.12); } }
+    @keyframes leaderboardSlideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes rankMovementPop { 0% { opacity:0; transform:scale(.65); } 75% { opacity:1; transform:scale(1.12); } 100% { transform:scale(1); } }
+    .projection-options .answer-tile .answer-label { font-size:clamp(18px,1.55vw,27px); line-height:1.18; font-weight:900; }
+    .answer-vote-percent { color:rgba(255,255,255,.78); font-size:clamp(10px,.8vw,13px); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; }
     .answer-vote-count {
       min-width: 1.6em;
       text-align: right;
@@ -4767,6 +4806,7 @@
         gap: 8px;
       }
       .projection-options .answer-tile { padding: 8px 12px; font-size: clamp(28px, 2.2vw, 36px); }
+      .projection-options .answer-tile .answer-label { font-size:clamp(16px,1.35vw,22px); line-height:1.15; }
       .projection-options .answer-tile .shape { font-size: clamp(36px, 3vw, 48px); }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -4775,6 +4815,45 @@
     }
 
   
+    /* Ranking parcial em linguagem visual de placar esportivo, não de conversa */
+    .live-competition-panel{position:fixed;right:clamp(16px,2.4vw,38px);bottom:clamp(76px,8vh,104px);z-index:1400;width:min(430px,calc(100vw - 28px));padding:0;overflow:hidden;border:1px solid rgba(125,211,252,.38);border-radius:20px;background:linear-gradient(155deg,rgba(7,17,31,.985),rgba(3,9,18,.985) 72%);color:#f8fafc;box-shadow:0 24px 72px rgba(0,0,0,.58),0 0 0 1px rgba(255,255,255,.035) inset,0 0 38px rgba(14,165,233,.12);backdrop-filter:blur(18px);animation:liveCompetitionEnter .42s cubic-bezier(.2,.8,.2,1) both}
+    .live-competition-panel:before{content:"";display:block;height:3px;background:linear-gradient(90deg,#22d3ee 0%,#60a5fa 42%,#c4f56a 100%)}
+    .live-competition-panel.hidden{display:none}
+    .live-competition-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px 0}
+    .live-competition-actions{display:flex;align-items:center;gap:6px;flex:none}
+    .live-competition-icon-btn{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(148,163,184,.22);border-radius:9px;background:rgba(255,255,255,.045);color:#dbeafe;font-size:15px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
+    .live-competition-icon-btn:hover{background:rgba(56,189,248,.15);border-color:rgba(125,211,252,.65);color:#fff}
+    .live-competition-panel.is-collapsed .live-competition-heading,.live-competition-panel.is-collapsed .live-competition-message,.live-competition-panel.is-collapsed .live-competition-list,.live-competition-panel.is-collapsed .live-competition-subhead{display:none}
+    .live-competition-panel.is-collapsed{width:min(330px,calc(100vw - 24px));padding-bottom:9px}
+    .live-competition-kicker{font-size:9px;letter-spacing:.2em;font-weight:1000;color:#67e8f9}
+    .live-competition-round{font-size:9px;letter-spacing:.12em;font-weight:900;color:#94a3b8}
+    .live-competition-heading{margin:8px 15px 0;font-size:25px;line-height:1;font-weight:1000;letter-spacing:-.055em;text-transform:uppercase}
+    .live-competition-subhead{display:flex;align-items:center;gap:7px;margin:7px 15px 12px;color:#94a3b8;font-size:9px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+    .live-competition-subhead:before{content:"";width:17px;height:2px;background:#c4f56a;border-radius:2px}
+    .live-competition-message{margin:0 15px 11px;padding:8px 10px;border-left:2px solid #38bdf8;background:linear-gradient(90deg,rgba(56,189,248,.1),rgba(56,189,248,0));font-size:11px;line-height:1.35;font-weight:850;color:#bae6fd}
+    .live-competition-message.has-movement{border-left-color:#facc15;color:#fef08a;background:linear-gradient(90deg,rgba(250,204,21,.12),rgba(250,204,21,0));animation:liveCompetitionPulse .8s ease-out}
+    .live-competition-list{display:flex;flex-direction:column;gap:5px;list-style:none;padding:0 12px 14px;margin:0}
+    .live-rank-row{position:relative;display:flex;align-items:center;gap:9px;min-width:0;padding:9px 10px;border:1px solid rgba(148,163,184,.1);border-radius:11px;background:linear-gradient(100deg,rgba(30,41,59,.76),rgba(15,23,42,.52));animation:liveCompetitionRow .3s ease-out both;animation-delay:var(--rank-delay)}
+    .live-rank-row:first-child{border-color:rgba(250,204,21,.34);background:linear-gradient(100deg,rgba(161,98,7,.2),rgba(30,41,59,.78) 58%,rgba(15,23,42,.68))}
+    .live-rank-row:nth-child(2) .live-rank-number{color:#e2e8f0;border-color:rgba(226,232,240,.25)}
+    .live-rank-row:nth-child(3) .live-rank-number{color:#fdba74;border-color:rgba(251,146,60,.28)}
+    .live-rank-number{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid rgba(125,211,252,.2);border-radius:9px;background:rgba(56,189,248,.09);color:#bae6fd;font-size:13px;font-weight:1000;font-variant-numeric:tabular-nums}
+    .live-rank-row:first-child .live-rank-number{border:0;background:linear-gradient(145deg,#fde68a,#f59e0b);color:#422006;box-shadow:0 3px 12px rgba(245,158,11,.2)}
+    .live-rank-avatar{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:rgba(148,163,184,.1);font-size:16px;flex:0 0 auto}
+    .live-rank-player{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+    .live-rank-player strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:950;letter-spacing:.005em}
+    .live-rank-player small{font-size:9px;color:#94a3b8;font-weight:800;letter-spacing:.025em;text-transform:uppercase}
+    .live-rank-score{font-size:13px;font-weight:1000;font-variant-numeric:tabular-nums;color:#d9f99d;white-space:nowrap}
+    .live-rank-score:after{content:" PTS";font-size:8px;letter-spacing:.08em;color:#94a3b8;margin-left:2px}
+    .live-rank-movement{font-size:9px;font-weight:1000;white-space:nowrap;padding:3px 5px;border-radius:5px;background:rgba(16,185,129,.1)}
+    .live-rank-movement.up{color:#86efac}.live-rank-movement.down{color:#fca5a5;background:rgba(239,68,68,.1)}
+    .live-rank-streak{font-size:8px;font-weight:950;color:#fcd34d;white-space:nowrap;letter-spacing:.02em}
+    .live-rank-empty{padding:12px;color:#cbd5e1;font-size:12px}
+    @keyframes liveCompetitionEnter{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes liveCompetitionRow{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes liveCompetitionPulse{0%{transform:scale(.99)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
+    @media(max-width:640px){.live-competition-panel{right:10px;bottom:90px;width:min(360px,calc(100vw - 20px))}.live-competition-heading{font-size:21px}.live-rank-row{gap:6px;padding:7px}.live-rank-player strong{font-size:11px}.live-rank-score{font-size:11px}}
+
     /* Confirmação interna do Arena ECG */
     .arena-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(2,6,23,.76);backdrop-filter:blur(8px)}
     .arena-confirm-backdrop.hidden{display:none}
@@ -5716,12 +5795,32 @@
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Frequência do ranking</span>
                   <select id="rankingFrequencySelect" class="field text-xs mt-1.5 w-full cursor-pointer">
-                    <option value="every_question" selected>A cada pergunta</option>
-                    <option value="every_5">A cada 5 perguntas</option>
+                    <option value="every_20_percent">A cada 20% das questões</option>
+                    <option value="every_40_percent" selected>A cada 40% das questões</option>
+                    <option value="every_60_percent">A cada 60% das questões</option>
+                    <option value="every_80_percent">A cada 80% das questões</option>
+                    <option value="every_question">Após toda questão</option>
+                    <option value="every_5">A cada 5 questões</option>
                     <option value="end_only">Só no final da partida</option>
                     <option value="never">Nunca (sem ranking)</option>
                   </select>
                 </label>
+
+                <label class="block mt-3">
+                  <span class="text-xs font-bold text-slate-300">Animação do gabarito</span>
+                  <select id="revealAnimationSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
+                    <option value="immersive" selected>Envolvente, com entrada e contagem animada</option>
+                    <option value="simple">Simples, com transição curta</option>
+                    <option value="off">Sem animações</option>
+                  </select>
+                </label>
+                <div class="mt-3 space-y-2">
+                  <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300 select-none"><input type="checkbox" id="showVoteCountsCheck" class="w-4 h-4 rounded accent-lime-400 cursor-pointer" checked><span>Destacar número e percentual de votos por alternativa</span></label>
+                  <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300 select-none"><input type="checkbox" id="showRankChangesCheck" class="w-4 h-4 rounded accent-lime-400 cursor-pointer" checked><span>Mostrar mudanças de posição no ranking</span></label>
+                  <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300 select-none"><input type="checkbox" id="showStreakHighlightsCheck" class="w-4 h-4 rounded accent-lime-400 cursor-pointer" checked><span>Destacar sequências de acertos</span></label>
+                </div>
+
+                <p class="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/50 px-3 py-2 text-[11px] leading-relaxed text-slate-400">Pontuação da partida: resposta correta vale 500 pontos, com até 500 pontos extras conforme a rapidez da resposta. Resposta incorreta ou não respondida vale 0 ponto. Em caso de empate, a classificação usa a pontuação acumulada.</p>
 
                 <div class="pt-2">
                   <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300 select-none">
@@ -5863,11 +5962,7 @@
               <span class="text-xl">→</span>
             </button>
 
-            <button id="btnResumePreviousRoom" type="button" class="hidden muted-btn w-full py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
-              <span>↻</span><span>RETOMAR SALA ANTERIOR</span>
-            </button>
-
-            <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+                        <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
               <span>👁</span>
               <span>Visualizar partida</span>
             </button>
@@ -6076,26 +6171,21 @@
             </div>
           </div>
 
-          <!-- Ranking ao vivo da rodada -->
-          <div id="revealRankingSection" class="reveal-ranking-row hidden">
-            <div class="reveal-ranking-header">
-              <span class="section-label">Top Classificação ao Vivo</span>
-            </div>
-            <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
-          </div>
+          <!-- O ranking competitivo agora aparece como painel flutuante na apresentação principal. -->
 
 
         </div>
       </aside>
     </div>
 
-          <!-- Ranking ao vivo da rodada (quando habilitado nas regras) -->
-          <div id="revealRankingSection" class="reveal-ranking-row hidden">
-            <div class="reveal-ranking-header">
-              <span class="section-label">Top Classificação ao Vivo</span>
-            </div>
-            <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
-          </div>
+          <!-- Ranking competitivo na tela principal do professor -->
+          <aside id="liveCompetitionPanel" class="live-competition-panel hidden" aria-live="polite" aria-label="Ranking parcial da turma">
+            <div class="live-competition-topline"><span class="live-competition-kicker">ARENA ECG · AO VIVO</span><div class="live-competition-actions"><span id="liveCompetitionRound" class="live-competition-round"></span><button id="liveCompetitionMuteBtn" class="live-competition-icon-btn" type="button" title="Silenciar sons do ranking parcial" aria-label="Silenciar sons do ranking parcial" aria-pressed="false">🔊</button><button id="liveCompetitionCollapseBtn" class="live-competition-icon-btn" type="button" title="Recolher ranking parcial" aria-label="Recolher ranking parcial" aria-expanded="true">⌃</button></div></div>
+            <div class="live-competition-heading">Classificação</div>
+            <div class="live-competition-subhead">Top 5 · Pontuação acumulada</div>
+            <div id="liveCompetitionMessage" class="live-competition-message"></div>
+            <ol id="liveCompetitionList" class="live-competition-list"></ol>
+          </aside>
         </div>
       </div>
     </div>
@@ -6112,10 +6202,6 @@
       <button id="btnReveal" type="button" class="teacher-ctrl-btn teacher-btn-reveal" title="Revelar resposta e gabarito imediato">
         👁 Revelar
       </button>
-      <button id="btnToggleExplain" type="button" class="teacher-ctrl-btn teacher-btn-explain" title="Abrir / Fechar painel de explicação clínica (Atalho: E)">
-        📋 Explicar
-      </button>
-
       <div class="teacher-bar-divider" aria-hidden="true"></div>
       <button id="btnAddTime" type="button" class="teacher-ctrl-btn icon-btn" title="Adicionar +10 segundos ao cronômetro">
         +10s
@@ -6385,9 +6471,9 @@
 
         <!-- Contagem Regressiva do Pódio -->
         <div id="podiumCountdownArea" class="hidden panel p-8 max-w-md mx-auto my-6 border-2 border-lime-400/30 shadow-2xl">
-          <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">PREPARANDO OS CAMPEÕES</p>
-          <div id="podiumCountdownNumber" class="text-7xl sm:text-8xl font-black font-mono text-lime-400 my-4 countdown-pulse">3</div>
-          <p class="text-sm text-slate-300 font-semibold">Calculando pontuações e velocidade...</p>
+          <p class="podium-countdown-label text-xs font-black uppercase tracking-widest text-slate-400 mb-2">PREPARANDO OS CAMPEÕES</p>
+          <div id="podiumCountdownNumber" class="text-7xl sm:text-8xl font-black font-mono text-lime-400 my-4 countdown-pulse" role="status" aria-live="assertive">3</div>
+          <p class="text-sm text-slate-300 font-semibold">Pontuações consolidadas. A classificação será revelada em instantes.</p>
           <button id="btnSkipPodiumCountdown" type="button" class="muted-btn text-xs font-bold py-2 px-4 mt-5 rounded-lg cursor-pointer">Pular contagem ⏩</button>
         </div>
 
@@ -6404,7 +6490,7 @@
 
           <!-- Botões de Ação Final -->
           <div class="flex items-center justify-center gap-4 mt-8 flex-wrap">
-            <button id="btnPodiumRestart" type="button" class="primary px-6 py-3 font-black text-sm tracking-wide rounded-xl shadow-xl hover:scale-105 active:scale-95 transition cursor-pointer">Nova sessão</button>
+            <button id="btnPodiumRestart" type="button" class="primary px-6 py-3 font-black text-sm tracking-wide rounded-xl shadow-xl hover:scale-105 active:scale-95 transition cursor-pointer">Configurar nova sessão</button>
             <button id="btnMoreConfetti" type="button" class="muted-btn px-5 py-3 font-bold text-xs rounded-xl flex items-center gap-2 cursor-pointer">🎉 Mais confete</button>
             <button id="podiumBack" type="button" class="muted-btn px-5 py-3 font-bold text-xs rounded-xl cursor-pointer">Início</button>
           </div>
@@ -6510,17 +6596,19 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
       isExplaining:false,config: { ecgMode: 'static',
-      ecgAnimated: false,rankingFrequency:'every_question',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true},
+      ecgAnimated: false,rankingFrequency:'every_40_percent',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true,
+      revealAnimation:'immersive',showVoteCounts:true,showRankChanges:true,showStreakHighlights:true},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
-      zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map()
+      zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map(),lastRankChanges:new Map()
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null, lastHeartSoundAt=0;
+    const LIVE_COMPETITION_MIN_VISIBLE_MS=8000;
+    let liveCompetitionHideTimer=null,liveCompetitionShownAt=0,liveCompetitionCollapsed=false,liveCompetitionMuted=false;
     let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
     const ARENA_SUPABASE_URL='https://xrsoexottjoyyavzkqoh.supabase.co';
     const ARENA_SUPABASE_KEY='sb_publishable_DvQzAnKff0GP2RXAOYBluA_bxlMKW5N';
-    const ARENA_HOST_SESSION_KEY='ecg-arena-host-session';
     let arenaHostSyncTimer=null, arenaHostCreatePromise=null;
     async function arenaApi(payload){
       const response=await fetch(ARENA_SUPABASE_URL+'/functions/v1/arena-persistence',{method:'POST',headers:{'Content-Type':'application/json','apikey':ARENA_SUPABASE_KEY,'Authorization':'Bearer '+ARENA_SUPABASE_KEY},body:JSON.stringify(payload)});
@@ -6528,11 +6616,31 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(!response.ok)throw new Error(data.error||'Falha na sincronização da Arena.');
       return data;
     }
-    function arenaSnapshot(){return {selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,currentRhythmId:state.currentRhythm?.id||null,isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,sessionStats:state.sessionStats||{}}}
+    let arenaRealtimeClient=null,arenaHostRealtimeChannel=null,arenaRealtimeReady=false;
+    function getArenaRealtimeClient(){
+      if(!window.supabase?.createClient)throw new Error('Biblioteca de comunicação em tempo real indisponível.');
+      if(!arenaRealtimeClient)arenaRealtimeClient=window.supabase.createClient(ARENA_SUPABASE_URL,ARENA_SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false},realtime:{params:{eventsPerSecond:100}}});
+      return arenaRealtimeClient;
+    }
+    async function subscribeArenaHostRealtime(topic){
+      const client=getArenaRealtimeClient();
+      if(arenaHostRealtimeChannel){try{await client.removeChannel(arenaHostRealtimeChannel)}catch(e){}arenaHostRealtimeChannel=null}
+      arenaRealtimeReady=false;
+      return await new Promise((resolve,reject)=>{
+        let settled=false;
+        const channel=client.channel(topic,{config:{private:false}})
+          .on('broadcast',{event:'answer_received'},message=>handleArenaRealtimeAnswer(message?.payload))
+          .subscribe(status=>{
+            if(status==='SUBSCRIBED'){arenaHostRealtimeChannel=channel;arenaRealtimeReady=true;if(!settled){settled=true;resolve(true)}}
+            else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){if(arenaHostRealtimeChannel===channel)arenaRealtimeReady=false;if(!settled){settled=true;reject(new Error('Não foi possível conectar o canal de respostas em tempo real.'))}}
+          });
+      });
+    }
+    function arenaSnapshot(){return {schemaVersion:2,savedAt:Date.now(),selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,roundQueue:Array.isArray(state.roundQueue)?state.roundQueue:[],currentRhythmId:state.currentRhythm?.id||null,currentChoices:Array.isArray(state.currentChoices)?state.currentChoices.map(c=>({id:c.id,label:c.label,color:c.color,shape:c.shape})):[],chosenRate:Number(state.chosenRate)||null,roundStartTime:Number(state.roundStartTime)||null,roundDeadline:Number(state.serverRoundDeadline)||Number(state.roundDeadline)||null,timeLeft:Number(state.timeLeft)||0,answersReceived:Array.from(state.answersReceived.entries()).map(([id,a])=>[String(id),{choiceId:a.choiceId,answeredAt:a.answeredAt,receivedOrder:a.receivedOrder??null,elapsedMs:a.elapsedMs??null}]),isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,roundLocked:!!state.roundLocked,sessionFinished:!!state.sessionFinished,sessionClosed:!!state.sessionClosed,sessionStats:state.sessionStats||{}}}
     function registerArenaHostRoom(pin){
       state.sessionFinished=false;
       state.sessionClosed=false;
-      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin,hostToken:data.hostToken,roomId:data.room.id}))}catch(e){};queueArenaHostSync();return data}).catch(error=>{console.warn('Arena Supabase:',error);return null});
+      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(async data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;await subscribeArenaHostRealtime(data.hostChannelTopic);queueArenaHostSync();return data}).catch(error=>{arenaRealtimeReady=false;console.warn('Arena Supabase:',error);showToast('Não foi possível conectar a sala ao servidor em tempo real. Confira a conexão antes de iniciar.');return null});
       return arenaHostCreatePromise;
     }
     function queueArenaHostSync(){
@@ -6619,14 +6727,13 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       } catch(e) {}
     }
 
-    function playCountdownBeep(isFinal = false) {
+    function playCountdownBeep(step = 3) {
       if (!soundOn) return;
       try {
-        if (isFinal) {
-          beep(880, 0.25, 'triangle');
-        } else {
-          beep(587, 0.12, 'sine');
-        }
+        const tones = { 3: 440, 2: 554, 1: 740 };
+        const frequency = tones[step] || 880;
+        beep(frequency, step === 1 ? 0.2 : 0.13, step === 1 ? 'triangle' : 'sine');
+        if (step === 1) setTimeout(() => beep(880, 0.1, 'triangle'), 130);
       } catch(e) {}
     }
 
@@ -7252,66 +7359,45 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
     function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sectionSetupSequence')?.classList.toggle('hidden',!show);$('sequenceEditor')?.classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.add('hidden');if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
-    function initHost(recovery=null){
+    function initHost(){
+      $('btnStartGame')?.classList.remove('hidden');
       state.role='host';
-      if(recovery){
-        state.pin=recovery.session.pin;
-        state.arenaHostToken=recovery.session.hostToken;
-        state.arenaRoomId=recovery.session.roomId||recovery.snapshot.room?.id||null;
-        const gs=recovery.snapshot.room?.game_state||{};
-        state.selectedRhythmIds=Array.isArray(gs.selectedRhythmIds)?gs.selectedRhythmIds.filter(id=>rhythmById(id)):state.selectedRhythmIds;
-        state.gameMode=gs.gameMode||state.gameMode;
-        state.difficulty=gs.difficulty||state.difficulty;
-        state.roundLimit=gs.roundLimit??state.roundLimit;
-        state.roundDuration=Number(gs.roundDuration)||state.roundDuration;
-        state.roundNumber=Number(gs.roundNumber)||0;
-        state.queueIndex=Number(gs.queueIndex)||0;
-        state.lastRoundId=null;
-        state.currentRhythm=null;
-        state.currentChoices=[];
-        state.isRevealed=false;
-        state.isPaused=false;
-        state.answersReceived.clear();
-        state.roundLocked=false;
-        state.sessionStats=gs.sessionStats||{totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null};
-        state.participants.clear();
-        for(const saved of (recovery.snapshot.participants||[])){
-          const id=String(saved.participant_key||'');
-          if(!id)continue;
-          state.participants.set(id,{id,name:saved.display_name||'Participante',avatar:saved.avatar||'stetho',conn:null,score:Number(saved.score)||0,streak:Number(saved.streak)||0,lastAnswer:saved.participant_state?.lastAnswer||null,joinedAt:Date.parse(saved.joined_at)||Date.now(),reconnectTimer:null});
-        }
-        try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin:state.pin,hostToken:state.arenaHostToken,roomId:state.arenaRoomId}))}catch(e){}
-      }else{
-        state.pin=randomPin();
-        state.arenaHostToken=null;state.arenaRoomId=null;
-        registerArenaHostRoom(state.pin);
-        state.participants.clear();
-        state.roundNumber=0;
-        state.lastRoundId=null;
-        state.sessionStats = {
-          totalRounds: 0,
-          totalAnswers: 0,
-          totalCorrect: 0,
-          fastestAnswer: null,
-          highestStreak: null
-        };
-      }
+      state.pin=randomPin();
+      state.arenaHostToken=null;
+      state.arenaRoomId=null;
+      state.participants.clear();
+      state.answersReceived.clear();
+      state.previousRank.clear();
+      state.lastRankChanges=new Map();
+      state.roundQueue=[];
+      state.queueIndex=0;
+      state.roundNumber=0;
+      state.currentRhythm=null;
+      state.currentChoices=[];
+      state.isRevealed=false;
+      state.isPaused=false;
+      state.roundLocked=false;
+      state.sessionFinished=false;
+      state.sessionClosed=false;
+      state.lastRoundId=null;
+      state.sessionStats={totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null};
       $('hostPinDisplay').innerHTML=state.pin.split('').map(d=>'<span class="host-pin-digit">'+d+'</span>').join('');
       const url=location.origin+location.pathname+'?pin='+state.pin;
       $('hostDirectUrl').textContent=url;
       const qr=$('qrCodeContainer');
       qr.innerHTML='';
       if(window.QRCode)new QRCode(qr,{text:url,width:320,height:320,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-      const listEl = $('participantsList');
-      if(listEl) listEl.innerHTML = '';
+      const listEl=$('participantsList');
+      if(listEl)listEl.innerHTML='';
       updateParticipants();
       switchView('viewHost');
       try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}
       try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}
       setupPeer(state.pin);
+      registerArenaHostRoom(state.pin);
     }
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=Array.from(state.participants.values()).find(x=>x.conn===conn);if(!p)return;p.conn=null;if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=setTimeout(()=>{if(state.participants.get(p.id)===p&&!p.conn)removeParticipant(p.id)},300000)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
-    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){return}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
     function sendParticipant(p, msg) {
       let sentPeer = false;
       if (p?.conn?.open) {
@@ -7396,7 +7482,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function avatarEmoji(id){return AVATARS.find(a=>a.id===id)?.emoji||'🩺'}
     function kickParticipant(id){const p=state.participants.get(id);if(!p)return;sendParticipant(p,{type:'KICK',studentId:id});state.channel?.postMessage({type:'KICK',studentId:id});removeParticipant(id)}
     function buildRoundQueue(){let queue=state.gameMode==='sequence'?state.answerOrder.slice():state.selectedRhythmIds.slice().sort(()=>Math.random()-.5);if(state.roundLimit)queue=queue.slice(0,state.roundLimit);state.roundQueue=queue;state.queueIndex=0}
-    function startRoundForRhythm(id){
+    async function startRoundForRhythm(id){
+      if(state.roundOpenInProgress)return;
       const baseRhythm=rhythmById(id);
       if(!baseRhythm)return;
 
@@ -7433,6 +7520,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));
       state.answersReceived.clear();
       state.isRevealed=false;
+      // O ranking permanece visível por pelo menos 8 segundos após surgir; o temporizador controla o recolhimento automático.
       state.roundLocked=false;
       state.isPaused=false;
       state.isExplaining=false;
@@ -7440,7 +7528,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.studentLastChoice=null;
       state.studentRank=0;
       state.sampleOffset=0;
-      state.roundStartTime=Date.now();
+      state.roundStartTime=Date.now();state.serverRoundDeadline=null;
       $('revealPanel')?.classList.add('hidden');
       $('btnNextFixed')?.classList.add('hidden');
       updateExplainStateUI(false);
@@ -7467,10 +7555,28 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       updateAnswerProgress();
       initRealEcg(rhythm.id,chosenRate);
       setProjectionVisible(true);
-      state.roundDeadline=Date.now()+state.roundDuration*1000;
+      state.serverRoundDeadline=null;state.roundDeadline=Date.now()+state.roundDuration*1000;
       const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
-      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
-      startTimer();
+      state.roundOpenInProgress=true;
+      try{
+        const created=arenaHostCreatePromise?await arenaHostCreatePromise:null;
+        if(!created||!state.arenaHostToken||!arenaRealtimeReady)throw new Error('A sala não está conectada ao servidor em tempo real.');
+        const opened=await arenaApi({action:'open_round',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber,durationSeconds:state.roundDuration,gameState:arenaSnapshot()});
+        state.roundStartTime=Number(opened.startedAtMs)||state.roundStartTime;
+        state.serverRoundDeadline=Number(opened.deadlineAtMs)||state.roundDeadline;
+        const serverOffset=Number(opened.serverNowMs)-Date.now();
+        state.roundDeadline=state.serverRoundDeadline-(Number.isFinite(serverOffset)?serverOffset:0);
+        state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));
+        sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
+        startTimer(false);
+        queueArenaHostSync();
+      }catch(error){
+        console.error('Arena round open:',error);
+        state.roundLocked=true;
+        showToast('A rodada não iniciou porque o servidor não confirmou a sincronização em tempo real. Tente novamente.');
+      }finally{
+        state.roundOpenInProgress=false;
+      }
     }
     function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
@@ -7555,10 +7661,27 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const btnRev=$('btnRevealNow');
       if(btnRev)btnRev.classList.add('hidden');
     }
-    function revealRound(){
-      if(state.isRevealed||!state.currentRhythm)return;
+    async function revealRound(){
+      if(state.isRevealed||!state.currentRhythm||state.revealInProgress)return;
+      state.revealInProgress=true;
+      let serverLocked=false;
+      for(let attempt=0;attempt<3&&!serverLocked;attempt++){
+        try{
+          await arenaApi({action:'lock_round',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber});
+          serverLocked=true;
+        }catch(error){if(attempt<2)await new Promise(resolve=>setTimeout(resolve,250*(attempt+1)));else console.error('Arena lock round:',error)}
+      }
+      if(!serverLocked){
+        state.revealInProgress=false;
+        showToast('O servidor não confirmou o bloqueio da rodada. A revelação foi pausada para proteger a pontuação. Tente novamente.');
+        return;
+      }
+      const reconciled=await reconcileArenaRoundAnswers();
+      if(state.isRevealed||!state.currentRhythm){state.revealInProgress=false;return;}
+      if(!reconciled)showToast('Aviso: não foi possível confirmar todas as respostas salvas no servidor.');
       state.roundLocked=true;
       state.isRevealed=true;
+      state.revealInProgress=false;
       state.isExplaining=false;
       clearInterval(state.timerHandle);
       // Mantenha o traçado congelado até o professor continuar:
@@ -7585,7 +7708,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       for(const [id,p] of state.participants){
         const answer=state.answersReceived.get(id);
         const isCorrect=!!answer&&answer.choiceId===correct.id;
-        const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,answer.answeredAt-state.roundStartTime)):state.roundDuration*1000;
+        const rawElapsed=answer&&Number.isFinite(Number(answer.elapsedMs))?Number(answer.elapsedMs):(answer?answer.answeredAt-state.roundStartTime:state.roundDuration*1000);const elapsed=answer?Math.max(0,Math.min(state.roundDuration*1000,rawElapsed)):state.roundDuration*1000;
         const remaining=answer?Math.max(0,1-elapsed/(state.roundDuration*1000)):0;
         const points=isCorrect?500+Math.round(500*remaining):0;
         p.streak=isCorrect?p.streak+1:0;
@@ -7620,14 +7743,19 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           };
         }
       }
-      results.sort((a,b)=>b.p.score-a.p.score);
+      results.sort((a,b)=>compareArenaParticipants(a.p,b.p));
+      state.lastRankChanges = new Map();
       results.forEach((r,i)=>{
         const old=state.previousRank.get(r.p.id)||0;
         r.rank=i+1;
         r.rankDelta=old?old-(i+1):0;
+        state.lastRankChanges.set(r.p.id,{from:old,to:i+1,delta:r.rankDelta});
         state.previousRank.set(r.p.id,i+1);
       });
-      updateLeaderboard();
+      // O gabarito precisa aparecer primeiro. O ranking será revelado depois,
+      // para separar visualmente e sonoramente as duas etapas.
+      hideLiveCompetitionPanel();
+      const revealRoundNumber = state.roundNumber;
       const resultById=new Map(results.map(r=>[r.p.id,r]));
       // 1. Revela apenas o diagnóstico; a FC permanece exclusivamente no monitor.
       const qHeader = document.querySelector('.projection-question');
@@ -7668,6 +7796,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
           tile.classList.remove('is-correct','is-dimmed');
           tile.classList.add(isCorrect?'is-correct':'is-dimmed');
+          tile.classList.remove('reveal-enter','reveal-immersive','reveal-simple');
+          if(state.config.revealAnimation==='immersive')tile.classList.add('reveal-enter','reveal-immersive');
+          else if(state.config.revealAnimation==='simple')tile.classList.add('reveal-enter','reveal-simple');
+          tile.style.setProperty('--reveal-delay', (idx*100)+'ms');
 
           tile.innerHTML=`
             <div class="answer-tile-content">
@@ -7677,21 +7809,26 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             </div>
             <div class="answer-reveal-meta">
               <span class="answer-vote-bar" role="img" aria-label="${voteCount} votos"><span class="answer-vote-bar-fill" style="--vote-width:${votePct}%"></span></span>
-              <span class="answer-vote-count" data-vote-target="${voteCount}">0</span>
+              <span class="answer-vote-count ${state.config.showVoteCounts===false?'hidden':''}" data-vote-target="${voteCount}" aria-label="${voteCount} votos">0</span>
+              <span class="answer-vote-percent ${state.config.showVoteCounts===false?'hidden':''}">${votePct}%</span>
             </div>
           `;
           const voteFill=tile.querySelector('.answer-vote-bar-fill');
           const voteCounter=tile.querySelector('.answer-vote-count');
           requestAnimationFrame(()=>{ if(voteFill) voteFill.style.width=votePct+'%'; });
           if(voteCounter){
-            const start=performance.now();
-            const animateCount=(now)=>{
-              const progress=Math.min(1,(now-start)/1000);
-              const eased=1-Math.pow(1-progress,3);
-              voteCounter.textContent=String(Math.round(voteCount*eased));
-              if(progress<1)requestAnimationFrame(animateCount);
-            };
-            requestAnimationFrame(animateCount);
+            if(state.config.revealAnimation==='off')voteCounter.textContent=String(voteCount);
+            else {
+              const duration=state.config.revealAnimation==='simple'?420:1050;
+              const start=performance.now();
+              const animateCount=(now)=>{
+                const progress=Math.min(1,(now-start)/duration);
+                const eased=state.config.revealAnimation==='simple'?progress:1-Math.pow(1-progress,3);
+                voteCounter.textContent=String(Math.round(voteCount*eased));
+                if(progress<1)requestAnimationFrame(animateCount);
+              };
+              requestAnimationFrame(animateCount);
+            }
           }
         });
       }
@@ -7722,6 +7859,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         sendParticipant(p,payload);
       }
       fanfare();
+      const rankingRevealTimer = setTimeout(() => {
+        if (state.roundNumber !== revealRoundNumber || !state.isRevealed || state.sessionFinished) return;
+        updateLeaderboard(true);
+      }, 1800);
+      if (window.podiumTimers) window.podiumTimers.push(rankingRevealTimer);
     }
     function loadStoredConfig(){
       try{
@@ -7730,7 +7872,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           const c=JSON.parse(raw);
           if(c.ecgMode)state.config.ecgMode=c.ecgMode;
           if(c.revealExplanation)state.config.revealExplanation=c.revealExplanation;
-          if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
+          if(c.rankingFrequency)state.config.rankingFrequency=(c.rankingFrequency==='every_question'?'every_40_percent':c.rankingFrequency);
+          if(c.revealAnimation)state.config.revealAnimation=c.revealAnimation;
+          if(typeof c.showVoteCounts==='boolean')state.config.showVoteCounts=c.showVoteCounts;
+          if(typeof c.showRankChanges==='boolean')state.config.showRankChanges=c.showRankChanges;
+          if(typeof c.showStreakHighlights==='boolean')state.config.showStreakHighlights=c.showStreakHighlights;
           if(typeof c.studentShowsPosition==='boolean')state.config.studentShowsPosition=c.studentShowsPosition;
           if(c.setupFcDefaultV2===true&&typeof c.showBpmDuringQuestion==='boolean')state.config.showBpmDuringQuestion=c.showBpmDuringQuestion;else{state.config.showBpmDuringQuestion=true;state.config.setupFcDefaultV2=true;try{localStorage.setItem('arena_config',JSON.stringify({...c,showBpmDuringQuestion:true,setupFcDefaultV2:true}))}catch(e){}}
           if(typeof c.roundDuration==='number' && c.roundDuration>=5 && c.roundDuration<=180){
@@ -7744,6 +7890,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if($('revealExplanationSelect'))$('revealExplanationSelect').value=state.config.revealExplanation;
       if($('ecgModeSelect'))$('ecgModeSelect').value=state.config.ecgMode;
       if($('rankingFrequencySelect'))$('rankingFrequencySelect').value=state.config.rankingFrequency;
+      if($('revealAnimationSelect'))$('revealAnimationSelect').value=state.config.revealAnimation||'immersive';
+      if($('showVoteCountsCheck'))$('showVoteCountsCheck').checked=state.config.showVoteCounts!==false;
+      if($('showRankChangesCheck'))$('showRankChangesCheck').checked=state.config.showRankChanges!==false;
+      if($('showStreakHighlightsCheck'))$('showStreakHighlightsCheck').checked=state.config.showStreakHighlights!==false;
       if($('studentShowsPositionCheck'))$('studentShowsPositionCheck').checked=state.config.studentShowsPosition;
       if($('showFcSelect'))$('showFcSelect').value=state.config.showBpmDuringQuestion?'yes':'no';
     }
@@ -7751,6 +7901,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if($('revealExplanationSelect'))state.config.revealExplanation=$('revealExplanationSelect').value;
       if($('ecgModeSelect'))state.config.ecgMode=$('ecgModeSelect').value;
       if($('rankingFrequencySelect'))state.config.rankingFrequency=$('rankingFrequencySelect').value;
+      if($('revealAnimationSelect'))state.config.revealAnimation=$('revealAnimationSelect').value;
+      if($('showVoteCountsCheck'))state.config.showVoteCounts=$('showVoteCountsCheck').checked;
+      if($('showRankChangesCheck'))state.config.showRankChanges=$('showRankChangesCheck').checked;
+      if($('showStreakHighlightsCheck'))state.config.showStreakHighlights=$('showStreakHighlightsCheck').checked;
       if($('studentShowsPositionCheck'))state.config.studentShowsPosition=$('studentShowsPositionCheck').checked;
       if($('showFcSelect'))state.config.showBpmDuringQuestion=($('showFcSelect').value==='yes');
       state.config.roundDuration = state.roundDuration || 25;
@@ -7758,7 +7912,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       saveSetupPreferences();
     }
     const ARENA_SETUP_PREFERENCES_KEY='arena_setup_preferences_v1';
-    const ARENA_SETUP_FIELD_IDS=['gameMode','roundDurationInput','roundCountSelect','difficultySelect','ecgModeSelect','showFcSelect','revealExplanationSelect','rankingFrequencySelect','studentShowsPositionCheck'];
+    const ARENA_SETUP_FIELD_IDS=['gameMode','roundDurationInput','roundCountSelect','difficultySelect','ecgModeSelect','showFcSelect','revealExplanationSelect','rankingFrequencySelect','revealAnimationSelect','showVoteCountsCheck','showRankChangesCheck','showStreakHighlightsCheck','studentShowsPositionCheck'];
     function saveSetupPreferences(){
       try{
         const fields={};ARENA_SETUP_FIELD_IDS.forEach(id=>{const el=$(id);if(el)fields[id]=el.type==='checkbox'?el.checked:el.value;});
@@ -7789,7 +7943,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateHostLobbySummary(){
       const ecgMap={static:'Traçado: Estático (8s)',animated:'Traçado: Animado'};
       const expMap={off:'Explicação: Desligada',summary:'Explicação: Resumida',full:'Explicação: Completa'};
-      const rankMap={every_question:'Ranking: A cada rodada',every_5:'Ranking: A cada 5 rodadas',end_only:'Ranking: Só no final',never:'Ranking: Nunca'};
+      const rankMap={every_20_percent:'Ranking: A cada 20%',every_40_percent:'Ranking: A cada 40%',every_60_percent:'Ranking: A cada 60%',every_80_percent:'Ranking: A cada 80%',every_question:'Ranking: Toda rodada',every_5:'Ranking: A cada 5 rodadas',end_only:'Ranking: Só no final',never:'Ranking: Nunca'};
       const posMap=state.config.studentShowsPosition?'Aluno vê posição: Sim':'Aluno vê posição: Não';
       const fcMap=state.config.showBpmDuringQuestion?'FC na pergunta: Sim':'FC na pergunta: Não';
       const el=$('hostGameSummary');
@@ -7798,22 +7952,129 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
     }
     function shouldShowRankingThisRound(){
-      const freq=state.config.rankingFrequency;
-      if(freq==='never'||freq==='end_only')return false;
-      if(freq==='every_5'){
-        const isLast=(state.roundLimit&&state.roundNumber>=state.roundLimit)||(state.queueIndex>=state.roundQueue.length);
-        return(state.roundNumber%5===0)||isLast;
+      const freq=state.config.rankingFrequency||'every_40_percent';
+      const total=Math.max(1,Number(state.roundLimit)||Number(state.roundQueue?.length)||1);
+      const completed=Math.max(0,Number(state.roundNumber)||0);
+      const isLast=completed>=total;
+      // O ranking final é obrigatório e independente da configuração do ranking parcial.
+      if(isLast)return true;
+      if(freq==='never')return false;
+      if(freq==='end_only')return false;
+      if(freq==='every_question')return completed>0;
+      if(freq==='every_5')return completed>0&&completed%5===0;
+      const match=freq.match(/^every_(20|40|60|80)_percent$/);
+      if(match){
+        // Em partidas curtas, nunca transformar o ranking parcial em um pop-up a cada questão.
+        // Percentuais são espaçados por no mínimo duas rodadas; o resultado final continua aparecendo.
+        const interval=Math.max(2,Math.ceil(total*Number(match[1])/100));
+        return completed>0&&completed%interval===0;
       }
-      return true;
+      return completed>0&&completed%Math.max(2,Math.ceil(total*.4))===0;
     }
-    function updateLeaderboard(){
-      const show=shouldShowRankingThisRound();
-      const sec=$('revealRankingSection');
-      if(sec)sec.classList.toggle('hidden',!show);
+    function hideLiveCompetitionPanel(){
+      const panel=$('liveCompetitionPanel');
+      if(!panel)return;
+      panel.classList.add('hidden');
+      panel.style.display='none';
+      panel.setAttribute('aria-hidden','true');
+      panel.classList.remove('is-collapsed');
+      liveCompetitionCollapsed=false;
+      if(liveCompetitionHideTimer){clearTimeout(liveCompetitionHideTimer);liveCompetitionHideTimer=null;}
+    }
+    function playLiveCompetitionCue(){
+      if(liveCompetitionMuted)return;
+      try{
+        const Ctx=window.AudioContext||window.webkitAudioContext;
+        if(!Ctx)return;
+        if(!audioCtx)audioCtx=new Ctx();
+        if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
+        const now=audioCtx.currentTime;
+        [660,880].forEach((frequency,index)=>{
+          const oscillator=audioCtx.createOscillator();
+          const gain=audioCtx.createGain();
+          oscillator.type='sine';
+          oscillator.frequency.value=frequency;
+          gain.gain.setValueAtTime(.0001,now+index*.11);
+          gain.gain.exponentialRampToValueAtTime(.055,now+index*.11+.015);
+          gain.gain.exponentialRampToValueAtTime(.0001,now+index*.11+.095);
+          oscillator.connect(gain);gain.connect(audioCtx.destination);
+          oscillator.start(now+index*.11);oscillator.stop(now+index*.11+.1);
+        });
+      }catch(e){}
+    }
+    function compareArenaParticipants(a,b){
+      const scoreDifference=(Number(b.score)||0)-(Number(a.score)||0);
+      if(scoreDifference)return scoreDifference;
+      const orderA=state.answersReceived.get(a.id)?.receivedOrder;
+      const orderB=state.answersReceived.get(b.id)?.receivedOrder;
+      if(Number.isFinite(Number(orderA))&&Number.isFinite(Number(orderB))&&Number(orderA)!==Number(orderB))return Number(orderA)-Number(orderB);
+      return (Number(a.joinedAt)||0)-(Number(b.joinedAt)||0);
+    }
+    function updateLeaderboard(forceReveal=false){
+      const panel=$('liveCompetitionPanel');
+      const requestedShow=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound());
+      const currentlyVisible=!!(panel&&panel.style.display==='block'&&!panel.classList.contains('hidden'));
+      const show=!!(requestedShow||(currentlyVisible&&Date.now()-liveCompetitionShownAt<LIVE_COMPETITION_MIN_VISIBLE_MS));
+      if(panel){
+        panel.classList.toggle('hidden',!show);
+        panel.style.display=show?'block':'none';
+        panel.setAttribute('aria-hidden',show?'false':'true');
+        if(show&&!currentlyVisible){
+          liveCompetitionShownAt=Date.now();
+          panel.classList.remove('is-collapsed');
+          liveCompetitionCollapsed=false;
+          playLiveCompetitionCue();
+          if(liveCompetitionHideTimer)clearTimeout(liveCompetitionHideTimer);
+          liveCompetitionHideTimer=setTimeout(hideLiveCompetitionPanel,LIVE_COMPETITION_MIN_VISIBLE_MS);
+        }
+      }
       if(!show)return;
-      const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
-      $('teacherLeaderboard').innerHTML=list.slice(0,5).map((p,i)=>`<div class="flex items-center gap-2 rounded-lg bg-slate-950 px-2 py-1.5"><span>${avatarEmoji(p.avatar)}</span><span class="text-[10px] text-amber-300 font-black">#${i+1}</span><span class="truncate flex-1 text-xs font-bold">${escapeHTML(p.name)}</span><span class="text-xs font-black text-lime-300">${p.score}</span></div>`).join('')||'<p class="text-xs text-slate-500">Aguardando participantes.</p>';
+      const list=[...state.participants.values()].sort(compareArenaParticipants);
+      const top=list.slice(0,5);
+      const listEl=$('liveCompetitionList');
+      const msgEl=$('liveCompetitionMessage');
+      const roundEl=$('liveCompetitionRound');
+      if(roundEl)roundEl.textContent='QUESTÃO '+state.roundNumber;
+      const biggestMove=top.map(p=>({p,change:state.lastRankChanges?.get(p.id)})).filter(x=>x.change&&x.change.from>0&&x.change.delta>0).sort((a,b)=>b.change.delta-a.change.delta)[0];
+      if(msgEl){
+        if(biggestMove&&state.config.showRankChanges!==false){
+          msgEl.textContent=biggestMove.p.name+' avançou '+biggestMove.change.delta+' '+(biggestMove.change.delta===1?'posição':'posições')+'!';
+          msgEl.classList.add('has-movement');
+        }else{
+          msgEl.textContent=top.length?('Disputa acirrada: '+(top[0].name||'A turma')+' lidera a classificação.'):'Aguardando as primeiras respostas para montar o ranking.';
+          msgEl.classList.remove('has-movement');
+        }
+      }
+      if(listEl){
+        listEl.innerHTML=top.map((p,i)=>{
+          const above=i===0?null:top[i-1];
+          const gap=above?Math.max(0,above.score-p.score):Math.max(0,p.score-(top[1]?.score??p.score));
+          const gapText=i===0?(top.length>1?'LIDERA POR '+gap+' PTS':'LÍDER'):(gap+' pts do #'+i);
+          const change=state.lastRankChanges?.get(p.id);
+          const movement=state.config.showRankChanges!==false&&change?.from&&change.delta!==0?'<span class="live-rank-movement '+(change.delta>0?'up':'down')+'">'+(change.delta>0?'▲ +':'▼ ')+Math.abs(change.delta)+'</span>':'';
+          const streak=state.config.showStreakHighlights!==false&&p.streak>=2?'<span class="live-rank-streak">'+p.streak+' acertos seg.</span>':'';
+          return '<li class="live-rank-row" style="--rank-delay:'+(i*75)+'ms"><span class="live-rank-number">'+(i+1)+'</span><span class="live-rank-avatar">'+avatarEmoji(p.avatar)+'</span><span class="live-rank-player"><strong>'+escapeHTML(p.name)+'</strong><small>'+gapText+'</small></span>'+movement+streak+'<strong class="live-rank-score">'+p.score+'</strong></li>';
+        }).join('')||'<li class="live-rank-empty">Aguardando participantes...</li>';
+      }
     }
+    if($('liveCompetitionCollapseBtn'))$('liveCompetitionCollapseBtn').addEventListener('click',()=>{
+      const panel=$('liveCompetitionPanel');if(!panel)return;
+      liveCompetitionCollapsed=!liveCompetitionCollapsed;
+      panel.classList.toggle('is-collapsed',liveCompetitionCollapsed);
+      const btn=$('liveCompetitionCollapseBtn');
+      btn.textContent=liveCompetitionCollapsed?'⌄':'⌃';
+      btn.title=liveCompetitionCollapsed?'Expandir ranking parcial':'Recolher ranking parcial';
+      btn.setAttribute('aria-label',btn.title);
+      btn.setAttribute('aria-expanded',liveCompetitionCollapsed?'false':'true');
+    });
+    if($('liveCompetitionMuteBtn'))$('liveCompetitionMuteBtn').addEventListener('click',()=>{
+      liveCompetitionMuted=!liveCompetitionMuted;
+      const btn=$('liveCompetitionMuteBtn');
+      btn.textContent=liveCompetitionMuted?'🔇':'🔊';
+      btn.title=liveCompetitionMuted?'Ativar sons do ranking parcial':'Silenciar sons do ranking parcial';
+      btn.setAttribute('aria-label',btn.title);
+      btn.setAttribute('aria-pressed',liveCompetitionMuted?'true':'false');
+    });
     function showPodium() {
       state.sessionFinished=true;
       queueArenaHostSync();
@@ -7823,9 +8084,14 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('revealPanel')?.classList.add('hidden');
       $('btnNextFixed')?.classList.add('hidden');
       $('explainOverlay')?.classList.add('hidden');
+      // Esconde a sala de espera inteira: o botão fixo "INICIAR PARTIDA"
+      // não deve ficar sobreposto ao pódio final.
+      $('viewHost')?.classList.add('hidden');
+      $('btnStartGame')?.classList.add('hidden');
+      hideLiveCompetitionPanel();
       $('hostPodium')?.classList.remove('hidden');
 
-      const list = [...state.participants.values()].sort((a, b) => b.score - a.score);
+      const list = [...state.participants.values()].sort(compareArenaParticipants);
 
       // Avisa os celulares dos alunos para mostrar o resultado com pontuações acumuladas
       list.forEach((p, index) => {
@@ -7865,8 +8131,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         othersContainer.innerHTML = '';
       }
 
-      // Se ranking desligado ou 0 participantes conectados
-      if (state.config?.rankingFrequency === 'never' || list.length === 0) {
+      // O ranking final é obrigatório, mesmo quando o ranking parcial está desativado.
+      // Só mostramos a tela alternativa quando realmente não há participantes.
+      if (list.length === 0) {
         if (countdownArea) countdownArea.classList.add('hidden');
         if (contentArea) contentArea.classList.remove('hidden');
         placesContainer.className = 'grid place-items-center w-full max-w-2xl mx-auto';
@@ -7888,7 +8155,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       let count = 3;
       const countEl = $('podiumCountdownNumber');
       if (countEl) countEl.textContent = String(count);
-      playCountdownBeep(false);
+      playCountdownBeep(3);
 
       let countdownFinished = false;
       function startPodiumReveal() {
@@ -7905,6 +8172,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         };
       }
 
+      if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+        startPodiumReveal();
+        return;
+      }
+
       const interval = setInterval(() => {
         if (countdownFinished) {
           clearInterval(interval);
@@ -7918,7 +8190,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
             void countEl.offsetWidth;
             countEl.classList.add('countdown-pulse');
           }
-          playCountdownBeep(count === 1);
+          playCountdownBeep(count);
         } else {
           clearInterval(interval);
           startPodiumReveal();
@@ -7930,6 +8202,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function renderPodiumSequence(list) {
       const container = $('podiumPlaces');
       if (!container) return;
+      const reducedMotion = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const revealDelay = ms => reducedMotion ? 0 : ms;
 
       const othersContainer = $('podiumOthersContainer');
       if (othersContainer) {
@@ -7954,11 +8228,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         `;
 
         const t1 = setTimeout(() => {
-          $('podiumCol1')?.classList.add('revealed-podium-step');
+          $('podiumCol1')?.classList.add('revealed-podium-step', 'podium-winner-reveal');
           fanfare();
-          launchConfetti(5500);
+          if (!reducedMotion) launchConfetti(5500);
           renderPodiumSummary();
-        }, 150);
+        }, revealDelay(150));
         window.podiumTimers.push(t1);
 
       } else if (list.length === 2) {
@@ -7991,15 +8265,15 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const t2 = setTimeout(() => {
           $('podiumCol2')?.classList.add('revealed-podium-step');
           beep(554, 0.25, 'triangle');
-        }, 200);
+        }, revealDelay(200));
 
         // 1º sobe em seguida com fanfarra e confete
         const t1 = setTimeout(() => {
-          $('podiumCol1')?.classList.add('revealed-podium-step');
+          $('podiumCol1')?.classList.add('revealed-podium-step', 'podium-winner-reveal');
           fanfare();
-          launchConfetti(5500);
+          if (!reducedMotion) launchConfetti(5500);
           renderPodiumSummary();
-        }, 1400);
+        }, revealDelay(1400));
 
         window.podiumTimers.push(t2, t1);
 
@@ -8043,19 +8317,19 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const t3 = setTimeout(() => {
           $('podiumCol3')?.classList.add('revealed-podium-step');
           beep(440, 0.2, 'triangle');
-        }, 200);
+        }, revealDelay(200));
 
         // 2. 2º Lugar sobe em seguida
         const t2 = setTimeout(() => {
           $('podiumCol2')?.classList.add('revealed-podium-step');
           beep(554, 0.25, 'triangle');
-        }, 1400);
+        }, revealDelay(1400));
 
         // 3. 1º Lugar sobe no clímax com fanfarra e confete
         const t1 = setTimeout(() => {
-          $('podiumCol1')?.classList.add('revealed-podium-step');
+          $('podiumCol1')?.classList.add('revealed-podium-step', 'podium-winner-reveal');
           fanfare();
-          launchConfetti(5500);
+          if (!reducedMotion) launchConfetti(5500);
 
           // 4. Demais classificados (4º em diante)
           if (list.length > 3 && othersContainer) {
@@ -8081,7 +8355,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
           // 5. Resumo da Turma
           renderPodiumSummary();
-        }, 2800);
+        }, revealDelay(2800));
 
         window.podiumTimers.push(t3, t2, t1);
       }
@@ -8596,6 +8870,63 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         setTimeout(()=>{el.textContent=messages[studentLobbyMessageIndex];el.style.opacity='1'},250);
       },4200);
     }
+    async function submitArenaStudentAnswer(roundNumber,choiceId,grid,button){
+      let lastError=null;
+      for(let attempt=0;attempt<3;attempt++){
+        try{
+          const result=await arenaApi({action:'submit_answer',pin:state.pin,participantKey:state.studentId,sessionToken:state.arenaSessionToken,roundNumber,choiceId});
+          if(result?.ok&&result?.recorded)return true;
+          throw new Error('O servidor não confirmou o registro da resposta.');
+        }catch(error){
+          lastError=error;
+          if(attempt<2)await new Promise(resolve=>setTimeout(resolve,250*(attempt+1)));
+        }
+      }
+      console.error('Arena answer submit:',lastError);
+      if(state.role==='student'&&state.roundNumber===roundNumber&&!state.isRevealed){
+        state.roundLocked=false;
+        grid?.classList.remove('answered');
+        grid?.querySelectorAll('button').forEach(item=>{item.disabled=false;item.classList.remove('opacity-35','ring-4','ring-white')});
+        button?.classList.remove('ring-4','ring-white');
+        showToast('Não foi possível confirmar sua resposta. Verifique a conexão e tente novamente.');
+      }
+      return false;
+    }
+    function handleArenaRealtimeAnswer(answer){
+      if(!answer||Number(answer.roundNumber)!==Number(state.roundNumber)||state.isRevealed)return;
+      const id=String(answer.participantKey||'');
+      const participant=state.participants.get(id);
+      if(!participant)return;
+      const existing=state.answersReceived.get(id);
+      if(existing&&Number.isFinite(Number(existing.receivedOrder)))return;
+      const answeredAt=Date.parse(answer.answeredAt);
+      if(!Number.isFinite(answeredAt))return;
+      state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0,elapsedMs:Number(answer.elapsedMs)});
+      participant.lastAnswer=String(answer.choiceId);
+      updateAnswerProgress();
+      updateLeaderboard();
+      queueArenaHostSync();
+      if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd();
+    }
+    async function reconcileArenaRoundAnswers(){
+      if(!state.arenaHostToken||!state.pin||!state.roundNumber)return false;
+      try{
+        const result=await arenaApi({action:'host_answers',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber});
+        for(const answer of result.answers||[]){
+          const id=String(answer.participantKey||'');
+          if(!state.participants.has(id))continue;
+          const answeredAt=Date.parse(answer.answeredAt);
+          if(!Number.isFinite(answeredAt))continue;
+          const existing=state.answersReceived.get(id);
+          if(!existing||!Number.isFinite(Number(existing.receivedOrder))){
+            state.answersReceived.set(id,{choiceId:String(answer.choiceId),answeredAt,receivedOrder:Number(answer.receivedOrder)||0,elapsedMs:Number(answer.elapsedMs)});
+            const participant=state.participants.get(id);if(participant)participant.lastAnswer=String(answer.choiceId);
+          }
+        }
+        updateAnswerProgress();updateLeaderboard();
+        return true;
+      }catch(error){console.error('Arena answer reconciliation:',error);return false}
+    }
     function studentSend(msg){state.channel?.postMessage(msg);if(state.studentConn?.open)state.studentConn.send(msg)}
     window.addEventListener('offline',()=>{if(state.role==='student'&&state.studentId)setStudentReconnectStatus(true)});
     window.addEventListener('online',()=>{if(state.role==='student'&&state.studentId)scheduleStudentReconnect()});
@@ -8696,12 +9027,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         btn.classList.add('ring-4', 'ring-white');
         try { navigator.vibrate?.(40); } catch(e) {}
         beep(760, 0.05);
-        studentSend({
-          type: 'ANSWER',
-          studentId: state.studentId,
-          choiceId: btn.dataset.choice,
-          round: msg.round
-        });
+        void submitArenaStudentAnswer(msg.round,btn.dataset.choice,grid,btn);
       }));
 
       clearInterval(window.studentTimer);
@@ -9198,6 +9524,7 @@ function animatePoints(points) {
     if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     $('showFcSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     $('rankingFrequencySelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
+    ['revealAnimationSelect','showVoteCountsCheck','showRankChangesCheck','showStreakHighlightsCheck'].forEach(id=>{if($(id))$(id).onchange=()=>{saveStoredConfig();updateSessionSummary();};});
     $('studentShowsPositionCheck').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
 
     // Preview listeners
@@ -9236,23 +9563,6 @@ function animatePoints(points) {
       updateHostLobbySummary();
       initHost();
     };
-    async function resumePreviousHostRoom(){
-      let saved;
-      try{saved=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
-      if(!saved?.pin||!saved?.hostToken){showToast('Não há uma sala anterior salva neste navegador.');return}
-      const btn=$('btnResumePreviousRoom');if(btn){btn.disabled=true;btn.querySelector('span:last-child').textContent='RECUPERANDO SALA…'}
-      try{
-        const snapshot=await arenaApi({action:'host_snapshot',pin:saved.pin,hostToken:saved.hostToken});
-        initHost({session:saved,snapshot});
-        showToast('Sala recuperada. Os alunos podem reconectar com o mesmo PIN.');
-      }catch(error){
-        console.warn('Arena recovery:',error);
-        showToast('Não foi possível recuperar a sala. Ela pode ter expirado ou a sessão não ser válida.');
-        if(btn){btn.classList.add('hidden')}
-      }finally{
-        if(btn){btn.disabled=false;btn.querySelector('span:last-child').textContent='RETOMAR SALA ANTERIOR'}
-      }
-    }
     function toggleSound() {
       soundOn = !soundOn;
       if(soundOn&&state.ecgAnimated)getAudio();
@@ -9262,12 +9572,6 @@ function animatePoints(points) {
       showToast(soundOn ? 'Som ativado' : 'Som desativado');
     }
 
-    if ($('btnResumePreviousRoom')) {
-      let savedHostSession=null;
-      try{savedHostSession=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
-      if(savedHostSession?.pin&&savedHostSession?.hostToken)$('btnResumePreviousRoom').classList.remove('hidden');
-      $('btnResumePreviousRoom').onclick=resumePreviousHostRoom;
-    }
     if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
@@ -9275,7 +9579,6 @@ function animatePoints(points) {
     if ($('btnToggleAnimation')) $('btnToggleAnimation').onclick = toggleEcgAnimation;
     if ($('btnPause')) $('btnPause').onclick = toggleEcgAnimation;
     if ($('btnReveal')) $('btnReveal').onclick = revealRound;
-    if ($('btnToggleExplain')) $('btnToggleExplain').onclick = toggleExplainPanel;
     if ($('btnCloseExplain')) $('btnCloseExplain').onclick = () => applyExplanationMode('off');
     if ($('revealExplanationSelect')) $('revealExplanationSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     const handleNext = () => { if (!state.isRevealed) revealRound(); else startNextRound(); };
@@ -9304,12 +9607,57 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
     if ($('btnCopyLink')) $('btnCopyLink').onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname + '?pin=' + state.pin).then(() => showToast('Link copiado'));
     if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
     if ($('rankingFrequencySelect')) $('rankingFrequencySelect').onchange = saveStoredConfig;
+    ['revealAnimationSelect','showVoteCountsCheck','showRankChangesCheck','showStreakHighlightsCheck'].forEach(id=>{if($(id))$(id).onchange=saveStoredConfig;});
     if ($('studentShowsPositionCheck')) $('studentShowsPositionCheck').onchange = saveStoredConfig;
     if ($('showFcSelect')) $('showFcSelect').onchange = saveStoredConfig;
     if ($('btnCloseZoom')) $('btnCloseZoom').onclick = () => $('explainOverlay')?.classList.add('hidden');
     if ($('btnZoomReveal')) $('btnZoomReveal').onclick = () => { $('explainOverlay')?.classList.add('hidden'); revealRound(); };
     if ($('btnRuler')) $('btnRuler').onclick = () => { state.rulerOn = !state.rulerOn; openZoom(state.zoomRect); };
-    if ($('btnPodiumRestart')) $('btnPodiumRestart').onclick = () => switchView('viewHostSetup');
+    async function prepareNewSession() {
+      const button = $('btnPodiumRestart');
+      if (button?.disabled) return;
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Preparando…';
+      }
+      let closeFailed = false;
+      try {
+        if (state.pin && state.arenaHostToken && !state.sessionClosed) {
+          await arenaApi({action:'close_room',pin:state.pin,hostToken:state.arenaHostToken});
+          state.sessionClosed = true;
+        }
+      } catch (error) {
+        closeFailed = true;
+        console.warn('Arena close previous session:', error);
+      } finally {
+        if (window.podiumTimers) {
+          window.podiumTimers.forEach(timer => { clearTimeout(timer); clearInterval(timer); });
+          window.podiumTimers = [];
+        }
+        clearInterval(state.timerHandle);
+        cancelAnimationFrame(ecgFrame);
+        try { state.peer?.destroy(); } catch (error) {}
+        try { state.channel?.close(); } catch (error) {}
+        try { state.syncChannel?.close(); } catch (error) {}
+        state.peer = null;
+        state.channel = null;
+        state.syncChannel = null;
+        state.answersReceived.clear();
+        state.participants.clear();
+        state.previousRank.clear();
+        state.lastRankChanges = new Map();
+        const canvas = $('confettiCanvas');
+        const context = canvas?.getContext?.('2d');
+        if (context) context.clearRect(0, 0, canvas.width, canvas.height);
+        switchView('viewHostSetup');
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'Configurar nova sessão';
+        }
+        if (closeFailed) showToast('Nova configuração aberta, mas não foi possível confirmar o encerramento da sala anterior.');
+      }
+    }
+    if ($('btnPodiumRestart')) $('btnPodiumRestart').onclick = prepareNewSession;
     if ($('btnMoreConfetti')) $('btnMoreConfetti').onclick = () => launchConfetti(5000);
     if ($('podiumBack')) $('podiumBack').onclick = () => switchView('viewHome');
 
@@ -9327,10 +9675,6 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       }
       if ((e.key === 'n' || e.key === 'N') && state.role === 'host' && state.isRevealed) {
         startNextRound();
-      }
-      if ((e.key === 'e' || e.key === 'E') && state.role === 'host' && state.projection) {
-        e.preventDefault();
-        toggleExplainPanel();
       }
     });
 
