@@ -5539,6 +5539,7 @@
                   </div>
                 </details>
             </div>
+            </div>
           </section>
 
           <!-- ========================================== -->
@@ -5607,7 +5608,7 @@
             <div>
               <div class="flex justify-between items-center text-xs mb-1.5">
                 <span class="text-slate-400 font-medium">Ritmos no jogo</span>
-                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300 text-sm">0</b> / 18</span>
+                <span class="font-mono font-bold text-white"><b id="sumRhythms" class="text-lime-300 text-sm">0</b> / <span id="sumRhythmsTotal">0</span></span>
               </div>
               <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                 <div id="sumRhythmsBar" class="bg-lime-400 h-full transition-all duration-300" style="width: 0%"></div>
@@ -5681,7 +5682,7 @@
 
       <!-- Barra de Ação Rápida Flutuante no Mobile (Fácil acesso ao Criar Sala) -->
       <div id="mobileSetupBar" class="mobile-setup-bar fixed bottom-0 left-0 right-0 p-3 z-30 shadow-2xl">
-  <div class="flex items-center justify-between gap-3"><div class="flex flex-col min-w-0"><span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos selecionados</span><span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-cyan-300 text-sm">0</b> / 18 ritmos</span></div>
+  <div class="flex items-center justify-between gap-3"><div class="flex flex-col min-w-0"><span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ritmos selecionados</span><span class="text-xs font-black text-white"><b id="mobileSumCount" class="text-cyan-300 text-sm">0</b> / <span id="mobileSumTotal">0</span> ritmos</span></div>
     <div class="flex items-center gap-2"><button id="mobileSummaryToggle" type="button" class="muted-btn py-2.5 px-3 text-xs font-bold" aria-expanded="false" aria-controls="mobileSummaryDetails">Resumo⌄</button><button type="button" id="mobileCreateRoomButton" class="primary py-2.5 px-4 text-xs font-black tracking-wider rounded-xl shadow-lg flex items-center gap-2 cursor-pointer"><span>Criar sala</span><span aria-hidden="true">→</span></button></div>
   </div>
   <div id="mobileSummaryDetails" class="hidden mt-3 pt-3 border-t border-slate-700/70"><div class="grid grid-cols-3 gap-2 text-xs"><div><span class="block text-slate-400 text-[10px]">Rodadas</span><b id="mobileSumRounds">0</b></div><div><span class="block text-slate-400 text-[10px]">Duração</span><b id="mobileSumDuration">0 min</b></div><div><span class="block text-slate-400 text-[10px]">Tempo/rodada</span><b id="mobileSumRoundDuration">25s</b></div></div>
@@ -6539,8 +6540,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const n = document.querySelectorAll('#rhythmLibrary input:checked').length;
       if ($('selectedCount')) $('selectedCount').textContent = String(n);
       if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
+      if ($('sumRhythmsTotal')) $('sumRhythmsTotal').textContent = String(ECG_RHYTHMS.length);
       if ($('mobileSumCount')) $('mobileSumCount').textContent = String(n);
-      if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
+      if ($('mobileSumTotal')) $('mobileSumTotal').textContent = String(ECG_RHYTHMS.length);
       renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value || '');
       if (n && $('setupError')) $('setupError').classList.add('hidden');
       if (n && $('rhythmSetupError')) $('rhythmSetupError').classList.add('hidden');
@@ -6688,7 +6690,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateSessionSummary(){
       const checkedInputs = document.querySelectorAll('#rhythmLibrary input:checked');
       const count = checkedInputs.length;
-      const totalRhythms = 18;
+      const totalRhythms = ECG_RHYTHMS.length;
 
       // 1. Rhythms count & progress bar
       if ($('sumRhythms')) $('sumRhythms').textContent = String(count);
