@@ -6534,6 +6534,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
       renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value || '');
       if (n && $('setupError')) $('setupError').classList.add('hidden');
+      if (n && $('rhythmSetupError')) $('rhythmSetupError').classList.add('hidden');
 
       // Update each category badge count
       document.querySelectorAll('.category-group').forEach(grp => {
@@ -8756,7 +8757,7 @@ function animatePoints(points) {
       document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{const active=button.dataset.setupTab===tab;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});
       const index=['model','rhythms','rules','summary'].indexOf(tab); if($('setupProgressFill'))$('setupProgressFill').style.width=`${Math.max(0,index)/3*100}%`;
       if(tab==='rules')toggleSequenceEditor(); if(tab==='summary')updateSessionSummary();
-      if(window.innerWidth<=1023&&tab==='summary'){ $('mobileSummaryDetails')?.classList.remove('hidden'); $('mobileSetupBar')?.classList.add('is-expanded'); $('mobileSummaryToggle')?.setAttribute('aria-expanded','true'); }
+      if(window.innerWidth<=1023&&tab==='summary'){ $('mobileSummaryDetails')?.classList.remove('hidden'); $('mobileSetupBar')?.classList.add('is-expanded'); $('mobileSummaryToggle')?.setAttribute('aria-expanded','true'); if($('mobileSummaryToggle'))$('mobileSummaryToggle').textContent='Fechar resumo⌃'; }
     }
     document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab)));
     document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep)));
