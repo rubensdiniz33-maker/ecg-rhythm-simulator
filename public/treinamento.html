@@ -5961,11 +5961,7 @@
               <span class="text-xl">→</span>
             </button>
 
-            <button id="btnResumePreviousRoom" type="button" class="hidden muted-btn w-full py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
-              <span>↻</span><span>RETOMAR SALA ANTERIOR</span>
-            </button>
-
-            <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+                        <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
               <span>👁</span>
               <span>Visualizar partida</span>
             </button>
@@ -6612,7 +6608,6 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
     const ARENA_SUPABASE_URL='https://xrsoexottjoyyavzkqoh.supabase.co';
     const ARENA_SUPABASE_KEY='sb_publishable_DvQzAnKff0GP2RXAOYBluA_bxlMKW5N';
-    const ARENA_HOST_SESSION_KEY='ecg-arena-host-session';
     let arenaHostSyncTimer=null, arenaHostCreatePromise=null;
     async function arenaApi(payload){
       const response=await fetch(ARENA_SUPABASE_URL+'/functions/v1/arena-persistence',{method:'POST',headers:{'Content-Type':'application/json','apikey':ARENA_SUPABASE_KEY,'Authorization':'Bearer '+ARENA_SUPABASE_KEY},body:JSON.stringify(payload)});
@@ -6624,7 +6619,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function registerArenaHostRoom(pin){
       state.sessionFinished=false;
       state.sessionClosed=false;
-      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin,hostToken:data.hostToken,roomId:data.room.id}))}catch(e){};queueArenaHostSync();return data}).catch(error=>{console.warn('Arena Supabase:',error);return null});
+      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;queueArenaHostSync();return data}).catch(error=>{console.warn('Arena Supabase:',error);showToast('Não foi possível registrar a sala no servidor. Confira a conexão antes de iniciar.');return null});
       return arenaHostCreatePromise;
     }
     function queueArenaHostSync(){
@@ -7377,78 +7372,42 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(state.timeLeft<=0){handleRoundEnd()}else{startTimer(false);queueArenaHostSync()}
       return true;
     }
-    function initHost(recovery=null){
+    function initHost(){
       $('btnStartGame')?.classList.remove('hidden');
       state.role='host';
-      if(recovery){
-        state.pin=recovery.session.pin;
-        state.arenaHostToken=recovery.session.hostToken;
-        state.arenaRoomId=recovery.session.roomId||recovery.snapshot.room?.id||null;
-        const gs=recovery.snapshot.room?.game_state||{};
-        state.selectedRhythmIds=Array.isArray(gs.selectedRhythmIds)?gs.selectedRhythmIds.filter(id=>rhythmById(id)):state.selectedRhythmIds;
-        state.gameMode=gs.gameMode||state.gameMode;
-        state.difficulty=gs.difficulty||state.difficulty;
-        state.roundLimit=gs.roundLimit??state.roundLimit;
-        state.roundDuration=Number(gs.roundDuration)||state.roundDuration;
-        state.roundNumber=Number(gs.roundNumber)||0;
-        state.queueIndex=Number(gs.queueIndex)||0;
-        state.roundQueue=Array.isArray(gs.roundQueue)?gs.roundQueue.filter(id=>typeof id==='string'&&rhythmById(id)):[];
-        state.lastRoundId=null;
-        state.currentRhythm=null;
-        state.currentChoices=[];
-        state.isRevealed=false;
-        state.isPaused=false;
-        state.answersReceived.clear();
-        state.roundLocked=false;
-        state.sessionStats=gs.sessionStats||{totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null};
-        state.participants.clear();
-        for(const saved of (recovery.snapshot.participants||[])){
-          const id=String(saved.participant_key||'');
-          if(!id)continue;
-          state.participants.set(id,{id,name:saved.display_name||'Participante',avatar:saved.avatar||'stetho',conn:null,score:Number(saved.score)||0,streak:Number(saved.streak)||0,lastAnswer:saved.participant_state?.lastAnswer||null,joinedAt:Date.parse(saved.joined_at)||Date.now(),reconnectTimer:null});
-        }
-        try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin:state.pin,hostToken:state.arenaHostToken,roomId:state.arenaRoomId}))}catch(e){}
-      }else{
-        state.pin=randomPin();
-        state.arenaHostToken=null;state.arenaRoomId=null;
-        registerArenaHostRoom(state.pin);
-        state.participants.clear();
-        state.answersReceived.clear();
-        state.previousRank.clear();
-        state.lastRankChanges = new Map();
-        state.roundQueue = [];
-        state.queueIndex = 0;
-        state.roundNumber=0;
-        state.currentRhythm=null;
-        state.currentChoices=[];
-        state.isRevealed=false;
-        state.isPaused=false;
-        state.roundLocked=false;
-        state.sessionFinished=false;
-        state.sessionClosed=false;
-        state.lastRoundId=null;
-        state.sessionStats = {
-          totalRounds: 0,
-          totalAnswers: 0,
-          totalCorrect: 0,
-          fastestAnswer: null,
-          highestStreak: null
-        };
-      }
+      state.pin=randomPin();
+      state.arenaHostToken=null;
+      state.arenaRoomId=null;
+      state.participants.clear();
+      state.answersReceived.clear();
+      state.previousRank.clear();
+      state.lastRankChanges=new Map();
+      state.roundQueue=[];
+      state.queueIndex=0;
+      state.roundNumber=0;
+      state.currentRhythm=null;
+      state.currentChoices=[];
+      state.isRevealed=false;
+      state.isPaused=false;
+      state.roundLocked=false;
+      state.sessionFinished=false;
+      state.sessionClosed=false;
+      state.lastRoundId=null;
+      state.sessionStats={totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null};
       $('hostPinDisplay').innerHTML=state.pin.split('').map(d=>'<span class="host-pin-digit">'+d+'</span>').join('');
       const url=location.origin+location.pathname+'?pin='+state.pin;
       $('hostDirectUrl').textContent=url;
       const qr=$('qrCodeContainer');
       qr.innerHTML='';
       if(window.QRCode)new QRCode(qr,{text:url,width:320,height:320,colorDark:'#060a10',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-      const listEl = $('participantsList');
-      if(listEl) listEl.innerHTML = '';
+      const listEl=$('participantsList');
+      if(listEl)listEl.innerHTML='';
       updateParticipants();
       switchView('viewHost');
       try{state.channel?.close();state.channel=new BroadcastChannel(CHANNEL_PREFIX+state.pin);state.channel.onmessage=e=>handleHostMessage(e.data,null)}catch(e){}
       try{state.syncChannel?.close();state.syncChannel=new BroadcastChannel('ecg-arena-sync');state.syncChannel.onmessage=e=>{if(e.data?.type==='SYNC_RHYTHM')startRoundForRhythm(e.data.rhythmId)}}catch(e){}
       setupPeer(state.pin);
-      if(recovery){const restored=restoreRecoveredHostRound(recovery.snapshot.room?.game_state||{});if(!restored){state.currentRhythm=null;state.currentChoices=[];state.isRevealed=false;state.isPaused=false;state.roundLocked=false;showToast('Sala recuperada, mas não havia dados suficientes para restaurar a rodada. Confira a sessão antes de continuar.')}}
+      registerArenaHostRoom(state.pin);
     }
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=Array.from(state.participants.values()).find(x=>x.conn===conn);if(!p)return;p.conn=null;if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=setTimeout(()=>{if(state.participants.get(p.id)===p&&!p.conn)removeParticipant(p.id)},300000)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
     function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();updateLeaderboard();queueArenaHostSync();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
@@ -9522,23 +9481,6 @@ function animatePoints(points) {
       updateHostLobbySummary();
       initHost();
     };
-    async function resumePreviousHostRoom(){
-      let saved;
-      try{saved=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
-      if(!saved?.pin||!saved?.hostToken){showToast('Não há uma sala anterior salva neste navegador.');return}
-      const btn=$('btnResumePreviousRoom');if(btn){btn.disabled=true;btn.querySelector('span:last-child').textContent='RECUPERANDO SALA…'}
-      try{
-        const snapshot=await arenaApi({action:'host_snapshot',pin:saved.pin,hostToken:saved.hostToken});
-        initHost({session:saved,snapshot});
-        showToast('Sala recuperada. Os alunos podem reconectar com o mesmo PIN.');
-      }catch(error){
-        console.warn('Arena recovery:',error);
-        showToast('Não foi possível recuperar a sala. Ela pode ter expirado ou a sessão não ser válida.');
-        if(btn){btn.classList.add('hidden')}
-      }finally{
-        if(btn){btn.disabled=false;btn.querySelector('span:last-child').textContent='RETOMAR SALA ANTERIOR'}
-      }
-    }
     function toggleSound() {
       soundOn = !soundOn;
       if(soundOn&&state.ecgAnimated)getAudio();
@@ -9548,12 +9490,6 @@ function animatePoints(points) {
       showToast(soundOn ? 'Som ativado' : 'Som desativado');
     }
 
-    if ($('btnResumePreviousRoom')) {
-      let savedHostSession=null;
-      try{savedHostSession=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
-      if(savedHostSession?.pin&&savedHostSession?.hostToken)$('btnResumePreviousRoom').classList.remove('hidden');
-      $('btnResumePreviousRoom').onclick=resumePreviousHostRoom;
-    }
     if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
