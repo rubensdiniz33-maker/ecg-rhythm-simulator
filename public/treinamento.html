@@ -5635,6 +5635,16 @@
     </div>
   </div>
 
+  <section id="viewSessionEnded" class="hidden min-h-screen items-center justify-center px-5 py-10 text-center" style="background:var(--bg-gradient);color:var(--text);">
+    <div class="w-full max-w-md rounded-3xl border p-8 sm:p-10" style="background:var(--panel);border-color:var(--line-strong);box-shadow:var(--shadow-panel)">
+      <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl text-3xl" style="background:rgba(240,182,75,.12);border:1px solid rgba(240,182,75,.35)">⏹</div>
+      <p class="mb-2 text-xs font-black uppercase tracking-[.2em]" style="color:var(--amber)">Arena ECG</p>
+      <h1 class="mb-3 text-2xl font-black sm:text-3xl">Sessão encerrada</h1>
+      <p class="mb-7 text-sm leading-6" style="color:var(--muted)">Esta sessão foi encerrada pelo professor ou o jogo já foi finalizado. Não é mais possível entrar nesta sala.</p>
+      <a id="btnEndedHome" href="/arena-ecg" class="inline-flex min-h-12 w-full items-center justify-center rounded-xl px-5 py-3 text-sm font-black" style="background:var(--primary-bg);color:var(--primary-text)">Voltar ao início da Arena ECG</a>
+    </div>
+  </section>
+
   <!-- Student input and game screens -->
   <section id="viewStudentJoin" class="student-join-screen hidden" aria-label="Cadastro de participante">
     <div class="student-join-wrapper">
@@ -5946,7 +5956,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function queueArenaHostSync(){
       if(!state.arenaHostToken||!state.pin)return;
       if(arenaHostSyncTimer)clearTimeout(arenaHostSyncTimer);
-      arenaHostSyncTimer=setTimeout(async()=>{const participants=Array.from(state.participants?.values?.()||[]).map(p=>({id:String(p.id),score:Number(p.score)||0,streak:Number(p.streak)||0,connected:!!p.conn?.open,participantState:{lastAnswer:p.lastAnswer||null}}));const status=state.isPaused?'paused':(state.currentRhythm?'running':'waiting');try{await arenaApi({action:'host_sync',pin:state.pin,hostToken:state.arenaHostToken,participants,gameState:arenaSnapshot(),status})}catch(error){console.warn('Arena Supabase sync:',error)}},700);
+      arenaHostSyncTimer=setTimeout(async()=>{const participants=Array.from(state.participants?.values?.()||[]).map(p=>({id:String(p.id),score:Number(p.score)||0,streak:Number(p.streak)||0,connected:!!p.conn?.open,participantState:{lastAnswer:p.lastAnswer||null}}));const status=state.sessionFinished?'finished':(state.sessionClosed?'closed':(state.isPaused?'paused':(state.currentRhythm?'running':'waiting')));try{await arenaApi({action:'host_sync',pin:state.pin,hostToken:state.arenaHostToken,participants,gameState:arenaSnapshot(),status})}catch(error){console.warn('Arena Supabase sync:',error)}},700);
     }
     let studentReconnectTimer=null, studentReconnectAttempts=0, pendingConfirmAction=null;
     function readStudentSession(){try{const x=JSON.parse(sessionStorage.getItem(STUDENT_SESSION_KEY)||'null');return x&&/^\d{6}$/.test(String(x.pin||''))&&x.studentId?x:null}catch(e){return null}}
@@ -7121,6 +7131,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       $('teacherLeaderboard').innerHTML=list.slice(0,5).map((p,i)=>`<div class="flex items-center gap-2 rounded-lg bg-slate-950 px-2 py-1.5"><span>${avatarEmoji(p.avatar)}</span><span class="text-[10px] text-amber-300 font-black">#${i+1}</span><span class="truncate flex-1 text-xs font-bold">${escapeHTML(p.name)}</span><span class="text-xs font-black text-lime-300">${p.score}</span></div>`).join('')||'<p class="text-xs text-slate-500">Aguardando participantes.</p>';
     }
     function showPodium() {
+      state.sessionFinished=true;
+      queueArenaHostSync();
       clearInterval(state.timerHandle);
       cancelAnimationFrame(ecgFrame);
       setProjectionVisible(false);
@@ -7825,8 +7837,30 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
 
     function renderAvatarPicker(){const picker=$('avatarPicker');picker.innerHTML=AVATARS.map((a,i)=>`<button type="button" class="avatar-option ${i===0?'selected':''}" data-avatar="${a.id}" title="${a.label}" aria-label="${a.label}">${a.emoji}</button>`).join('');picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{picker.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');state.studentAvatar=btn.dataset.avatar}))}
+    function showSessionEnded(){
+      clearInterval(window.studentTimer);
+      setStudentReconnectStatus(false);
+      ['viewHome','viewHostSetup','viewHost','viewStudentJoin','studentLobby','studentGame','studentReveal','hostPodium'].forEach(id=>$(id)?.classList.add('hidden'));
+      $('projection')?.classList.add('hidden');
+      $('viewSessionEnded')?.classList.remove('hidden');
+      $('viewSessionEnded')?.classList.add('flex');
+      document.title='Sessão encerrada · Arena ECG';
+    }
+    async function checkRoomBeforeJoin(pin){
+      try{
+        const result=await arenaApi({action:'check_room',pin});
+        if(result?.ended){showSessionEnded();return false}
+        return true;
+      }catch(error){
+        const message=String(error?.message||'');
+        if(/encerrad|finalizad|não encontrada/i.test(message)){showSessionEnded();return false}
+        const errorEl=$('joinError');
+        if(errorEl){errorEl.textContent='Não foi possível verificar se a sala continua ativa. Verifique sua conexão e tente novamente.';errorEl.classList.remove('hidden')}
+        return false;
+      }
+    }
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
-    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const enteredName=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}const saved=readStudentSession();const reuse=saved&&saved.pin===pin&&!!saved.sessionToken;const name=reuse?(saved.name||enteredName):enteredName;if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.role='student';state.pin=pin;state.studentName=name;state.studentId=reuse?saved.studentId:'std-'+Math.random().toString(36).slice(2,10);if(reuse){state.studentAvatar=saved.avatar||state.studentAvatar;state.studentScore=Number(saved.score)||0;state.studentStreak=Number(saved.streak)||0;const avatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(avatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));avatarBtn.classList.add('selected')}}else{state.studentScore=0;state.studentStreak=0}persistStudentSession();registerArenaStudent(reuse,saved);$('joinButton').disabled=true;$('joinButton').textContent=reuse?'Reconectando…':'Conectando…';$('joinError').classList.add('hidden');if(reuse)setStudentReconnectStatus(true);connectStudentTransport(reuse);if(!reuse){setTimeout(()=>{if(!state.studentConnected&&state.studentId){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden');setStudentReconnectStatus(false)}},9000)}else{setTimeout(()=>{if(!state.studentConnected){$('joinButton').disabled=false;$('joinButton').textContent='TENTAR NOVAMENTE';}},9000)}}
+    async function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const enteredName=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return} $('joinButton').disabled=true; $('joinError').classList.add('hidden'); if(!(await checkRoomBeforeJoin(pin))){$('joinButton').disabled=false;return} const saved=readStudentSession();const reuse=saved&&saved.pin===pin&&!!saved.sessionToken;const name=reuse?(saved.name||enteredName):enteredName;if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.role='student';state.pin=pin;state.studentName=name;state.studentId=reuse?saved.studentId:'std-'+Math.random().toString(36).slice(2,10);if(reuse){state.studentAvatar=saved.avatar||state.studentAvatar;state.studentScore=Number(saved.score)||0;state.studentStreak=Number(saved.streak)||0;const avatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(avatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));avatarBtn.classList.add('selected')}}else{state.studentScore=0;state.studentStreak=0}persistStudentSession();registerArenaStudent(reuse,saved);$('joinButton').disabled=true;$('joinButton').textContent=reuse?'Reconectando…':'Conectando…';$('joinError').classList.add('hidden');if(reuse)setStudentReconnectStatus(true);connectStudentTransport(reuse);if(!reuse){setTimeout(()=>{if(!state.studentConnected&&state.studentId){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden');setStudentReconnectStatus(false)}},9000)}else{setTimeout(()=>{if(!state.studentConnected){$('joinButton').disabled=false;$('joinButton').textContent='TENTAR NOVAMENTE';}},9000)}}
     let studentLobbyMessageTimer=null, studentLobbyMessageIndex=0;
     function startStudentLobbyMessages(){
       const messages=['O professor vai iniciar em breve','Fique atento ao traçado','Prepare-se para identificar o ritmo'];
@@ -8466,7 +8500,7 @@ function animatePoints(points) {
     }
 
 if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
-    if ($('btnLeaveHost')) $('btnLeaveHost').onclick = () => showArenaConfirm('Encerrar sala?','Os participantes serão desconectados e você voltará ao início.','Encerrar sala',()=>{state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')});
+    if ($('btnLeaveHost')) $('btnLeaveHost').onclick = () => showArenaConfirm('Encerrar sala?','Os participantes serão desconectados e você voltará ao início.','Encerrar sala',async()=>{state.sessionClosed=true;try{if(state.arenaHostToken)await arenaApi({action:'close_room',pin:state.pin,hostToken:state.arenaHostToken})}catch(error){console.warn('Arena close room:',error)}state.peer?.destroy();state.channel?.close();state.syncChannel?.close();cancelAnimationFrame(ecgFrame);switchView('viewHome')});
     if ($('btnCopyPin')) $('btnCopyPin').onclick = () => navigator.clipboard?.writeText(state.pin).then(() => showToast('PIN copiado'));
     if ($('btnCopyLink')) $('btnCopyLink').onclick = () => navigator.clipboard?.writeText(location.origin + location.pathname + '?pin=' + state.pin).then(() => showToast('Link copiado'));
     if ($('ecgModeSelect')) $('ecgModeSelect').onchange = () => { saveStoredConfig(); updateSessionSummary(); };
