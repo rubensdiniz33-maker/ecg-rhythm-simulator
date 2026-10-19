@@ -6596,7 +6596,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function playSynchronizedBeats(){
       if(!ecgEngine)return;
       const rhythmId=state.currentRhythm?.id;
-      const canPlay=soundOn&&state.ecgAnimated&&!['vf','asystole'].includes(rhythmId)&&!state.isRevealed&&!state.isPaused&&!state.roundLocked;
+      const canPlay=soundOn&&state.ecgAnimated&&!['vf','asystole'].includes(rhythmId);
       if(!canPlay){lastHeartSoundAt=0;return;}
 
       // O som acompanha o ritmo da animação e a FC medida/configurada.
