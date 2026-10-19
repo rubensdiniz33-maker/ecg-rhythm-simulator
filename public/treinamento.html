@@ -4794,6 +4794,11 @@
     .live-competition-panel{position:fixed;right:clamp(12px,2vw,28px);bottom:clamp(82px,10vh,118px);z-index:1400;width:min(390px,calc(100vw - 24px));padding:17px 18px 15px;border:1px solid rgba(56,189,248,.55);border-radius:18px;background:linear-gradient(145deg,rgba(5,15,29,.97),rgba(12,25,43,.96));color:#f8fafc;box-shadow:0 18px 60px rgba(0,0,0,.48),0 0 28px rgba(14,165,233,.16);backdrop-filter:blur(14px);animation:liveCompetitionEnter .42s cubic-bezier(.2,.8,.2,1) both}
     .live-competition-panel.hidden{display:none}
     .live-competition-topline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .live-competition-actions{display:flex;align-items:center;gap:6px;flex:none}
+    .live-competition-icon-btn{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(148,163,184,.25);border-radius:9px;background:rgba(15,23,42,.82);color:#cbd5e1;font-size:16px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
+    .live-competition-icon-btn:hover{background:rgba(14,165,233,.2);border-color:rgba(56,189,248,.55);color:#fff}
+    .live-competition-panel.is-collapsed .live-competition-heading,.live-competition-panel.is-collapsed .live-competition-message,.live-competition-panel.is-collapsed .live-competition-list{display:none}
+    .live-competition-panel.is-collapsed{width:min(310px,calc(100vw - 24px));padding:10px 12px}
     .live-competition-kicker{font-size:10px;letter-spacing:.17em;font-weight:950;color:#67e8f9}
     .live-competition-round{font-size:10px;font-weight:850;color:#cbd5e1}
     .live-competition-heading{margin-top:5px;font-size:22px;line-height:1.05;font-weight:1000;letter-spacing:-.045em}
@@ -6147,7 +6152,7 @@
 
           <!-- Ranking competitivo na tela principal do professor -->
           <aside id="liveCompetitionPanel" class="live-competition-panel hidden" aria-live="polite" aria-label="Ranking parcial da turma">
-            <div class="live-competition-topline"><span class="live-competition-kicker">ARENA ECG · AO VIVO</span><span id="liveCompetitionRound" class="live-competition-round"></span></div>
+            <div class="live-competition-topline"><span class="live-competition-kicker">ARENA ECG · AO VIVO</span><div class="live-competition-actions"><span id="liveCompetitionRound" class="live-competition-round"></span><button id="liveCompetitionMuteBtn" class="live-competition-icon-btn" type="button" title="Silenciar sons do ranking parcial" aria-label="Silenciar sons do ranking parcial" aria-pressed="false">🔊</button><button id="liveCompetitionCollapseBtn" class="live-competition-icon-btn" type="button" title="Recolher ranking parcial" aria-label="Recolher ranking parcial" aria-expanded="true">⌃</button></div></div>
             <div class="live-competition-heading">TOP 5 DA TURMA</div>
             <div id="liveCompetitionMessage" class="live-competition-message"></div>
             <ol id="liveCompetitionList" class="live-competition-list"></ol>
@@ -6572,6 +6577,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map(),lastRankChanges:new Map()
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null, lastHeartSoundAt=0;
+    const LIVE_COMPETITION_MIN_VISIBLE_MS=8000;
+    let liveCompetitionHideTimer=null,liveCompetitionShownAt=0,liveCompetitionCollapsed=false,liveCompetitionMuted=false;
     let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
@@ -7490,7 +7497,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));
       state.answersReceived.clear();
       state.isRevealed=false;
-      if($('liveCompetitionPanel')){ $('liveCompetitionPanel').classList.add('hidden'); $('liveCompetitionPanel').style.display='none'; $('liveCompetitionPanel').setAttribute('aria-hidden','true'); }
+      // O ranking permanece visível por pelo menos 8 segundos após surgir; o temporizador controla o recolhimento automático.
       state.roundLocked=false;
       state.isPaused=false;
       state.isExplaining=false;
@@ -7895,13 +7902,54 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
       return completed>0&&(completed%Math.max(1,Math.ceil(total*.2))===0||completed===1);
     }
+    function hideLiveCompetitionPanel(){
+      const panel=$('liveCompetitionPanel');
+      if(!panel)return;
+      panel.classList.add('hidden');
+      panel.style.display='none';
+      panel.setAttribute('aria-hidden','true');
+      panel.classList.remove('is-collapsed');
+      liveCompetitionCollapsed=false;
+      if(liveCompetitionHideTimer){clearTimeout(liveCompetitionHideTimer);liveCompetitionHideTimer=null;}
+    }
+    function playLiveCompetitionCue(){
+      if(liveCompetitionMuted)return;
+      try{
+        const Ctx=window.AudioContext||window.webkitAudioContext;
+        if(!Ctx)return;
+        if(!audioCtx)audioCtx=new Ctx();
+        if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
+        const now=audioCtx.currentTime;
+        [660,880].forEach((frequency,index)=>{
+          const oscillator=audioCtx.createOscillator();
+          const gain=audioCtx.createGain();
+          oscillator.type='sine';
+          oscillator.frequency.value=frequency;
+          gain.gain.setValueAtTime(.0001,now+index*.11);
+          gain.gain.exponentialRampToValueAtTime(.055,now+index*.11+.015);
+          gain.gain.exponentialRampToValueAtTime(.0001,now+index*.11+.095);
+          oscillator.connect(gain);gain.connect(audioCtx.destination);
+          oscillator.start(now+index*.11);oscillator.stop(now+index*.11+.1);
+        });
+      }catch(e){}
+    }
     function updateLeaderboard(forceReveal=false){
       const panel=$('liveCompetitionPanel');
-      const show=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound());
+      const requestedShow=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound());
+      const currentlyVisible=!!(panel&&panel.style.display==='block'&&!panel.classList.contains('hidden'));
+      const show=!!(requestedShow||(currentlyVisible&&Date.now()-liveCompetitionShownAt<LIVE_COMPETITION_MIN_VISIBLE_MS));
       if(panel){
         panel.classList.toggle('hidden',!show);
         panel.style.display=show?'block':'none';
         panel.setAttribute('aria-hidden',show?'false':'true');
+        if(show&&!currentlyVisible){
+          liveCompetitionShownAt=Date.now();
+          panel.classList.remove('is-collapsed');
+          liveCompetitionCollapsed=false;
+          playLiveCompetitionCue();
+          if(liveCompetitionHideTimer)clearTimeout(liveCompetitionHideTimer);
+          liveCompetitionHideTimer=setTimeout(hideLiveCompetitionPanel,LIVE_COMPETITION_MIN_VISIBLE_MS);
+        }
       }
       if(!show)return;
       const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
@@ -7932,6 +7980,24 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }).join('')||'<li class="live-rank-empty">Aguardando participantes...</li>';
       }
     }
+    if($('liveCompetitionCollapseBtn'))$('liveCompetitionCollapseBtn').addEventListener('click',()=>{
+      const panel=$('liveCompetitionPanel');if(!panel)return;
+      liveCompetitionCollapsed=!liveCompetitionCollapsed;
+      panel.classList.toggle('is-collapsed',liveCompetitionCollapsed);
+      const btn=$('liveCompetitionCollapseBtn');
+      btn.textContent=liveCompetitionCollapsed?'⌄':'⌃';
+      btn.title=liveCompetitionCollapsed?'Expandir ranking parcial':'Recolher ranking parcial';
+      btn.setAttribute('aria-label',btn.title);
+      btn.setAttribute('aria-expanded',liveCompetitionCollapsed?'false':'true');
+    });
+    if($('liveCompetitionMuteBtn'))$('liveCompetitionMuteBtn').addEventListener('click',()=>{
+      liveCompetitionMuted=!liveCompetitionMuted;
+      const btn=$('liveCompetitionMuteBtn');
+      btn.textContent=liveCompetitionMuted?'🔇':'🔊';
+      btn.title=liveCompetitionMuted?'Ativar sons do ranking parcial':'Silenciar sons do ranking parcial';
+      btn.setAttribute('aria-label',btn.title);
+      btn.setAttribute('aria-pressed',liveCompetitionMuted?'true':'false');
+    });
     function showPodium() {
       state.sessionFinished=true;
       queueArenaHostSync();
