@@ -2380,23 +2380,17 @@
       border-color: var(--lime);
       box-shadow: 0 8px 24px rgba(197, 243, 106, 0.2);
     }
-    .student-pop-in {
-      animation: studentPopIn 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-    }
+    .student-pop-in { animation: studentPopIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
     @keyframes studentPopIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.3) translateY(28px);
-      }
-      65% {
-        opacity: 1;
-        transform: scale(1.12) translateY(-4px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+      0% { opacity: 0; transform: translateY(12px) scale(.94); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
+    .host-pin-digits { display:flex; flex-wrap:nowrap; justify-content:center; align-items:center; gap:clamp(4px,1vw,10px); width:100%; margin:.6rem auto 0; }
+    .host-pin-digit { display:grid; place-items:center; flex:1 1 0; min-width:0; max-width:58px; aspect-ratio:.82; border:1px solid rgba(197,243,106,.48); border-radius:clamp(8px,1.3vw,14px); background:linear-gradient(180deg,rgba(197,243,106,.14),rgba(197,243,106,.04)); color:var(--lime); font:900 clamp(1.35rem,3.2vw,2.5rem)/1 ui-monospace,SFMono-Regular,Menlo,monospace; text-shadow:0 0 18px rgba(197,243,106,.28); box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 5px 18px rgba(0,0,0,.18); }
+    .lobby-empty-ecg { width:min(100%,340px); height:72px; margin:0 auto 1rem; overflow:hidden; color:var(--mint); filter:drop-shadow(0 0 8px rgba(84,231,168,.35)); }
+    .lobby-empty-ecg path { fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:460; stroke-dashoffset:460; animation:lobbyEcgTrace 2.1s linear infinite; }
+    @keyframes lobbyEcgTrace { 0% {stroke-dashoffset:460;opacity:.45} 15% {opacity:1} 75%,100% {stroke-dashoffset:0;opacity:.9} }
+    @media (prefers-reduced-motion: reduce) { .student-pop-in,.lobby-empty-ecg path { animation-duration:.01ms; animation-iteration-count:1; } }
     .lobby-avatar-wrap {
       width: 4rem;
       height: 4rem;
@@ -4919,7 +4913,6 @@
         </div>
         <div class="flex gap-2">
           <button id="btnToggleSound" type="button" class="muted-btn text-xs" title="Alternar som">🔊 Som</button>
-          <button id="btnThemeToggle" type="button" class="muted-btn text-xs">☀️ Claro</button>
           <button id="btnFullscreen" type="button" class="muted-btn text-xs">⛶ Projeção</button>
           <button id="btnLeaveHost" type="button" class="muted-btn text-xs text-rose-300">Encerrar</button>
         </div>
@@ -4942,7 +4935,7 @@
             <!-- PIN Gigante para Telão -->
             <div class="mt-4 pt-4 border-t border-slate-800/80 w-full">
               <p class="text-xs font-black uppercase tracking-widest text-slate-400">PIN DA SALA</p>
-              <div id="hostPinDisplay" class="font-black tracking-[.25em] text-5xl sm:text-6xl my-1 font-mono transition-transform hover:scale-105" style="color:var(--lime); text-shadow:0 0 25px rgba(197,243,106,0.35);">------</div>
+              <div id="hostPinDisplay" class="host-pin-digits" role="group" aria-label="PIN da sala"><span class="host-pin-digit">–</span><span class="host-pin-digit">–</span><span class="host-pin-digit">–</span><span class="host-pin-digit">–</span><span class="host-pin-digit">–</span><span class="host-pin-digit">–</span></div>
             </div>
 
             <div class="flex justify-center gap-2 mt-3">
@@ -4954,7 +4947,7 @@
         </div>
 
         <!-- Grade de Participantes & Contador Enorme -->
-        <div class="panel p-6 sm:p-8 flex flex-col min-h-[520px] shadow-2xl justify-between border-2 border-slate-800/80">
+        <div class="panel p-5 sm:p-7 flex flex-col min-h-[520px] lg:min-h-[640px] shadow-2xl border-2 border-slate-800/80">
           <!-- Top Bar com Contador Enorme e Botão Iniciar -->
           <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
             <div class="flex items-center gap-4">
@@ -4979,13 +4972,13 @@
           </div>
 
           <!-- Grade Grande de Avatares com Animação -->
-          <div class="flex-1 my-5 flex flex-col justify-center">
-            <div id="participantsEmpty" class="m-auto text-center py-14 px-4">
-              <div class="text-7xl mb-4 animate-bounce">📡</div>
-              <p class="text-2xl font-black" style="color:var(--text-title);">Aguardando a turma conectar...</p>
-              <p class="text-sm text-slate-400 mt-2 max-w-md mx-auto">Aponte a câmera para o QR Code ao lado ou digite o PIN no celular para entrar na disputa!</p>
+          <div class="flex-1 min-h-0 mt-5 flex flex-col">
+            <div id="participantsEmpty" class="m-auto w-full text-center py-8 px-4">
+              <svg class="lobby-empty-ecg" viewBox="0 0 340 72" role="img" aria-label="Traçado de ECG animado"><path d="M4 38 H72 L88 38 L101 31 L112 46 L128 9 L145 62 L160 29 L174 38 H336"/></svg>
+              <p class="text-xl sm:text-2xl font-black" style="color:var(--text-title);">Aguardando alunos…</p>
+              <p class="text-sm text-slate-400 mt-2 max-w-md mx-auto">Compartilhe o QR Code ou o PIN para a turma entrar na sala.</p>
             </div>
-            <div id="participantsList" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5 max-h-[460px] overflow-y-auto p-1.5 scroll-list"></div>
+            <div id="participantsList" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5 auto-rows-min content-start flex-1 min-h-0 overflow-y-auto p-1.5 scroll-list w-full"></div>
           </div>
 
           <!-- Rodapé do Lobby com Resumo das Configurações -->
@@ -6166,7 +6159,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         fastestAnswer: null,
         highestStreak: null
       };
-      $('hostPinDisplay').textContent=state.pin.slice(0,3)+' '+state.pin.slice(3);
+      $('hostPinDisplay').innerHTML=state.pin.split('').map(d=>'<span class="host-pin-digit">'+d+'</span>').join('');
       const url=location.origin+location.pathname+'?pin='+state.pin;
       $('hostDirectUrl').textContent=url;
       const qr=$('qrCodeContainer');
