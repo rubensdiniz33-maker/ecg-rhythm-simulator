@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/arena-ecg",
+      "destination": "/treinamento.html"
+    },
+    {
+      "source": "/arena-ecg/",
+      "destination": "/treinamento.html"
+    }
+  ]
+}
