@@ -1741,6 +1741,37 @@
       box-sizing: border-box;
       margin-bottom: 6px;
     }
+    .student-fc-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 54px;
+      padding: 5px 7px;
+      border-radius: 9999px;
+      border: 1px solid rgba(16,185,129,.28);
+      background: rgba(16,185,129,.08);
+      color: #86efac;
+      font: 800 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+      flex-shrink: 0;
+      opacity: .88;
+    }
+    .student-fc-pill.hidden { display: none !important; }
+    .student-fc-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 5px rgba(52,211,153,.45);
+      animation: pulse 1.5s infinite;
+      flex-shrink: 0;
+    }
+    .student-fc-unit {
+      font-size: 9px;
+      font-weight: 700;
+      opacity: .7;
+    }
     .student-round-pill {
       display: inline-flex;
       align-items: center;
@@ -4729,7 +4760,38 @@
     #arenaConfirmAccept{background:#e11d48;color:white;box-shadow:0 8px 24px rgba(225,29,72,.22)}
     #studentReconnectStatus{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:9999;padding:10px 16px;border:1px solid rgba(250,204,21,.35);border-radius:999px;background:rgba(15,23,42,.94);color:#fef3c7;font-size:13px;font-weight:900;box-shadow:0 8px 30px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none}
     #studentReconnectStatus.hidden{display:none}
-  </style>
+  
+    /* Correções da projeção: FC no monitor e cronômetro sem sobreposição */
+    #projectionFcBadge { display: none !important; }
+    .projection-layout {
+      grid-template-rows: minmax(88px, auto) minmax(0, 1fr) auto;
+    }
+    .projection-header {
+      grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(88px, 1fr);
+      min-height: 88px;
+    }
+    .projection-header-left,
+    .projection-header-center,
+    .projection-header-right {
+      min-width: 0;
+    }
+    .projection-header-center {
+      overflow: hidden;
+    }
+    .projection-question {
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    @media (max-height: 820px), (max-width: 1400px) {
+      .projection-layout {
+        grid-template-rows: minmax(74px, auto) minmax(0, 1fr) auto;
+      }
+      .projection-header {
+        min-height: 74px;
+      }
+    }
+</style>
 </head>
 <body>
 
@@ -5187,6 +5249,10 @@
               <span class="text-xl">→</span>
             </button>
 
+            <button id="btnResumePreviousRoom" type="button" class="hidden muted-btn w-full py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+              <span>↻</span><span>RETOMAR SALA ANTERIOR</span>
+            </button>
+
             <button id="btnPreviewRound" type="button" class="muted-btn w-full py-2.5 text-xs font-bold border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
               <span>👁</span>
               <span>Visualizar partida</span>
@@ -5642,6 +5708,10 @@
       </div>
 
       <div class="student-topline-right flex items-center gap-1.5">
+        <div id="studentFcBadge" class="student-fc-pill hidden" aria-label="Frequência cardíaca do traçado">
+          <span class="student-fc-dot"></span>
+          <span id="studentFcValue">--</span><span class="student-fc-unit">bpm</span>
+        </div>
         <div class="student-timer-pill">
           <span class="text-xs opacity-75">⏱️</span>
           <span class="timer-num" id="studentTimer">25</span><span class="text-[10px] opacity-60">s</span>
@@ -5840,9 +5910,44 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
+    const ARENA_SUPABASE_URL='https://xrsoexottjoyyavzkqoh.supabase.co';
+    const ARENA_SUPABASE_KEY='sb_publishable_DvQzAnKff0GP2RXAOYBluA_bxlMKW5N';
+    const ARENA_HOST_SESSION_KEY='ecg-arena-host-session';
+    let arenaHostSyncTimer=null, arenaHostCreatePromise=null;
+    async function arenaApi(payload){
+      const response=await fetch(ARENA_SUPABASE_URL+'/functions/v1/arena-persistence',{method:'POST',headers:{'Content-Type':'application/json','apikey':ARENA_SUPABASE_KEY,'Authorization':'Bearer '+ARENA_SUPABASE_KEY},body:JSON.stringify(payload)});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(data.error||'Falha na sincronização da Arena.');
+      return data;
+    }
+    function arenaSnapshot(){return {selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,currentRhythmId:state.currentRhythm?.id||null,isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,sessionStats:state.sessionStats||{}}}
+    function registerArenaHostRoom(pin){
+      arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin,hostToken:data.hostToken,roomId:data.room.id}))}catch(e){};queueArenaHostSync();return data}).catch(error=>{console.warn('Arena Supabase:',error);return null});
+      return arenaHostCreatePromise;
+    }
+    function queueArenaHostSync(){
+      if(!state.arenaHostToken||!state.pin)return;
+      if(arenaHostSyncTimer)clearTimeout(arenaHostSyncTimer);
+      arenaHostSyncTimer=setTimeout(async()=>{const participants=Array.from(state.participants?.values?.()||[]).map(p=>({id:String(p.id),score:Number(p.score)||0,streak:Number(p.streak)||0,connected:!!p.conn?.open,participantState:{lastAnswer:p.lastAnswer||null}}));const status=state.isPaused?'paused':(state.currentRhythm?'running':'waiting');try{await arenaApi({action:'host_sync',pin:state.pin,hostToken:state.arenaHostToken,participants,gameState:arenaSnapshot(),status})}catch(error){console.warn('Arena Supabase sync:',error)}},700);
+    }
     let studentReconnectTimer=null, studentReconnectAttempts=0, pendingConfirmAction=null;
     function readStudentSession(){try{const x=JSON.parse(sessionStorage.getItem(STUDENT_SESSION_KEY)||'null');return x&&/^\d{6}$/.test(String(x.pin||''))&&x.studentId?x:null}catch(e){return null}}
-    function persistStudentSession(){if(state.role!=='student'||!state.studentId||!state.pin)return;try{sessionStorage.setItem(STUDENT_SESSION_KEY,JSON.stringify({pin:state.pin,studentId:state.studentId,name:state.studentName||'',avatar:state.studentAvatar||'stetho',score:Number(state.studentScore)||0,streak:Number(state.studentStreak)||0}))}catch(e){}}
+    function persistStudentSession(){if(state.role!=='student'||!state.studentId||!state.pin)return;try{sessionStorage.setItem(STUDENT_SESSION_KEY,JSON.stringify({pin:state.pin,studentId:state.studentId,name:state.studentName||'',avatar:state.studentAvatar||'stetho',score:Number(state.studentScore)||0,streak:Number(state.studentStreak)||0,sessionToken:state.arenaSessionToken||null}))}catch(e){}}
+    async function registerArenaStudent(reuse,saved){
+      for(let attempt=0;attempt<6;attempt++){
+        try{
+          let data;
+          if(reuse&&saved?.sessionToken){data=await arenaApi({action:'resume_room',pin:state.pin,participantKey:state.studentId,sessionToken:saved.sessionToken});state.arenaSessionToken=saved.sessionToken}
+          else{data=await arenaApi({action:'join_room',pin:state.pin,participantKey:state.studentId,displayName:state.studentName,avatar:state.studentAvatar});state.arenaSessionToken=data.sessionToken}
+          if(data.participant){state.studentScore=Number(data.participant.score)||state.studentScore;state.studentStreak=Number(data.participant.streak)||state.studentStreak;persistStudentSession()}
+          return data;
+        }catch(error){
+          if(attempt===5){console.warn('Arena Supabase student session:',error);return null}
+          await new Promise(resolve=>setTimeout(resolve,700));
+        }
+      }
+      return null;
+    }
     function setStudentReconnectStatus(active){const el=$('studentReconnectStatus');if(!el)return;el.classList.toggle('hidden',!active);if(active)el.textContent='Reconectando…'}
     function scheduleStudentReconnect(){if(state.role!=='student'||!state.studentId||!state.pin||!navigator.onLine)return;setStudentReconnectStatus(true);if(studentReconnectTimer)return;studentReconnectTimer=setTimeout(()=>{studentReconnectTimer=null;connectStudentTransport(true)},2200)}
     function handleStudentAck(m){if(m?.type!=='JOIN_ACK'||m.studentId!==state.studentId)return;if(m.targetStudentId&&m.targetStudentId!==state.studentId)return;state.studentName=m.studentName||state.studentName;state.studentAvatar=m.avatar||state.studentAvatar;if(typeof m.totalScore==='number')state.studentScore=m.totalScore;if(typeof m.streak==='number')state.studentStreak=m.streak;state.studentConnected=true;studentReconnectAttempts=0;if(studentReconnectTimer){clearTimeout(studentReconnectTimer);studentReconnectTimer=null}setStudentReconnectStatus(false);if($('studentNameDisplay'))$('studentNameDisplay').textContent=state.studentName||'';if($('studentAvatarDisplay'))$('studentAvatarDisplay').textContent=avatarEmoji(state.studentAvatar);if($('studentLobbyPin'))$('studentLobbyPin').textContent=state.pin||'------';if($('studentScore'))$('studentScore').textContent=String(state.studentScore||0);if($('studentScoreLobby'))$('studentScoreLobby').textContent=String(state.studentScore||0);persistStudentSession();if(!$('viewStudentJoin')?.classList.contains('hidden')){startStudentLobbyMessages();switchView('studentLobby')}}
@@ -6489,19 +6594,50 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function renderSequence(){const list=$('selectedRhythmOrder');if(!list)return;const current=[...list.querySelectorAll('li')].map(x=>x.dataset.id);const selected=[...document.querySelectorAll('#rhythmLibrary input:checked')].map(x=>x.value);state.answerOrder=[...current.filter(id=>selected.includes(id)),...selected.filter(id=>!current.includes(id))];list.innerHTML=state.answerOrder.map((id,i)=>{const r=rhythmById(id);return `<li draggable="true" data-id="${id}" class="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5"><span class="text-xs font-mono text-slate-500 w-5">${i+1}</span><span class="text-xs font-bold flex-1 truncate text-white">${r.name}</span><button type="button" data-move="up" aria-label="Mover ${r.name} para cima" class="text-slate-400 hover:text-white px-1">▲</button><button type="button" data-move="down" aria-label="Mover ${r.name} para baixo" class="text-slate-400 hover:text-white px-1">▼</button><span class="text-slate-500 cursor-grab" aria-hidden="true">⠿</span></li>`}).join('');$('sequenceEmpty').classList.toggle('hidden',state.answerOrder.length>0);list.querySelectorAll('button[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const li=btn.closest('li'),from=state.answerOrder.indexOf(li.dataset.id),to=from+(btn.dataset.move==='up'?-1:1);if(to<0||to>=state.answerOrder.length)return;[state.answerOrder[from],state.answerOrder[to]]=[state.answerOrder[to],state.answerOrder[from]];renderSequence();updateSessionSummary();}));list.querySelectorAll('li').forEach(li=>{li.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',li.dataset.id));li.addEventListener('dragover',e=>e.preventDefault());li.addEventListener('drop',e=>{e.preventDefault();const dragged=e.dataTransfer.getData('text/plain'),from=state.answerOrder.indexOf(dragged),to=state.answerOrder.indexOf(li.dataset.id);if(from<0||to<0)return;state.answerOrder.splice(to,0,state.answerOrder.splice(from,1)[0]);renderSequence();updateSessionSummary();})})}
     function toggleSequenceEditor(){const show=$('gameMode').value==='sequence';$('sectionSetupSequence')?.classList.toggle('hidden',!show);$('sequenceEditor')?.classList.toggle('hidden',!show);if($('sequenceRandomNotice'))$('sequenceRandomNotice').classList.add('hidden');if(show)renderSequence();updateSessionSummary();}
     function chooseDistractors(target){const groups=state.difficulty==='hard'?HARD_GROUPS:EASY_GROUPS;const preferred=(groups[target.id]||[]).filter(id=>id!==target.id&&id!=='aesp');const selected=[];for(const id of preferred){if(selected.length===3)break;if(!selected.includes(id))selected.push(id)}const forbidden=target.id==='aesp'?['sinus','sinus-brady','sinus-tachy']:[];const fallback=ECG_RHYTHMS.filter(r=>r.id!==target.id&&!selected.includes(r.id)&&r.id!=='aesp'&&!forbidden.includes(r.id)).sort(()=>Math.random()-.5);while(selected.length<3&&fallback.length)selected.push(fallback.pop().id);return selected.map(rhythmById).filter(Boolean)}
-    function initHost(){
+    function initHost(recovery=null){
       state.role='host';
-      state.pin=randomPin();
-      state.participants.clear();
-      state.roundNumber=0;
-      state.lastRoundId=null;
-      state.sessionStats = {
-        totalRounds: 0,
-        totalAnswers: 0,
-        totalCorrect: 0,
-        fastestAnswer: null,
-        highestStreak: null
-      };
+      if(recovery){
+        state.pin=recovery.session.pin;
+        state.arenaHostToken=recovery.session.hostToken;
+        state.arenaRoomId=recovery.session.roomId||recovery.snapshot.room?.id||null;
+        const gs=recovery.snapshot.room?.game_state||{};
+        state.selectedRhythmIds=Array.isArray(gs.selectedRhythmIds)?gs.selectedRhythmIds.filter(id=>rhythmById(id)):state.selectedRhythmIds;
+        state.gameMode=gs.gameMode||state.gameMode;
+        state.difficulty=gs.difficulty||state.difficulty;
+        state.roundLimit=gs.roundLimit??state.roundLimit;
+        state.roundDuration=Number(gs.roundDuration)||state.roundDuration;
+        state.roundNumber=Number(gs.roundNumber)||0;
+        state.queueIndex=Number(gs.queueIndex)||0;
+        state.lastRoundId=null;
+        state.currentRhythm=null;
+        state.currentChoices=[];
+        state.isRevealed=false;
+        state.isPaused=false;
+        state.answersReceived.clear();
+        state.roundLocked=false;
+        state.sessionStats=gs.sessionStats||{totalRounds:0,totalAnswers:0,totalCorrect:0,fastestAnswer:null,highestStreak:null};
+        state.participants.clear();
+        for(const saved of (recovery.snapshot.participants||[])){
+          const id=String(saved.participant_key||'');
+          if(!id)continue;
+          state.participants.set(id,{id,name:saved.display_name||'Participante',avatar:saved.avatar||'stetho',conn:null,score:Number(saved.score)||0,streak:Number(saved.streak)||0,lastAnswer:saved.participant_state?.lastAnswer||null,joinedAt:Date.parse(saved.joined_at)||Date.now(),reconnectTimer:null});
+        }
+        try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin:state.pin,hostToken:state.arenaHostToken,roomId:state.arenaRoomId}))}catch(e){}
+      }else{
+        state.pin=randomPin();
+        state.arenaHostToken=null;state.arenaRoomId=null;
+        registerArenaHostRoom(state.pin);
+        state.participants.clear();
+        state.roundNumber=0;
+        state.lastRoundId=null;
+        state.sessionStats = {
+          totalRounds: 0,
+          totalAnswers: 0,
+          totalCorrect: 0,
+          fastestAnswer: null,
+          highestStreak: null
+        };
+      }
       $('hostPinDisplay').innerHTML=state.pin.split('').map(d=>'<span class="host-pin-digit">'+d+'</span>').join('');
       const url=location.origin+location.pathname+'?pin='+state.pin;
       $('hostDirectUrl').textContent=url;
@@ -6537,6 +6673,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
     }
     function sendToAll(msg) {
+      queueArenaHostSync();
       state.channel?.postMessage(msg);
       state.participants.forEach(p => {
         if (p?.conn?.open) {
@@ -6546,6 +6683,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function removeParticipant(id){if(state.participants.delete(id)){state.answersReceived.delete(id);updateParticipants();updateAnswerProgress();updateLeaderboard()}}
     function updateParticipants(){
+      queueArenaHostSync();
       const n=state.participants.size;
       // Contagem de presença para a tela de espera do aluno, sem alterar o fluxo do jogo.
       state.participants.forEach(p=>sendParticipant(p,{type:'LOBBY_COUNT',count:n}));
@@ -6673,10 +6811,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       setProjectionVisible(true);
       state.roundDeadline=Date.now()+state.roundDuration*1000;
       const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');
-      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition});
+      sendToAll({type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.roundDuration,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion});
       startTimer();
     }
-    function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition}}
+    function questionPayload(){const studentSeesPosition=(state.config.studentShowsPosition && state.config.rankingFrequency !== 'never');return {type:'ROUND_QUESTION',round:state.roundNumber,choices:state.currentChoices.map(({id,color,shape})=>({id,color,shape})),seconds:state.timeLeft,paused:state.isPaused,showPosition:studentSeesPosition,showFc:!!state.config.showBpmDuringQuestion}}
     function startNextRound(){if(state.roundLimit&&state.roundNumber>=state.roundLimit||state.queueIndex>=state.roundQueue.length){showPodium();return}const id=state.roundQueue[state.queueIndex++];startRoundForRhythm(id)}
     function startTimer(reset = true){clearInterval(state.timerHandle);if(reset){state.timeLeft=state.roundDuration;state.roundDeadline=Date.now()+state.timeLeft*1000;}updateTimerDisplay();state.timerHandle=setInterval(()=>{if(state.roundLocked)return;state.timeLeft=Math.max(0,Math.ceil((state.roundDeadline-Date.now())/1000));updateTimerDisplay();if(state.timeLeft<=5&&state.timeLeft>0)beep(880,.045);if(state.timeLeft===0){state.roundLocked=true;clearInterval(state.timerHandle);handleRoundEnd()}},100)}
     function updateTimerDisplay(){
@@ -6705,8 +6843,12 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const badge=$('monitorFcBadge');
       const projBadge=$('projectionFcBadge');
       if(badge)badge.classList.toggle('hidden',!show);
-      if(projBadge)projBadge.classList.toggle('hidden',!show);
-      if(!show)return;
+      // A FC deve aparecer somente sobre o monitor de ECG, nunca no cabeçalho.
+      if(projBadge)projBadge.classList.add('hidden');
+      if(!show){
+        sendToAll({type:'STUDENT_FC',show:false});
+        return;
+      }
       let bpmText='--';
       if(state.currentRhythm?.id==='asystole'){
         bpmText='0';
@@ -6724,6 +6866,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
       if($('monitorFcValue'))$('monitorFcValue').textContent=bpmText;
       if($('projectionFcValue'))$('projectionFcValue').textContent=bpmText;
+      sendToAll({type:'STUDENT_FC',show:true,value:bpmText});
     }
     function updateAnswerProgress(){$('answerCount').textContent=String(state.answersReceived.size);$('totalStudents').textContent=String(state.participants.size);$('answerProgress').style.width=state.participants.size?Math.min(100,state.answersReceived.size/state.participants.size*100)+'%':'0%'}
     function handleRoundEnd(){
@@ -7665,7 +7808,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
     function renderAvatarPicker(){const picker=$('avatarPicker');picker.innerHTML=AVATARS.map((a,i)=>`<button type="button" class="avatar-option ${i===0?'selected':''}" data-avatar="${a.id}" title="${a.label}" aria-label="${a.label}">${a.emoji}</button>`).join('');picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{picker.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');state.studentAvatar=btn.dataset.avatar}))}
     function showJoin(pin){state.role='student';switchView('viewStudentJoin');renderAvatarPicker();if(pin){$('pinInput').value=pin;$('pinDetectedValue').textContent=pin;$('pinDetected').classList.remove('hidden');$('pinField').classList.add('hidden')}else{$('pinDetected').classList.add('hidden');$('pinField').classList.remove('hidden')}}
-    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const enteredName=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}const saved=readStudentSession();const reuse=saved&&saved.pin===pin;const name=reuse?(saved.name||enteredName):enteredName;if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.role='student';state.pin=pin;state.studentName=name;state.studentId=reuse?saved.studentId:'std-'+Math.random().toString(36).slice(2,10);if(reuse){state.studentAvatar=saved.avatar||state.studentAvatar;state.studentScore=Number(saved.score)||0;state.studentStreak=Number(saved.streak)||0;const avatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(avatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));avatarBtn.classList.add('selected')}}else{state.studentScore=0;state.studentStreak=0}persistStudentSession();$('joinButton').disabled=true;$('joinButton').textContent=reuse?'Reconectando…':'Conectando…';$('joinError').classList.add('hidden');if(reuse)setStudentReconnectStatus(true);connectStudentTransport(reuse);if(!reuse){setTimeout(()=>{if(!state.studentConnected&&state.studentId){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden');setStudentReconnectStatus(false)}},9000)}else{setTimeout(()=>{if(!state.studentConnected){$('joinButton').disabled=false;$('joinButton').textContent='TENTAR NOVAMENTE';}},9000)}}
+    function submitJoin(e){e.preventDefault();const pin=$('pinInput').value.replace(/\D/g,'');const enteredName=$('userNameInput').value.trim().replace(/\s+/g,' ');if(pin.length!==6){$('joinError').textContent='O PIN deve ter 6 dígitos.';$('joinError').classList.remove('hidden');return}const saved=readStudentSession();const reuse=saved&&saved.pin===pin&&!!saved.sessionToken;const name=reuse?(saved.name||enteredName):enteredName;if(name.length<2||name.length>20){$('joinError').textContent='O nome de usuário deve ter de 2 a 20 caracteres.';$('joinError').classList.remove('hidden');return}state.role='student';state.pin=pin;state.studentName=name;state.studentId=reuse?saved.studentId:'std-'+Math.random().toString(36).slice(2,10);if(reuse){state.studentAvatar=saved.avatar||state.studentAvatar;state.studentScore=Number(saved.score)||0;state.studentStreak=Number(saved.streak)||0;const avatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(avatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));avatarBtn.classList.add('selected')}}else{state.studentScore=0;state.studentStreak=0}persistStudentSession();registerArenaStudent(reuse,saved);$('joinButton').disabled=true;$('joinButton').textContent=reuse?'Reconectando…':'Conectando…';$('joinError').classList.add('hidden');if(reuse)setStudentReconnectStatus(true);connectStudentTransport(reuse);if(!reuse){setTimeout(()=>{if(!state.studentConnected&&state.studentId){$('joinButton').disabled=false;$('joinButton').textContent='ENTRAR NA SALA →';$('joinError').textContent='Não conectou. Verifique o PIN e confirme que o professor abriu a sala.';$('joinError').classList.remove('hidden');setStudentReconnectStatus(false)}},9000)}else{setTimeout(()=>{if(!state.studentConnected){$('joinButton').disabled=false;$('joinButton').textContent='TENTAR NOVAMENTE';}},9000)}}
     let studentLobbyMessageTimer=null, studentLobbyMessageIndex=0;
     function startStudentLobbyMessages(){
       const messages=['O professor vai iniciar em breve','Fique atento ao traçado','Prepare-se para identificar o ritmo'];
@@ -7693,6 +7836,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         if (countEl) countEl.textContent = colleagues + (colleagues === 1 ? ' colega conectado' : ' colegas conectados');
       }
       else if (msg.type === 'ROUND_QUESTION') showStudentQuestion(msg);
+      else if (msg.type === 'STUDENT_FC') {
+        const fcBadge = $('studentFcBadge');
+        if (fcBadge) fcBadge.classList.toggle('hidden', !msg.show);
+        if (msg.show && $('studentFcValue')) $('studentFcValue').textContent = msg.value || '--';
+      }
       else if (msg.type === 'ROUND_PAUSE') {
         /* No-op: o relógio e as respostas nunca param */
       }
@@ -7736,6 +7884,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }
       }
 
+      const studentFcBadge = $('studentFcBadge');
+      if (studentFcBadge) studentFcBadge.classList.toggle('hidden', !msg.showFc);
+      if (!msg.showFc && $('studentFcValue')) $('studentFcValue').textContent = '--';
       const totalSec = Number(msg.seconds) || 25;
       state.currentTotalSec = totalSec;
       let sec = totalSec;
@@ -8236,6 +8387,23 @@ function animatePoints(points) {
       updateHostLobbySummary();
       initHost();
     };
+    async function resumePreviousHostRoom(){
+      let saved;
+      try{saved=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
+      if(!saved?.pin||!saved?.hostToken){showToast('Não há uma sala anterior salva neste navegador.');return}
+      const btn=$('btnResumePreviousRoom');if(btn){btn.disabled=true;btn.querySelector('span:last-child').textContent='RECUPERANDO SALA…'}
+      try{
+        const snapshot=await arenaApi({action:'host_snapshot',pin:saved.pin,hostToken:saved.hostToken});
+        initHost({session:saved,snapshot});
+        showToast('Sala recuperada. Os alunos podem reconectar com o mesmo PIN.');
+      }catch(error){
+        console.warn('Arena recovery:',error);
+        showToast('Não foi possível recuperar a sala. Ela pode ter expirado ou a sessão não ser válida.');
+        if(btn){btn.classList.add('hidden')}
+      }finally{
+        if(btn){btn.disabled=false;btn.querySelector('span:last-child').textContent='RETOMAR SALA ANTERIOR'}
+      }
+    }
     function toggleSound() {
       soundOn = !soundOn;
       if ($('btnToggleSound')) $('btnToggleSound').textContent = soundOn ? '🔊 Som' : '🔇 Mudo';
@@ -8243,6 +8411,12 @@ function animatePoints(points) {
       showToast(soundOn ? 'Som ativado' : 'Som desativado');
     }
 
+    if ($('btnResumePreviousRoom')) {
+      let savedHostSession=null;
+      try{savedHostSession=JSON.parse(sessionStorage.getItem(ARENA_HOST_SESSION_KEY)||'null')}catch(e){}
+      if(savedHostSession?.pin&&savedHostSession?.hostToken)$('btnResumePreviousRoom').classList.remove('hidden');
+      $('btnResumePreviousRoom').onclick=resumePreviousHostRoom;
+    }
     if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
