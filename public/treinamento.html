@@ -8529,11 +8529,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
 
-      if(state.ecgAnimated){
-        ecgFrame=requestAnimationFrame(ecgLoop);
-      }else{
-        drawEcgFrame();
-      }
+      ecgFrame=requestAnimationFrame(ecgLoop);
     }
 
     function toggleEcgAnimation(){
@@ -8543,14 +8539,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       lastHeartSoundAt=0;
       if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
-      if(state.ecgAnimated){
-        frameLast=0;
-        cancelAnimationFrame(ecgFrame);
-        ecgFrame=requestAnimationFrame(ecgLoop);
-      }else{
-        cancelAnimationFrame(ecgFrame);
-        drawEcgFrame();
-      }
+      frameLast=0;
+      cancelAnimationFrame(ecgFrame);
+      ecgFrame=requestAnimationFrame(ecgLoop);
     }
 
     function updateAnimationButtonUI(){
@@ -8568,7 +8559,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
 
     function ecgLoop(timestamp){
-      if(!ecgEngine)return;
+      if(!ecgEngine||!state.currentRhythm)return;
       if(state.ecgAnimated){
         const dt=frameLast?Math.min(.08,(timestamp-frameLast)/1000):.016;
         frameLast=timestamp;
@@ -8584,9 +8575,12 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           state.currentSamples=combined;
           state.sampleOffset+=samples.length;
         }
-        drawEcgFrame();
-        ecgFrame=requestAnimationFrame(ecgLoop);
+      }else{
+        // No modo estático, a forma de onda fica imóvel; só a continuidade visual é animada.
+        frameLast=0;
       }
+      drawEcgFrame();
+      ecgFrame=requestAnimationFrame(ecgLoop);
     }
 
     function ecgPalette(){
@@ -8671,18 +8665,18 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       ctx.stroke();
       ctx.shadowBlur=0;
 
-      // Continuidade discreta: um pequeno trecho acompanha a própria curva do ECG.
-      // Sem feixe vertical, brilho neon ou deslocamento do traçado.
-      if(state.ecgAnimated){
-        const sweepPeriod=5200;
+      // Continuidade visível e discreta: o destaque percorre a curva, sem mover o ECG.
+      // Funciona também no modo estático; nesse modo apenas o destaque se movimenta.
+      {
+        const sweepPeriod=3600;
         const sweepX=((performance.now()%sweepPeriod)/sweepPeriod)*w;
-        const segmentW=Math.max(30,Math.min(72,w*0.055));
+        const segmentW=Math.max(54,Math.min(110,w*0.085));
         const startX=Math.max(0,sweepX-segmentW);
-        const endX=Math.min(w-1,sweepX+2);
+        const endX=Math.min(w-1,sweepX+3);
         const fade=ctx.createLinearGradient(startX,0,Math.max(startX+1,endX),0);
         fade.addColorStop(0,'rgba(84,231,168,0)');
-        fade.addColorStop(0.65,state.theme==='light'?'rgba(5,150,105,.12)':'rgba(84,231,168,.18)');
-        fade.addColorStop(1,state.theme==='light'?'rgba(5,150,105,.32)':'rgba(84,231,168,.38)');
+        fade.addColorStop(0.45,state.theme==='light'?'rgba(5,150,105,.20)':'rgba(84,231,168,.24)');
+        fade.addColorStop(1,state.theme==='light'?'rgba(5,150,105,.48)':'rgba(84,231,168,.55)');
         ctx.beginPath();
         for(let x=Math.floor(startX);x<=endX;x++){
           const samplePos=lastIdx-(w-1-x)*samplesPerPx;
