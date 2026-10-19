@@ -7397,7 +7397,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       registerArenaHostRoom(state.pin);
     }
     function setupPeer(pin){try{state.peer?.destroy();state.peer=new Peer('ecg-sim-room-'+pin,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});state.peer.on('open',()=>{$('hostNetBadge').textContent='Sala ativa · PIN '+pin});state.peer.on('connection',conn=>{conn.on('data',m=>handleHostMessage(m,conn));conn.on('close',()=>{const p=Array.from(state.participants.values()).find(x=>x.conn===conn);if(!p)return;p.conn=null;if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=setTimeout(()=>{if(state.participants.get(p.id)===p&&!p.conn)removeParticipant(p.id)},300000)})});state.peer.on('error',e=>{console.warn(e);$('hostNetBadge').textContent='Sala local ativa · confira a conexão'})}catch(e){console.warn(e)}}
-    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){return}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
+    function handleHostMessage(msg,conn){if(!msg?.type)return;if(msg.type==='JOIN'){const id=msg.studentId||(conn?.peer||'local-'+Date.now());let p=state.participants.get(id);if(p){if(p.reconnectTimer)clearTimeout(p.reconnectTimer);p.reconnectTimer=null;if(conn)p.conn=conn;const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar,totalScore:p.score,streak:p.streak};if(conn?.open)conn.send(ack);else state.channel?.postMessage({...ack,targetStudentId:id});if(state.currentRhythm&&!state.isRevealed){const q=questionPayload();if(conn?.open)conn.send(q);else state.channel?.postMessage({...q,targetStudentId:id})}else if(state.isRevealed&&p.lastRevealPayload){if(conn?.open)conn.send(p.lastRevealPayload);else state.channel?.postMessage({...p.lastRevealPayload,targetStudentId:id})}updateParticipants();return}p={id,name:String(msg.name||'Participante').trim().slice(0,20),avatar:AVATARS.some(a=>a.id===msg.avatar)?msg.avatar:'stetho',conn,score:0,streak:0,lastAnswer:null,joinedAt:Date.now()};state.participants.set(id,p);const ack={type:'JOIN_ACK',studentId:id,studentName:p.name,avatar:p.avatar};if(conn?.open)conn.send(ack);state.channel?.postMessage(ack);updateParticipants();playJoinChime();if(state.currentRhythm&&!state.isRevealed)sendParticipant(p,questionPayload())}else if(msg.type==='ANSWER'){const answer=msg;const participant=state.participants.get(answer.studentId);if(!participant||state.roundLocked||state.isRevealed||answer.round!==state.roundNumber||Date.now()>state.roundDeadline||state.answersReceived.has(answer.studentId))return;state.answersReceived.set(answer.studentId,{choiceId:answer.choiceId,answeredAt:Date.now()});participant.lastAnswer=answer.choiceId;updateAnswerProgress();sendParticipant(participant,{type:'ANSWER_ACK',studentId:answer.studentId,choiceId:answer.choiceId,round:answer.round});updateLeaderboard();if(state.participants.size&&state.answersReceived.size>=state.participants.size)handleRoundEnd()}else if(msg.type==='LEAVE'){removeParticipant(msg.studentId)}}
     function sendParticipant(p, msg) {
       let sentPeer = false;
       if (p?.conn?.open) {
@@ -8978,7 +8978,14 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if (!msg?.type) return;
       if (msg.targetStudentId && state.studentId && msg.targetStudentId !== state.studentId) return;
       if (msg.studentId && msg.type === 'ROUND_REVEAL' && state.studentId && msg.studentId !== state.studentId) return;
-      if (msg.type === 'LOBBY_COUNT') {
+      if (msg.type === 'ANSWER_ACK') {
+        if (msg.studentId !== state.studentId || msg.round !== state.roundNumber || msg.choiceId !== state.studentLastChoice) return;
+        const selected = $('studentChoices')?.querySelector(`[data-choice="${msg.choiceId}"]`);
+        const status = selected?.querySelector('.answer-status');
+        if (status) status.textContent = 'Resposta registrada';
+        if (selected) selected.dataset.answerConfirmed = 'true';
+      }
+      else if (msg.type === 'LOBBY_COUNT') {
         const colleagues = Math.max(0, (Number(msg.count) || 0) - 1);
         const countEl = $('studentLobbyCount');
         if (countEl) countEl.textContent = colleagues + (colleagues === 1 ? ' colega conectado' : ' colegas conectados');
@@ -9053,7 +9060,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       grid.innerHTML = (msg.choices || []).map(c => `
         <button type="button" data-choice="${c.id}" class="answer-tile ${c.color}">
           <span class="shape">${c.shape}</span>
-          <span class="answer-status">Resposta enviada</span>
+          <span class="answer-status">Aguardando confirmação...</span>
         </button>
       `).join('');
 
