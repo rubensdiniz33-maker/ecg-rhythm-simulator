@@ -6726,9 +6726,6 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if ($('mobileSumRounds')) $('mobileSumRounds').textContent = String(effectiveRounds);
       if ($('mobileSumDuration')) $('mobileSumDuration').textContent = `${effectiveRounds > 0 ? Math.max(1, Math.round((effectiveRounds * (duration + 5)) / 60)) : 0} min`;
       if ($('mobileSumRoundDuration')) $('mobileSumRoundDuration').textContent = `${duration}s`;
-      if ($('mobileSumRounds')) $('mobileSumRounds').textContent = String(effectiveRounds);
-      if ($('mobileSumDuration')) $('mobileSumDuration').textContent = `${effectiveRounds > 0 ? Math.max(1, Math.round((effectiveRounds * (duration + 5)) / 60)) : 0} min`;
-      if ($('mobileSumRoundDuration')) $('mobileSumRoundDuration').textContent = `${duration}s`;
       const totalSeconds = effectiveRounds * (duration + 5);
       const estMinutes = effectiveRounds > 0 ? Math.max(1, Math.round(totalSeconds / 60)) : 0;
       if ($('sumEstimatedTime')) $('sumEstimatedTime').textContent = `${estMinutes} min`;
@@ -8983,7 +8980,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
       });
     }
     $('themeToggleFloating')?.addEventListener('click', toggleTheme);
-    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('rhythms');switchView('viewHostSetup')}else switchView('viewHome');
+    const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
   
     // Feedback de clique da Home: breve pulso antes de executar a ação existente.
     (() => {
