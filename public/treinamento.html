@@ -4791,36 +4791,44 @@
     }
 
   
-    .live-competition-panel{position:fixed;right:clamp(12px,2vw,28px);bottom:clamp(82px,10vh,118px);z-index:1400;width:min(390px,calc(100vw - 24px));padding:17px 18px 15px;border:1px solid rgba(56,189,248,.55);border-radius:18px;background:linear-gradient(145deg,rgba(5,15,29,.97),rgba(12,25,43,.96));color:#f8fafc;box-shadow:0 18px 60px rgba(0,0,0,.48),0 0 28px rgba(14,165,233,.16);backdrop-filter:blur(14px);animation:liveCompetitionEnter .42s cubic-bezier(.2,.8,.2,1) both}
+    /* Ranking parcial em linguagem visual de placar esportivo, não de conversa */
+    .live-competition-panel{position:fixed;right:clamp(16px,2.4vw,38px);bottom:clamp(76px,8vh,104px);z-index:1400;width:min(430px,calc(100vw - 28px));padding:0;overflow:hidden;border:1px solid rgba(125,211,252,.38);border-radius:20px;background:linear-gradient(155deg,rgba(7,17,31,.985),rgba(3,9,18,.985) 72%);color:#f8fafc;box-shadow:0 24px 72px rgba(0,0,0,.58),0 0 0 1px rgba(255,255,255,.035) inset,0 0 38px rgba(14,165,233,.12);backdrop-filter:blur(18px);animation:liveCompetitionEnter .42s cubic-bezier(.2,.8,.2,1) both}
+    .live-competition-panel:before{content:"";display:block;height:3px;background:linear-gradient(90deg,#22d3ee 0%,#60a5fa 42%,#c4f56a 100%)}
     .live-competition-panel.hidden{display:none}
-    .live-competition-topline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .live-competition-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px 0}
     .live-competition-actions{display:flex;align-items:center;gap:6px;flex:none}
-    .live-competition-icon-btn{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(148,163,184,.25);border-radius:9px;background:rgba(15,23,42,.82);color:#cbd5e1;font-size:16px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
-    .live-competition-icon-btn:hover{background:rgba(14,165,233,.2);border-color:rgba(56,189,248,.55);color:#fff}
-    .live-competition-panel.is-collapsed .live-competition-heading,.live-competition-panel.is-collapsed .live-competition-message,.live-competition-panel.is-collapsed .live-competition-list{display:none}
-    .live-competition-panel.is-collapsed{width:min(310px,calc(100vw - 24px));padding:10px 12px}
-    .live-competition-kicker{font-size:10px;letter-spacing:.17em;font-weight:950;color:#67e8f9}
-    .live-competition-round{font-size:10px;font-weight:850;color:#cbd5e1}
-    .live-competition-heading{margin-top:5px;font-size:22px;line-height:1.05;font-weight:1000;letter-spacing:-.045em}
-    .live-competition-message{margin:10px 0 11px;padding:8px 10px;border-radius:10px;background:rgba(14,165,233,.13);border:1px solid rgba(56,189,248,.22);font-size:12px;line-height:1.35;font-weight:850;color:#bae6fd}
-    .live-competition-message.has-movement{color:#fef08a;background:rgba(234,179,8,.13);border-color:rgba(250,204,21,.38);animation:liveCompetitionPulse .8s ease-out}
-    .live-competition-list{display:flex;flex-direction:column;gap:6px;list-style:none;padding:0;margin:0}
-    .live-rank-row{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 8px;border:1px solid rgba(148,163,184,.13);border-radius:10px;background:rgba(15,23,42,.72);animation:liveCompetitionRow .3s ease-out both;animation-delay:var(--rank-delay)}
-    .live-rank-number{display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:7px;background:rgba(56,189,248,.13);color:#bae6fd;font-size:13px;font-weight:1000}
-    .live-rank-row:first-child .live-rank-number{background:linear-gradient(135deg,#facc15,#f59e0b);color:#422006}
-    .live-rank-avatar{font-size:17px;flex:0 0 auto}
-    .live-rank-player{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
-    .live-rank-player strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:900}
-    .live-rank-player small{font-size:9px;font-weight:800;letter-spacing:.035em;color:#94a3b8}
-    .live-rank-score{font-size:12px;font-weight:950;color:#bef264;font-variant-numeric:tabular-nums}
-    .live-rank-movement{font-size:10px;font-weight:950;white-space:nowrap}
-    .live-rank-movement.up{color:#86efac}.live-rank-movement.down{color:#fca5a5}
-    .live-rank-streak{font-size:9px;font-weight:850;color:#fcd34d;white-space:nowrap}
+    .live-competition-icon-btn{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(148,163,184,.22);border-radius:9px;background:rgba(255,255,255,.045);color:#dbeafe;font-size:15px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
+    .live-competition-icon-btn:hover{background:rgba(56,189,248,.15);border-color:rgba(125,211,252,.65);color:#fff}
+    .live-competition-panel.is-collapsed .live-competition-heading,.live-competition-panel.is-collapsed .live-competition-message,.live-competition-panel.is-collapsed .live-competition-list,.live-competition-panel.is-collapsed .live-competition-subhead{display:none}
+    .live-competition-panel.is-collapsed{width:min(330px,calc(100vw - 24px));padding-bottom:9px}
+    .live-competition-kicker{font-size:9px;letter-spacing:.2em;font-weight:1000;color:#67e8f9}
+    .live-competition-round{font-size:9px;letter-spacing:.12em;font-weight:900;color:#94a3b8}
+    .live-competition-heading{margin:8px 15px 0;font-size:25px;line-height:1;font-weight:1000;letter-spacing:-.055em;text-transform:uppercase}
+    .live-competition-subhead{display:flex;align-items:center;gap:7px;margin:7px 15px 12px;color:#94a3b8;font-size:9px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+    .live-competition-subhead:before{content:"";width:17px;height:2px;background:#c4f56a;border-radius:2px}
+    .live-competition-message{margin:0 15px 11px;padding:8px 10px;border-left:2px solid #38bdf8;background:linear-gradient(90deg,rgba(56,189,248,.1),rgba(56,189,248,0));font-size:11px;line-height:1.35;font-weight:850;color:#bae6fd}
+    .live-competition-message.has-movement{border-left-color:#facc15;color:#fef08a;background:linear-gradient(90deg,rgba(250,204,21,.12),rgba(250,204,21,0));animation:liveCompetitionPulse .8s ease-out}
+    .live-competition-list{display:flex;flex-direction:column;gap:5px;list-style:none;padding:0 12px 14px;margin:0}
+    .live-rank-row{position:relative;display:flex;align-items:center;gap:9px;min-width:0;padding:9px 10px;border:1px solid rgba(148,163,184,.1);border-radius:11px;background:linear-gradient(100deg,rgba(30,41,59,.76),rgba(15,23,42,.52));animation:liveCompetitionRow .3s ease-out both;animation-delay:var(--rank-delay)}
+    .live-rank-row:first-child{border-color:rgba(250,204,21,.34);background:linear-gradient(100deg,rgba(161,98,7,.2),rgba(30,41,59,.78) 58%,rgba(15,23,42,.68))}
+    .live-rank-row:nth-child(2) .live-rank-number{color:#e2e8f0;border-color:rgba(226,232,240,.25)}
+    .live-rank-row:nth-child(3) .live-rank-number{color:#fdba74;border-color:rgba(251,146,60,.28)}
+    .live-rank-number{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid rgba(125,211,252,.2);border-radius:9px;background:rgba(56,189,248,.09);color:#bae6fd;font-size:13px;font-weight:1000;font-variant-numeric:tabular-nums}
+    .live-rank-row:first-child .live-rank-number{border:0;background:linear-gradient(145deg,#fde68a,#f59e0b);color:#422006;box-shadow:0 3px 12px rgba(245,158,11,.2)}
+    .live-rank-avatar{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:rgba(148,163,184,.1);font-size:16px;flex:0 0 auto}
+    .live-rank-player{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+    .live-rank-player strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:950;letter-spacing:.005em}
+    .live-rank-player small{font-size:9px;color:#94a3b8;font-weight:800;letter-spacing:.025em;text-transform:uppercase}
+    .live-rank-score{font-size:13px;font-weight:1000;font-variant-numeric:tabular-nums;color:#d9f99d;white-space:nowrap}
+    .live-rank-score:after{content:" PTS";font-size:8px;letter-spacing:.08em;color:#94a3b8;margin-left:2px}
+    .live-rank-movement{font-size:9px;font-weight:1000;white-space:nowrap;padding:3px 5px;border-radius:5px;background:rgba(16,185,129,.1)}
+    .live-rank-movement.up{color:#86efac}.live-rank-movement.down{color:#fca5a5;background:rgba(239,68,68,.1)}
+    .live-rank-streak{font-size:8px;font-weight:950;color:#fcd34d;white-space:nowrap;letter-spacing:.02em}
     .live-rank-empty{padding:12px;color:#cbd5e1;font-size:12px}
     @keyframes liveCompetitionEnter{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes liveCompetitionRow{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
-    @keyframes liveCompetitionPulse{0%{transform:scale(.98)}45%{transform:scale(1.025)}100%{transform:scale(1)}}
-    @media(max-width:640px){.live-competition-panel{right:10px;bottom:90px;width:min(340px,calc(100vw - 20px));padding:13px}.live-competition-heading{font-size:19px}.live-rank-row{gap:6px;padding:6px}.live-rank-player strong{font-size:11px}}
+    @keyframes liveCompetitionRow{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes liveCompetitionPulse{0%{transform:scale(.99)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
+    @media(max-width:640px){.live-competition-panel{right:10px;bottom:90px;width:min(360px,calc(100vw - 20px))}.live-competition-heading{font-size:21px}.live-rank-row{gap:6px;padding:7px}.live-rank-player strong{font-size:11px}.live-rank-score{font-size:11px}}
 
     /* Confirmação interna do Arena ECG */
     .arena-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(2,6,23,.76);backdrop-filter:blur(8px)}
@@ -5763,8 +5771,8 @@
                 <label class="block">
                   <span class="text-xs font-bold text-slate-300">Frequência do ranking</span>
                   <select id="rankingFrequencySelect" class="field text-xs mt-1.5 w-full cursor-pointer">
-                    <option value="every_20_percent" selected>A cada 20% das questões</option>
-                    <option value="every_40_percent">A cada 40% das questões</option>
+                    <option value="every_20_percent">A cada 20% das questões</option>
+                    <option value="every_40_percent" selected>A cada 40% das questões</option>
                     <option value="every_60_percent">A cada 60% das questões</option>
                     <option value="every_80_percent">A cada 80% das questões</option>
                     <option value="every_question">Após toda questão</option>
@@ -6571,7 +6579,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       roundQueue:[],queueIndex:0,lastRoundId:null,roundLocked:false,isPaused:false,
       pauseReasons:new Set(),theme:'dark',answerOrder:[],
       isExplaining:false,config: { ecgMode: 'static',
-      ecgAnimated: false,rankingFrequency:'every_20_percent',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true,
+      ecgAnimated: false,rankingFrequency:'every_40_percent',studentShowsPosition:true,showBpmDuringQuestion:true,setupFcDefaultV2:true,
       revealAnimation:'immersive',showVoteCounts:true,showRankChanges:true,showStreakHighlights:true},
       projection:false,currentSamples:new Float32Array(),sampleOffset:0,
       zoomRect:null,zoomMode:false,rulerOn:false,previousRank:new Map(),lastRankChanges:new Map()
@@ -7806,7 +7814,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
           const c=JSON.parse(raw);
           if(c.ecgMode)state.config.ecgMode=c.ecgMode;
           if(c.revealExplanation)state.config.revealExplanation=c.revealExplanation;
-          if(c.rankingFrequency)state.config.rankingFrequency=c.rankingFrequency;
+          if(c.rankingFrequency)state.config.rankingFrequency=(c.rankingFrequency==='every_question'?'every_40_percent':c.rankingFrequency);
           if(c.revealAnimation)state.config.revealAnimation=c.revealAnimation;
           if(typeof c.showVoteCounts==='boolean')state.config.showVoteCounts=c.showVoteCounts;
           if(typeof c.showRankChanges==='boolean')state.config.showRankChanges=c.showRankChanges;
@@ -7886,21 +7894,23 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
     }
     function shouldShowRankingThisRound(){
-      const freq=state.config.rankingFrequency||'every_20_percent';
+      const freq=state.config.rankingFrequency||'every_40_percent';
       const total=Math.max(1,Number(state.roundLimit)||Number(state.roundQueue?.length)||1);
       const completed=Math.max(0,Number(state.roundNumber)||0);
       const isLast=completed>=total;
       if(freq==='never')return false;
       if(freq==='end_only')return isLast;
+      if(freq==='every_question')return completed>0;
       if(isLast)return true;
       if(freq==='every_5')return completed>0&&completed%5===0;
-      if(freq==='every_question')return completed>0;
       const match=freq.match(/^every_(20|40|60|80)_percent$/);
       if(match){
-        const interval=Math.max(1,Math.ceil(total*Number(match[1])/100));
-        return completed>0&&(completed%interval===0||completed===1&&total===1);
+        // Em partidas curtas, nunca transformar o ranking parcial em um pop-up a cada questão.
+        // Percentuais são espaçados por no mínimo duas rodadas; o resultado final continua aparecendo.
+        const interval=Math.max(2,Math.ceil(total*Number(match[1])/100));
+        return completed>0&&completed%interval===0;
       }
-      return completed>0&&(completed%Math.max(1,Math.ceil(total*.2))===0||completed===1);
+      return completed>0&&completed%Math.max(2,Math.ceil(total*.4))===0;
     }
     function hideLiveCompetitionPanel(){
       const panel=$('liveCompetitionPanel');
