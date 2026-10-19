@@ -8075,8 +8075,22 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       btn.setAttribute('aria-label',btn.title);
       btn.setAttribute('aria-pressed',liveCompetitionMuted?'true':'false');
     });
+    async function persistArenaFinish(){
+      if(!state.pin||!state.arenaHostToken)return false;
+      for(let attempt=0;attempt<3;attempt++){
+        try{
+          await arenaApi({action:'finish_room',pin:state.pin,hostToken:state.arenaHostToken,gameState:arenaSnapshot()});
+          return true;
+        }catch(error){
+          if(attempt===2)console.error('Arena finish persistence:',error);
+          else await new Promise(resolve=>setTimeout(resolve,300*(attempt+1)));
+        }
+      }
+      return false;
+    }
     function showPodium() {
       state.sessionFinished=true;
+      void persistArenaFinish();
       queueArenaHostSync();
       clearInterval(state.timerHandle);
       cancelAnimationFrame(ecgFrame);
