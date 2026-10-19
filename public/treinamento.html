@@ -8522,7 +8522,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
 
       currentRateTarget=(rhythm.rateKey==='rate'&&Number.isFinite(Number(defs.rate)))?Number(defs.rate):null;
       lastRateVariationAt=performance.now();
-      state.ecgAnimated = (state.config.ecgMode === 'animated');
+      // O estado animado é inicializado ao começar a partida, não a cada pergunta.
       lastHeartSoundAt=0;
       if(state.ecgAnimated)getAudio();
       updateAnimationButtonUI();
@@ -9590,7 +9590,7 @@ function animatePoints(points) {
     if ($('btnGoToJoin')) $('btnGoToJoin').onclick = () => showJoin('');
     if ($('joinForm')) $('joinForm').onsubmit = submitJoin;
     if ($('joinBack')) $('joinBack').onclick = () => switchView('viewHome');
-    if ($('btnStartGame')) $('btnStartGame').onclick = () => { getAudio(); buildRoundQueue(); startNextRound(); };
+    if ($('btnStartGame')) $('btnStartGame').onclick = () => { getAudio(); state.ecgAnimated = (state.config.ecgMode === 'animated'); updateAnimationButtonUI(); buildRoundQueue(); startNextRound(); };
     if ($('btnToggleAnimation')) $('btnToggleAnimation').onclick = toggleEcgAnimation;
     if ($('btnPause')) $('btnPause').onclick = toggleEcgAnimation;
     if ($('btnReveal')) $('btnReveal').onclick = revealRound;
