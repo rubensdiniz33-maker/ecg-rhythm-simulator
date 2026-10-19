@@ -5950,6 +5950,8 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function arenaSnapshot(){return {selectedRhythmIds:state.selectedRhythmIds||[],gameMode:state.gameMode,difficulty:state.difficulty,roundLimit:state.roundLimit,roundDuration:state.roundDuration,roundNumber:state.roundNumber,queueIndex:state.queueIndex,currentRhythmId:state.currentRhythm?.id||null,isRevealed:!!state.isRevealed,isPaused:!!state.isPaused,sessionStats:state.sessionStats||{}}}
     function registerArenaHostRoom(pin){
+      state.sessionFinished=false;
+      state.sessionClosed=false;
       arenaHostCreatePromise=arenaApi({action:'create_room',pin,gameState:arenaSnapshot()}).then(data=>{state.arenaHostToken=data.hostToken;state.arenaRoomId=data.room.id;try{sessionStorage.setItem(ARENA_HOST_SESSION_KEY,JSON.stringify({pin,hostToken:data.hostToken,roomId:data.room.id}))}catch(e){};queueArenaHostSync();return data}).catch(error=>{console.warn('Arena Supabase:',error);return null});
       return arenaHostCreatePromise;
     }
