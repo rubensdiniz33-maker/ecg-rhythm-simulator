@@ -7490,7 +7490,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));
       state.answersReceived.clear();
       state.isRevealed=false;
-      $('liveCompetitionPanel')?.classList.add('hidden');
+      if($('liveCompetitionPanel')){ $('liveCompetitionPanel').classList.add('hidden'); $('liveCompetitionPanel').style.display='none'; $('liveCompetitionPanel').setAttribute('aria-hidden','true'); }
       state.roundLocked=false;
       state.isPaused=false;
       state.isExplaining=false;
@@ -7687,7 +7687,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         state.lastRankChanges.set(r.p.id,{from:old,to:i+1,delta:r.rankDelta});
         state.previousRank.set(r.p.id,i+1);
       });
-      updateLeaderboard();
+      updateLeaderboard(true);
       const resultById=new Map(results.map(r=>[r.p.id,r]));
       // 1. Revela apenas o diagnóstico; a FC permanece exclusivamente no monitor.
       const qHeader = document.querySelector('.projection-question');
@@ -7881,23 +7881,28 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function shouldShowRankingThisRound(){
       const freq=state.config.rankingFrequency||'every_20_percent';
       const total=Math.max(1,Number(state.roundLimit)||Number(state.roundQueue?.length)||1);
-      const isLast=!!((state.roundLimit&&state.roundNumber>=state.roundLimit)||(state.queueIndex>=state.roundQueue.length));
+      const completed=Math.max(0,Number(state.roundNumber)||0);
+      const isLast=completed>=total;
       if(freq==='never')return false;
       if(freq==='end_only')return isLast;
       if(isLast)return true;
-      if(freq==='every_5')return state.roundNumber%5===0;
-      if(freq==='every_question')return true;
+      if(freq==='every_5')return completed>0&&completed%5===0;
+      if(freq==='every_question')return completed>0;
       const match=freq.match(/^every_(20|40|60|80)_percent$/);
       if(match){
         const interval=Math.max(1,Math.ceil(total*Number(match[1])/100));
-        return state.roundNumber>0&&state.roundNumber%interval===0;
+        return completed>0&&(completed%interval===0||completed===1&&total===1);
       }
-      return state.roundNumber===1;
+      return completed>0&&(completed%Math.max(1,Math.ceil(total*.2))===0||completed===1);
     }
-    function updateLeaderboard(){
+    function updateLeaderboard(forceReveal=false){
       const panel=$('liveCompetitionPanel');
-      const show=!!(state.isRevealed&&shouldShowRankingThisRound());
-      if(panel)panel.classList.toggle('hidden',!show);
+      const show=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound());
+      if(panel){
+        panel.classList.toggle('hidden',!show);
+        panel.style.display=show?'block':'none';
+        panel.setAttribute('aria-hidden',show?'false':'true');
+      }
       if(!show)return;
       const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
       const top=list.slice(0,5);
