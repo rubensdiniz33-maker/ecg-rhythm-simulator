@@ -6527,7 +6527,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateSelectedCount(){
       const n = document.querySelectorAll('#rhythmLibrary input:checked').length;
       if ($('selectedCount')) $('selectedCount').textContent = String(n);
+      if ($('selectedCountTotal')) $('selectedCountTotal').textContent = String(ECG_RHYTHMS.length);
       if ($('mobileSumCount')) $('mobileSumCount').textContent = String(n);
+      renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value || '');
       if (n && $('setupError')) $('setupError').classList.add('hidden');
 
       // Update each category badge count
@@ -6536,7 +6538,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const total = grp.querySelectorAll('input').length;
         const checked = grp.querySelectorAll('input:checked').length;
         const countSpan = grp.querySelector('.cat-selected-count');
-        if (countSpan) countSpan.textContent = String(checked);
+        if (countSpan) countSpan.textContent = `${checked}/${total}`;
         const badge = grp.querySelector('.category-badge');
         if (badge) {
           badge.classList.toggle('text-lime-300', checked > 0);
@@ -6706,6 +6708,9 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const duration = Number($('roundDurationSelect')?.value) || 25;
       if ($('sumRoundDuration')) $('sumRoundDuration').textContent = `${duration}s por rodada`;
 
+      if ($('mobileSumRounds')) $('mobileSumRounds').textContent = String(effectiveRounds);
+      if ($('mobileSumDuration')) $('mobileSumDuration').textContent = `${effectiveRounds > 0 ? Math.max(1, Math.round((effectiveRounds * (duration + 5)) / 60)) : 0} min`;
+      if ($('mobileSumRoundDuration')) $('mobileSumRoundDuration').textContent = `${duration}s`;
       const totalSeconds = effectiveRounds * (duration + 5);
       const estMinutes = effectiveRounds > 0 ? Math.max(1, Math.round(totalSeconds / 60)) : 0;
       if ($('sumEstimatedTime')) $('sumEstimatedTime').textContent = `${estMinutes} min`;
@@ -6748,6 +6753,16 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }
       }
 
+      // Revisão da etapa 4, sincronizada com a configuração atual.
+      const review=$('reviewSummaryContent');
+      if(review){
+        const activePreset=document.querySelector('.preset-card.active');
+        const presetName=activePreset?.querySelector('.font-black')?.textContent?.trim()||'Personalizada';
+        const names=[...checkedInputs].map(input=>rhythmById(input.value)?.name||input.value);
+        const chips=names.length?names.map(name=>`<span class="inline-flex text-[10px] sm:text-xs px-2 py-1 rounded-lg border border-slate-700 bg-slate-900/70">${escapeHTML(name)}</span>`).join(''):'<span class="text-xs text-rose-300">Nenhum ritmo selecionado.</span>';
+        const gameMode=$('gameMode')?.value||'random', diff=$('difficultySelect')?.value||'easy', ecgMode=$('ecgModeSelect')?.value||'static';
+        review.innerHTML=`<div class="setup-review-card"><div class="flex items-start justify-between gap-3"><div><h3>Modelo da partida</h3><p class="font-bold text-sm mt-1">${escapeHTML(presetName)}</p></div><button class="setup-review-edit" type="button" data-go-step="model">Editar</button></div></div><div class="setup-review-card"><div class="flex items-start justify-between gap-3"><div><h3>Ritmos · ${count} selecionados</h3><div class="flex flex-wrap gap-1.5 mt-2">${chips}</div></div><button class="setup-review-edit" type="button" data-go-step="rhythms">Editar</button></div></div><div class="setup-review-card"><div class="flex items-start justify-between gap-3"><div class="min-w-0"><h3>Regras principais</h3><p class="text-xs mt-2 text-slate-300">${gameMode==='sequence'?'Sequência personalizada':'Sorteio aleatório'} · ${diff==='hard'?'Dificuldade alta':'Dificuldade fácil'}</p><p class="text-xs mt-1 text-slate-400">${ecgMode==='animated'?'Traçado animado':'Traçado estático'} · ${duration}s por rodada · ${effectiveRounds} rodadas</p></div><button class="setup-review-edit" type="button" data-go-step="rules">Editar</button></div></div><div class="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 text-xs text-slate-300">Duração estimada: <strong class="text-cyan-300">${estMinutes} min</strong>. A sala será criada após a validação das configurações.</div>`;
+      }
       // 5. Status badge
       if ($('summaryBadgeStatus')) {
         if (count === 0) {
@@ -6812,42 +6827,27 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       renderSequence();
     }
 
-    function filterRhythms(query){
-      const q = (query || '').trim().toLowerCase();
-      if ($('btnClearSearch')) $('btnClearSearch').classList.toggle('hidden', !q);
-      let matchedTotal = 0;
-
-      document.querySelectorAll('.category-group').forEach(grp => {
-        let groupMatches = 0;
-        grp.querySelectorAll('.rhythm-card').forEach(card => {
-          const name = card.dataset.name || '';
-          const shortName = card.dataset.short || '';
-          const feature = card.dataset.feature || '';
-          const matches = !q || name.includes(q) || shortName.includes(q) || feature.includes(q);
-          card.classList.toggle('hidden', !matches);
-          if (matches) groupMatches++;
-        });
-
-        if (q) {
-          grp.classList.toggle('hidden', groupMatches === 0);
-          if (groupMatches > 0) grp.classList.remove('collapsed');
-        } else {
-          grp.classList.remove('hidden');
-        }
-        matchedTotal += groupMatches;
-      });
-
-      const notice = $('searchResultNotice');
-      if (notice) {
-        if (q) {
-          notice.classList.remove('hidden');
-          notice.textContent = `${matchedTotal} ritmo(s) encontrado(s) para "${query}"`;
-        } else {
-          notice.classList.add('hidden');
-        }
-      }
+    function renderGlobalRhythmSearchResults(query){
+      const container=$('globalRhythmSearchResults'); if(!container)return;
+      const q=(query||'').trim().toLowerCase();
+      if(!q){container.classList.add('hidden');container.innerHTML='';return;}
+      const results=ECG_RHYTHMS.filter(r=>[r.name,r.shortName,r.teaching?.keyFeature,CLINICAL_CATEGORIES[r.category]?.label,r.id].join(' ').toLowerCase().includes(q));
+      container.classList.remove('hidden');
+      container.innerHTML=results.length?results.map(r=>{
+        const selected=!!document.querySelector(`#rhythmLibrary input[value="${r.id}"]:checked`);
+        const category=CLINICAL_CATEGORIES[r.category]?.label||'Outros';
+        return `<button type="button" class="global-rhythm-result" data-search-rhythm="${escapeHTML(r.id)}" aria-pressed="${selected}"><span class="flex-none w-5 h-5 rounded-md border flex items-center justify-center text-xs font-black ${selected?'border-cyan-300 bg-cyan-300/15 text-cyan-200':'border-slate-600 text-transparent'}">${selected?'✓':'·'}</span><span class="min-w-0 flex-1"><span class="block text-xs sm:text-sm font-bold">${escapeHTML(r.name)}</span><span class="block text-[10px] text-slate-400 mt-0.5">${escapeHTML(category)} · ${escapeHTML(r.shortName||'')}</span></span><span class="text-[10px] font-bold text-cyan-300">${selected?'Selecionado':'Selecionar'}</span></button>`;
+      }).join(''):'<p class="text-xs text-slate-400 p-3">Nenhum ritmo encontrado. Tente outra sigla ou termo clínico.</p>';
     }
-
+    function filterRhythms(query){
+      const q=(query||'').trim().toLowerCase();
+      if($('btnClearSearch'))$('btnClearSearch').classList.toggle('hidden',!q);
+      $('rhythmLibrary')?.classList.toggle('hidden',!!q);
+      renderGlobalRhythmSearchResults(q);
+      const total=q?ECG_RHYTHMS.filter(r=>[r.name,r.shortName,r.teaching?.keyFeature,CLINICAL_CATEGORIES[r.category]?.label,r.id].join(' ').toLowerCase().includes(q)).length:0;
+      const notice=$('searchResultNotice');
+      if(notice){notice.classList.toggle('hidden',!q);notice.textContent=q?`${total} ritmo(s) encontrado(s) para "${query}"`:'';}
+    }
     // === PREVIEW MODAL LOGIC ===
     let previewEngine = window.previewEngine = null;
     window.getPreviewEngine = () => previewEngine;
@@ -8668,7 +8668,7 @@ function animatePoints(points) {
       renderRhythmLibrary();
       loadStoredConfig();
       updateSessionSummary();
-      showSetupTab('rhythms');
+      showSetupTab('model');
       switchView('viewHostSetup');
     };
     $('btnSetupBack').onclick = () => switchView('viewHome');
@@ -8736,20 +8736,26 @@ function animatePoints(points) {
       };
     }
 
-    // Abas da configuração: exibe uma etapa por vez.
+    $('globalRhythmSearchResults')?.addEventListener('click',(event)=>{
+      const button=event.target.closest('[data-search-rhythm]'); if(!button)return;
+      const input=document.querySelector(`#rhythmLibrary input[value="${button.dataset.searchRhythm}"]`); if(!input)return;
+      input.checked=!input.checked; input.closest('.rhythm-card')?.classList.toggle('selected',input.checked);
+      document.querySelectorAll('.preset-card').forEach(p=>p.classList.remove('active'));
+      updateSelectedCount(); renderSequence(); renderGlobalRhythmSearchResults($('rhythmSearchInput')?.value||'');
+    });
+    // Navegação do assistente: quatro etapas clicáveis; resumo lateral persistente.
     function showSetupTab(tab){
-      if(!['rhythms','rules','summary'].includes(tab))tab='rhythms';
-      document.querySelectorAll('[data-setup-panel]').forEach(panel=>panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab));
-      document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{
-        const active=button.dataset.setupTab===tab;
-        button.classList.toggle('active',active);
-        button.setAttribute('aria-selected',String(active));
-      });
-      if(tab==='rules')toggleSequenceEditor();
-      if(tab==='summary')updateSessionSummary();
+      if(!['model','rhythms','rules','summary'].includes(tab))tab='model';
+      document.querySelectorAll('[data-setup-panel]').forEach(panel=>{if(panel.id!=='sectionSetupSummary')panel.classList.toggle('hidden',panel.dataset.setupPanel!==tab);});
+      document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>{const active=button.dataset.setupTab===tab;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});
+      const index=['model','rhythms','rules','summary'].indexOf(tab); if($('setupProgressFill'))$('setupProgressFill').style.width=`${Math.max(0,index)/3*100}%`;
+      if(tab==='rules')toggleSequenceEditor(); if(tab==='summary')updateSessionSummary();
+      if(window.innerWidth<=1023&&tab==='summary'){ $('mobileSummaryDetails')?.classList.remove('hidden'); $('mobileSetupBar')?.classList.add('is-expanded'); $('mobileSummaryToggle')?.setAttribute('aria-expanded','true'); }
     }
     document.querySelectorAll('#setupTabs [data-setup-tab]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.setupTab)));
-
+    document.querySelectorAll('[data-go-step]').forEach(button=>button.addEventListener('click',()=>showSetupTab(button.dataset.goStep)));
+    $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
+    $('btnCreateRoomFromReview')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
     // Settings listeners
     $('gameMode').onchange = () => { toggleSequenceEditor(); updateSessionSummary(); };
     $('difficultySelect').onchange = () => { state.difficulty = $('difficultySelect').value; updateSessionSummary(); };
