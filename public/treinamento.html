@@ -5184,6 +5184,10 @@
     body.theme-light #viewHostSetup .setup-step-icon { color:#036b8b!important; background:#e0f2fe!important; border-color:#7dd3fc!important; }
     body.theme-light #viewHostSetup .rhythm-card.selected { background:#e0f2fe!important; border-color:#0284c7!important; }
     body.theme-light #viewHostSetup .preset-card.active { border-color:#0284c7!important; background:#f0f9ff!important; box-shadow:0 0 0 1px #0284c7 inset!important; }
+
+    #viewHostSetup .advanced-rules[open] summary { border-bottom:1px solid var(--line); }
+    #viewHostSetup .advanced-rules summary::-webkit-details-marker { display:none; }
+    #viewHostSetup .advanced-rules summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
 </style>
 </head>
 <body>
@@ -5486,7 +5490,10 @@
                   </select>
                 </label>
 
-                <label class="block">
+                <details class="advanced-rules mt-4 rounded-xl border border-slate-800/80 bg-slate-950/20 overflow-hidden">
+                  <summary class="cursor-pointer select-none px-3.5 py-3 text-xs font-black text-cyan-300 flex items-center justify-between gap-3">Opções avançadas <span class="text-[10px] text-slate-500 font-semibold">Traçado, FC, explicações e ranking</span></summary>
+                  <div class="p-3.5 pt-0 space-y-3.5">
+<label class="block">
                   <span class="text-xs font-bold text-slate-300">Traçado do ECG</span>
                   <select id="ecgModeSelect" class="field text-xs mt-1.5 w-full cursor-pointer">
                     <option value="static" selected>Estático (padrão · faixa fixa de ~8s)</option>
@@ -5529,6 +5536,8 @@
                   </label>
                   <p class="text-[10px] text-slate-500 mt-1 pl-6.5">Exibe a posição individual no resultado de cada rodada no celular.</p>
               </div>
+                  </div>
+                </details>
             </div>
           </section>
 
