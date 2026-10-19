@@ -7662,6 +7662,18 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     async function revealRound(){
       if(state.isRevealed||!state.currentRhythm||state.revealInProgress)return;
       state.revealInProgress=true;
+      let serverLocked=false;
+      for(let attempt=0;attempt<3&&!serverLocked;attempt++){
+        try{
+          await arenaApi({action:'lock_round',pin:state.pin,hostToken:state.arenaHostToken,roundNumber:state.roundNumber});
+          serverLocked=true;
+        }catch(error){if(attempt<2)await new Promise(resolve=>setTimeout(resolve,250*(attempt+1)));else console.error('Arena lock round:',error)}
+      }
+      if(!serverLocked){
+        state.revealInProgress=false;
+        showToast('O servidor não confirmou o bloqueio da rodada. A revelação foi pausada para proteger a pontuação. Tente novamente.');
+        return;
+      }
       const reconciled=await reconcileArenaRoundAnswers();
       if(state.isRevealed||!state.currentRhythm){state.revealInProgress=false;return;}
       if(!reconciled)showToast('Aviso: não foi possível confirmar todas as respostas salvas no servidor.');
