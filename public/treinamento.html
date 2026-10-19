@@ -4791,6 +4791,32 @@
     }
 
   
+    .live-competition-panel{position:fixed;right:clamp(12px,2vw,28px);bottom:clamp(82px,10vh,118px);z-index:1400;width:min(390px,calc(100vw - 24px));padding:17px 18px 15px;border:1px solid rgba(56,189,248,.55);border-radius:18px;background:linear-gradient(145deg,rgba(5,15,29,.97),rgba(12,25,43,.96));color:#f8fafc;box-shadow:0 18px 60px rgba(0,0,0,.48),0 0 28px rgba(14,165,233,.16);backdrop-filter:blur(14px);animation:liveCompetitionEnter .42s cubic-bezier(.2,.8,.2,1) both}
+    .live-competition-panel.hidden{display:none}
+    .live-competition-topline{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .live-competition-kicker{font-size:10px;letter-spacing:.17em;font-weight:950;color:#67e8f9}
+    .live-competition-round{font-size:10px;font-weight:850;color:#cbd5e1}
+    .live-competition-heading{margin-top:5px;font-size:22px;line-height:1.05;font-weight:1000;letter-spacing:-.045em}
+    .live-competition-message{margin:10px 0 11px;padding:8px 10px;border-radius:10px;background:rgba(14,165,233,.13);border:1px solid rgba(56,189,248,.22);font-size:12px;line-height:1.35;font-weight:850;color:#bae6fd}
+    .live-competition-message.has-movement{color:#fef08a;background:rgba(234,179,8,.13);border-color:rgba(250,204,21,.38);animation:liveCompetitionPulse .8s ease-out}
+    .live-competition-list{display:flex;flex-direction:column;gap:6px;list-style:none;padding:0;margin:0}
+    .live-rank-row{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 8px;border:1px solid rgba(148,163,184,.13);border-radius:10px;background:rgba(15,23,42,.72);animation:liveCompetitionRow .3s ease-out both;animation-delay:var(--rank-delay)}
+    .live-rank-number{display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:7px;background:rgba(56,189,248,.13);color:#bae6fd;font-size:13px;font-weight:1000}
+    .live-rank-row:first-child .live-rank-number{background:linear-gradient(135deg,#facc15,#f59e0b);color:#422006}
+    .live-rank-avatar{font-size:17px;flex:0 0 auto}
+    .live-rank-player{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+    .live-rank-player strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:900}
+    .live-rank-player small{font-size:9px;font-weight:800;letter-spacing:.035em;color:#94a3b8}
+    .live-rank-score{font-size:12px;font-weight:950;color:#bef264;font-variant-numeric:tabular-nums}
+    .live-rank-movement{font-size:10px;font-weight:950;white-space:nowrap}
+    .live-rank-movement.up{color:#86efac}.live-rank-movement.down{color:#fca5a5}
+    .live-rank-streak{font-size:9px;font-weight:850;color:#fcd34d;white-space:nowrap}
+    .live-rank-empty{padding:12px;color:#cbd5e1;font-size:12px}
+    @keyframes liveCompetitionEnter{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes liveCompetitionRow{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes liveCompetitionPulse{0%{transform:scale(.98)}45%{transform:scale(1.025)}100%{transform:scale(1)}}
+    @media(max-width:640px){.live-competition-panel{right:10px;bottom:90px;width:min(340px,calc(100vw - 20px));padding:13px}.live-competition-heading{font-size:19px}.live-rank-row{gap:6px;padding:6px}.live-rank-player strong{font-size:11px}}
+
     /* Confirmação interna do Arena ECG */
     .arena-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(2,6,23,.76);backdrop-filter:blur(8px)}
     .arena-confirm-backdrop.hidden{display:none}
@@ -6112,26 +6138,20 @@
             </div>
           </div>
 
-          <!-- Ranking ao vivo da rodada -->
-          <div id="revealRankingSection" class="reveal-ranking-row hidden">
-            <div class="reveal-ranking-header">
-              <span class="section-label">Top Classificação ao Vivo</span>
-            </div>
-            <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
-          </div>
+          <!-- O ranking competitivo agora aparece como painel flutuante na apresentação principal. -->
 
 
         </div>
       </aside>
     </div>
 
-          <!-- Ranking ao vivo da rodada (quando habilitado nas regras) -->
-          <div id="revealRankingSection" class="reveal-ranking-row hidden">
-            <div class="reveal-ranking-header">
-              <span class="section-label">Top Classificação ao Vivo</span>
-            </div>
-            <div id="teacherLeaderboard" class="reveal-ranking-list"></div>
-          </div>
+          <!-- Ranking competitivo na tela principal do professor -->
+          <aside id="liveCompetitionPanel" class="live-competition-panel hidden" aria-live="polite" aria-label="Ranking parcial da turma">
+            <div class="live-competition-topline"><span class="live-competition-kicker">ARENA ECG · AO VIVO</span><span id="liveCompetitionRound" class="live-competition-round"></span></div>
+            <div class="live-competition-heading">TOP 5 DA TURMA</div>
+            <div id="liveCompetitionMessage" class="live-competition-message"></div>
+            <ol id="liveCompetitionList" class="live-competition-list"></ol>
+          </aside>
         </div>
       </div>
     </div>
@@ -7470,6 +7490,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       state.currentChoices=[rhythm,...chooseDistractors(rhythm)].sort(()=>Math.random()-.5).map((r,i)=>({id:r.id,label:r.name,color:ANSWER_COLORS[i],shape:ANSWER_SHAPES[i]}));
       state.answersReceived.clear();
       state.isRevealed=false;
+      $('liveCompetitionPanel')?.classList.add('hidden');
       state.roundLocked=false;
       state.isPaused=false;
       state.isExplaining=false;
@@ -7858,10 +7879,11 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
     }
     function shouldShowRankingThisRound(){
-      const freq=state.config.rankingFrequency;
-      if(freq==='never'||freq==='end_only')return false;
+      const freq=state.config.rankingFrequency||'every_20_percent';
       const total=Math.max(1,Number(state.roundLimit)||Number(state.roundQueue?.length)||1);
-      const isLast=(state.roundLimit&&state.roundNumber>=state.roundLimit)||(state.queueIndex>=state.roundQueue.length);
+      const isLast=!!((state.roundLimit&&state.roundNumber>=state.roundLimit)||(state.queueIndex>=state.roundQueue.length));
+      if(freq==='never')return false;
+      if(freq==='end_only')return isLast;
       if(isLast)return true;
       if(freq==='every_5')return state.roundNumber%5===0;
       if(freq==='every_question')return true;
@@ -7870,21 +7892,40 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         const interval=Math.max(1,Math.ceil(total*Number(match[1])/100));
         return state.roundNumber>0&&state.roundNumber%interval===0;
       }
-      return true;
+      return state.roundNumber===1;
     }
     function updateLeaderboard(){
-      const show=state.isRevealed&&shouldShowRankingThisRound();
-      const sections=document.querySelectorAll('#revealRankingSection');
-      sections.forEach(sec=>sec.classList.toggle('hidden',!show));
+      const panel=$('liveCompetitionPanel');
+      const show=!!(state.isRevealed&&shouldShowRankingThisRound());
+      if(panel)panel.classList.toggle('hidden',!show);
       if(!show)return;
       const list=[...state.participants.values()].sort((a,b)=>b.score-a.score);
-      const markup=list.slice(0,5).map((p,i)=>{
-        const change=state.lastRankChanges?.get(p.id);
-        const movement=state.config.showRankChanges!==false&&change?.from&&change.delta!==0 ? '<span class="rank-movement '+(change.delta>0?'rank-up':'rank-down')+'">'+(change.delta>0?'▲':'▼')+' '+Math.abs(change.delta)+'</span>' : '';
-        const streak=state.config.showStreakHighlights!==false&&p.streak>=2 ? '<span class="rank-streak" title="'+p.streak+' acertos consecutivos">🔥 '+p.streak+'</span>' : '';
-        return '<div class="leaderboard-player flex items-center gap-2 rounded-lg bg-slate-950 px-2 py-1.5" style="--rank-delay:'+(i*70)+'ms"><span>'+avatarEmoji(p.avatar)+'</span><span class="text-[10px] text-amber-300 font-black">#'+(i+1)+'</span><span class="truncate flex-1 text-xs font-bold">'+escapeHTML(p.name)+'</span>'+movement+streak+'<span class="text-xs font-black text-lime-300">'+p.score+'</span></div>';
-      }).join('')||'<p class="text-xs text-slate-500">Aguardando participantes.</p>';
-      document.querySelectorAll('#teacherLeaderboard').forEach(el=>{el.innerHTML=markup;});
+      const top=list.slice(0,5);
+      const listEl=$('liveCompetitionList');
+      const msgEl=$('liveCompetitionMessage');
+      const roundEl=$('liveCompetitionRound');
+      if(roundEl)roundEl.textContent='QUESTÃO '+state.roundNumber;
+      const biggestMove=top.map(p=>({p,change:state.lastRankChanges?.get(p.id)})).filter(x=>x.change&&x.change.from>0&&x.change.delta>0).sort((a,b)=>b.change.delta-a.change.delta)[0];
+      if(msgEl){
+        if(biggestMove&&state.config.showRankChanges!==false){
+          msgEl.textContent=biggestMove.p.name+' avançou '+biggestMove.change.delta+' '+(biggestMove.change.delta===1?'posição':'posições')+'!';
+          msgEl.classList.add('has-movement');
+        }else{
+          msgEl.textContent=top.length?('Disputa acirrada: '+(top[0].name||'A turma')+' lidera a classificação.'):'Aguardando as primeiras respostas para montar o ranking.';
+          msgEl.classList.remove('has-movement');
+        }
+      }
+      if(listEl){
+        listEl.innerHTML=top.map((p,i)=>{
+          const above=i===0?null:top[i-1];
+          const gap=above?Math.max(0,above.score-p.score):Math.max(0,(top[1]?.score||p.score)-p.score);
+          const gapText=i===0?(top.length>1?'LIDERA POR '+gap+' PTS':'LÍDER'):(gap+' pts do #'+i);
+          const change=state.lastRankChanges?.get(p.id);
+          const movement=state.config.showRankChanges!==false&&change?.from&&change.delta!==0?'<span class="live-rank-movement '+(change.delta>0?'up':'down')+'">'+(change.delta>0?'▲ +':'▼ ')+Math.abs(change.delta)+'</span>':'';
+          const streak=state.config.showStreakHighlights!==false&&p.streak>=2?'<span class="live-rank-streak">'+p.streak+' acertos seg.</span>':'';
+          return '<li class="live-rank-row" style="--rank-delay:'+(i*75)+'ms"><span class="live-rank-number">'+(i+1)+'</span><span class="live-rank-avatar">'+avatarEmoji(p.avatar)+'</span><span class="live-rank-player"><strong>'+escapeHTML(p.name)+'</strong><small>'+gapText+'</small></span>'+movement+streak+'<strong class="live-rank-score">'+p.score+'</strong></li>';
+        }).join('')||'<li class="live-rank-empty">Aguardando participantes...</li>';
+      }
     }
     function showPodium() {
       state.sessionFinished=true;
