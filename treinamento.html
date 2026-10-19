@@ -844,7 +844,7 @@
     }
 
     /* CONTROLES DO PROFESSOR: BARRA FLUTUANTE COM BOTÕES DE 44PX E ÍCONES */
-    
+
     /* ========================================================
        FORMAS PADRONIZADAS: TODAS BRANCAS COM CONTORNO ESCURO
        (Inclusive na alternativa amarela)
@@ -1659,7 +1659,7 @@
       opacity: 1;
     }
 
-    
+
     /* Esconder o cabeçalho global nas telas do aluno (lobby, pergunta, resultado) */
     body:has(#studentLobby:not(.hidden)) #globalHeader,
     body:has(#studentGame:not(.hidden)) #globalHeader,
@@ -2246,7 +2246,7 @@
         scroll-behavior: auto !important;
       }
     }
-  
+
     /* === SETUP REDESIGN: PRESETS, CLINICAL CATEGORIES, STICKY SUMMARY, PREVIEW === */
     .preset-card {
       border: 1px solid var(--line);
@@ -3553,6 +3553,647 @@
       }
     }
 
+
+
+    /* ============================================================
+       TEMA CLARO: HOME & CONFIGURAÇÕES (RESPEITO INTEGRAL ÀS VARIÁVEIS DO JOGO)
+       No claro: fundo claro, texto escuro, cartões brancos com borda suave
+       ============================================================ */
+
+    /* --- HOME / LOBBY INICIAL (ARENA ECG) --- */
+    body.theme-light #viewHome.arena-home-v2,
+    .theme-light #viewHome.arena-home-v2 {
+      --home-mint: var(--mint);
+      --home-cyan: var(--cyan);
+      color: var(--text);
+    }
+
+    body.theme-light #viewHome.arena-home-v2::before,
+    .theme-light #viewHome.arena-home-v2::before {
+      opacity: 0.30;
+      background-image:
+        linear-gradient(rgba(223, 178, 173, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(223, 178, 173, 0.4) 1px, transparent 1px);
+    }
+
+    body.theme-light #viewHome.arena-home-v2::after,
+    .theme-light #viewHome.arena-home-v2::after {
+      background: radial-gradient(circle, rgba(13, 104, 50, 0.06) 0%, rgba(2, 132, 199, 0.04) 40%, transparent 70%);
+    }
+
+    body.theme-light .arena-clinical-status,
+    .theme-light .arena-clinical-status {
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-card);
+    }
+
+    body.theme-light .arena-lobby-pulse,
+    .theme-light .arena-lobby-pulse,
+    body.theme-light .arena-monitor-live-dot,
+    .theme-light .arena-monitor-live-dot,
+    body.theme-light .arena-bottom-pulse,
+    .theme-light .arena-bottom-pulse {
+      background: var(--mint);
+      box-shadow: 0 0 8px rgba(4, 120, 87, 0.45);
+    }
+
+    body.theme-light .arena-lobby-eyebrow,
+    .theme-light .arena-lobby-eyebrow {
+      color: var(--muted);
+    }
+
+    body.theme-light .arena-lobby-eyebrow-line,
+    .theme-light .arena-lobby-eyebrow-line {
+      background: var(--lime);
+      box-shadow: none;
+    }
+
+    body.theme-light .arena-lobby-intro h1,
+    .theme-light .arena-lobby-intro h1 {
+      color: var(--text-title) !important;
+    }
+
+    body.theme-light .arena-lobby-intro h1 span,
+    .theme-light .arena-lobby-intro h1 span {
+      color: var(--lime) !important;
+      text-shadow: none !important;
+    }
+
+    body.theme-light .arena-lobby-description,
+    .theme-light .arena-lobby-description {
+      color: var(--muted) !important;
+    }
+
+    /* Card decorativo do Monitor de ECG na Home: cartão branco com borda suave */
+    body.theme-light .arena-monitor-card,
+    .theme-light .arena-monitor-card {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-panel) !important;
+    }
+
+    body.theme-light .arena-monitor-card-top,
+    .theme-light .arena-monitor-card-top,
+    body.theme-light .arena-monitor-card-bottom,
+    .theme-light .arena-monitor-card-bottom {
+      color: var(--muted) !important;
+    }
+
+    body.theme-light .arena-monitor-lead,
+    .theme-light .arena-monitor-lead {
+      color: var(--text) !important;
+    }
+
+    body.theme-light .arena-monitor-lead b,
+    .theme-light .arena-monitor-lead b {
+      color: var(--lime) !important;
+    }
+
+    body.theme-light .arena-mini-monitor,
+    .theme-light .arena-mini-monitor {
+      background: var(--ecg-bg) !important;
+      border: 1px solid var(--monitor-border) !important;
+    }
+
+    body.theme-light .arena-mini-grid,
+    .theme-light .arena-mini-grid {
+      background-image:
+        linear-gradient(var(--grid-large) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-large) 1px, transparent 1px),
+        linear-gradient(var(--grid-small) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-small) 1px, transparent 1px) !important;
+      opacity: 0.9;
+    }
+
+    body.theme-light .arena-mini-wave-line,
+    .theme-light .arena-mini-wave-line {
+      stroke: var(--trace) !important;
+    }
+
+    body.theme-light .arena-mini-wave-shadow,
+    .theme-light .arena-mini-wave-shadow {
+      stroke: rgba(236, 140, 137, 0.45) !important;
+    }
+
+    body.theme-light .arena-monitor-scan,
+    .theme-light .arena-monitor-scan {
+      background: linear-gradient(90deg, rgba(236, 140, 137, 0.4), transparent) !important;
+    }
+
+    body.theme-light .arena-actions-heading,
+    .theme-light .arena-actions-heading {
+      color: var(--muted) !important;
+    }
+
+    body.theme-light .arena-actions-heading-line,
+    .theme-light .arena-actions-heading-line {
+      background: linear-gradient(90deg, var(--line-strong), transparent) !important;
+    }
+
+    /* Cartões de Ação na Home: brancos, borda suave, texto escuro e ícones nítidos */
+    body.theme-light .arena-action-card,
+    .theme-light .arena-action-card {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+      color: var(--text) !important;
+    }
+
+    body.theme-light .arena-action-card:hover,
+    .theme-light .arena-action-card:hover {
+      background: #ffffff !important;
+      border-color: var(--line-strong) !important;
+      box-shadow: 0 16px 36px rgba(180, 80, 80, 0.12) !important;
+    }
+
+    body.theme-light .arena-action-card::before,
+    .theme-light .arena-action-card::before {
+      display: none !important;
+    }
+
+    body.theme-light .arena-action-teacher,
+    .theme-light .arena-action-teacher {
+      border-color: rgba(13, 104, 50, 0.35) !important;
+    }
+
+    body.theme-light .arena-action-teacher:hover,
+    .theme-light .arena-action-teacher:hover {
+      border-color: var(--lime) !important;
+      background: #ffffff !important;
+    }
+
+    body.theme-light .arena-action-student,
+    .theme-light .arena-action-student {
+      border-color: rgba(2, 132, 199, 0.35) !important;
+    }
+
+    body.theme-light .arena-action-student:hover,
+    .theme-light .arena-action-student:hover {
+      border-color: var(--cyan) !important;
+      background: #ffffff !important;
+    }
+
+    body.theme-light .arena-action-index,
+    .theme-light .arena-action-index {
+      color: var(--text-subtle) !important;
+    }
+
+    body.theme-light .arena-action-index i,
+    .theme-light .arena-action-index i {
+      background: var(--lime) !important;
+    }
+
+    body.theme-light .arena-action-student .arena-action-index i,
+    .theme-light .arena-action-student .arena-action-index i {
+      background: var(--cyan) !important;
+    }
+
+    body.theme-light .arena-action-icon,
+    .theme-light .arena-action-icon {
+      color: var(--lime) !important;
+      border: 1px solid rgba(13, 104, 50, 0.28) !important;
+      background: rgba(13, 104, 50, 0.08) !important;
+      box-shadow: none !important;
+    }
+
+    body.theme-light .arena-action-student .arena-action-icon,
+    .theme-light .arena-action-student .arena-action-icon {
+      color: var(--cyan) !important;
+      border-color: rgba(2, 132, 199, 0.28) !important;
+      background: rgba(2, 132, 199, 0.08) !important;
+      box-shadow: none !important;
+    }
+
+    body.theme-light .arena-action-copy strong,
+    .theme-light .arena-action-copy strong {
+      color: var(--text-title) !important;
+    }
+
+    body.theme-light .arena-action-copy > span,
+    .theme-light .arena-action-copy > span {
+      color: var(--muted) !important;
+    }
+
+    body.theme-light .arena-action-bottom,
+    .theme-light .arena-action-bottom {
+      color: var(--text-subtle) !important;
+      border-top: 1px solid var(--line) !important;
+    }
+
+    body.theme-light .arena-action-arrow,
+    .theme-light .arena-action-arrow {
+      color: var(--lime) !important;
+    }
+
+    body.theme-light .arena-action-student .arena-action-arrow,
+    .theme-light .arena-action-student .arena-action-arrow {
+      color: var(--cyan) !important;
+    }
+
+    body.theme-light .arena-lobby-security,
+    .theme-light .arena-lobby-security {
+      color: var(--text-subtle) !important;
+    }
+
+    body.theme-light .arena-security-icon,
+    .theme-light .arena-security-icon {
+      color: var(--lime) !important;
+    }
+
+    body.theme-light .arena-security-divider,
+    .theme-light .arena-security-divider {
+      background: var(--line-strong) !important;
+    }
+
+    body.theme-light .arena-lobby-bottomline,
+    .theme-light .arena-lobby-bottomline {
+      border-top: 1px solid var(--line) !important;
+      color: var(--muted) !important;
+    }
+
+    body.theme-light .arena-lobby-bottomline b,
+    .theme-light .arena-lobby-bottomline b {
+      color: var(--line-strong) !important;
+    }
+
+    /* --- TELA DE CONFIGURAÇÕES (PAINEL DOCENTE) --- */
+    body.theme-light #viewHostSetup,
+    .theme-light #viewHostSetup {
+      color: var(--text);
+    }
+
+    /* Barra de navegação por etapas */
+    .setup-nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--btn-text);
+      background: transparent;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .setup-nav-pill:hover {
+      background: var(--btn-hover-bg);
+      color: var(--btn-hover-text);
+      border-color: var(--btn-border);
+    }
+    .setup-nav-pill.active {
+      background: var(--primary-bg);
+      color: var(--primary-text);
+      border-color: var(--lime);
+      box-shadow: 0 2px 8px var(--primary-shadow);
+    }
+    .setup-step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .setup-nav-pill.active .setup-step-num {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    body.theme-light #viewHostSetup nav,
+    .theme-light #viewHostSetup nav {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+    body.theme-light .setup-nav-pill,
+    .theme-light .setup-nav-pill {
+      color: var(--text) !important;
+    }
+    body.theme-light .setup-nav-pill:hover,
+    .theme-light .setup-nav-pill:hover {
+      background: var(--panel-subtle) !important;
+      border-color: var(--line) !important;
+      color: var(--text-title) !important;
+    }
+    body.theme-light .setup-nav-pill.active,
+    .theme-light .setup-nav-pill.active {
+      background: var(--primary-bg) !important;
+      color: #ffffff !important;
+      border-color: var(--lime) !important;
+    }
+    body.theme-light .setup-nav-pill .setup-step-num,
+    .theme-light .setup-nav-pill .setup-step-num {
+      background: var(--line);
+      color: var(--text-title);
+    }
+    body.theme-light .setup-nav-pill.active .setup-step-num,
+    .theme-light .setup-nav-pill.active .setup-step-num {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    /* Painéis principais da configuração: cartões brancos com borda suave */
+    body.theme-light #viewHostSetup .panel,
+    .theme-light #viewHostSetup .panel {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-panel) !important;
+      color: var(--text) !important;
+    }
+
+    /* Divisores nas seções */
+    body.theme-light #viewHostSetup .border-b,
+    .theme-light #viewHostSetup .border-b,
+    body.theme-light #viewHostSetup .border-t,
+    .theme-light #viewHostSetup .border-t {
+      border-color: var(--line) !important;
+    }
+
+    /* Tag de cabeçalho do painel docente */
+    body.theme-light #viewHostSetup .border-cyan-500\/40,
+    .theme-light #viewHostSetup .border-cyan-500\/40 {
+      border-color: #bae6fd !important;
+      background-color: #e0f2fe !important;
+      color: #0284c7 !important;
+    }
+
+    /* Botão de desfazer modelo */
+    body.theme-light #btnUndoPreset,
+    .theme-light #btnUndoPreset {
+      background: #fef3c7 !important;
+      border-color: #fde68a !important;
+      color: #b45309 !important;
+    }
+
+    /* Contador de selecionados */
+    body.theme-light #selectedCount,
+    .theme-light #selectedCount {
+      color: var(--lime) !important;
+    }
+    body.theme-light #viewHostSetup .inline-flex.rounded-full.bg-slate-900,
+    .theme-light #viewHostSetup .inline-flex.rounded-full.bg-slate-900 {
+      background-color: #ffffff !important;
+      border-color: var(--line) !important;
+      color: var(--text) !important;
+    }
+
+    /* Presets (Modelos recomendados): cartões brancos com borda suave */
+    body.theme-light .preset-card,
+    .theme-light .preset-card {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+      color: var(--text) !important;
+    }
+    body.theme-light .preset-card:hover,
+    .theme-light .preset-card:hover {
+      border-color: var(--cyan) !important;
+      background: #ffffff !important;
+      box-shadow: 0 10px 24px rgba(180, 80, 80, 0.1) !important;
+    }
+    body.theme-light .preset-card.active,
+    .theme-light .preset-card.active {
+      background: #ffffff !important;
+      border-color: var(--lime) !important;
+      box-shadow: 0 0 0 1.5px var(--lime) inset, 0 8px 24px var(--primary-shadow) !important;
+    }
+    body.theme-light .preset-card .font-black,
+    .theme-light .preset-card .font-black {
+      color: var(--text-title) !important;
+    }
+    body.theme-light .preset-card:hover .font-black,
+    .theme-light .preset-card:hover .font-black {
+      color: var(--lime) !important;
+    }
+    body.theme-light .preset-card p,
+    .theme-light .preset-card p {
+      color: var(--muted) !important;
+    }
+    body.theme-light .preset-card span.bg-slate-800,
+    .theme-light .preset-card span.bg-slate-800 {
+      background: rgba(13, 104, 50, 0.1) !important;
+      color: #0d6832 !important;
+      border: 1px solid rgba(13, 104, 50, 0.22) !important;
+    }
+    body.theme-light .preset-card span.bg-rose-950\/80,
+    .theme-light .preset-card span.bg-rose-950\/80 {
+      background: #ffe4e6 !important;
+      color: #b91c1c !important;
+      border: 1px solid #fecdd3 !important;
+    }
+    body.theme-light .preset-card span.bg-cyan-950\/80,
+    .theme-light .preset-card span.bg-cyan-950\/80 {
+      background: #e0f2fe !important;
+      color: #0284c7 !important;
+      border: 1px solid #bae6fd !important;
+    }
+
+    /* Grupos de Categorias Clínicas em Modo Claro */
+    body.theme-light .category-group,
+    .theme-light .category-group {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+    body.theme-light .category-header,
+    .theme-light .category-header {
+      background: var(--panel-subtle) !important;
+      border-bottom: 1px solid var(--line) !important;
+      color: var(--text) !important;
+    }
+    body.theme-light .category-header h3,
+    .theme-light .category-header h3 {
+      color: var(--text-title) !important;
+    }
+    body.theme-light .category-header p,
+    .theme-light .category-header p {
+      color: var(--muted) !important;
+    }
+    body.theme-light .category-chevron,
+    .theme-light .category-chevron {
+      color: var(--muted) !important;
+    }
+    body.theme-light .category-badge,
+    .theme-light .category-badge {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--text) !important;
+    }
+    body.theme-light .category-body,
+    .theme-light .category-body {
+      background: #ffffff !important;
+    }
+
+    /* Cartões individuais de ritmos: brancos com borda suave */
+    body.theme-light .rhythm-card,
+    .theme-light .rhythm-card {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--text) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+    }
+    body.theme-light .rhythm-card:hover,
+    .theme-light .rhythm-card:hover {
+      background: var(--panel-subtle) !important;
+      border-color: var(--btn-hover-border) !important;
+    }
+    body.theme-light .rhythm-card.selected,
+    .theme-light .rhythm-card.selected {
+      background: #f0fdf4 !important;
+      border-color: var(--lime) !important;
+      box-shadow: 0 0 0 1.5px var(--lime) inset !important;
+    }
+    body.theme-light .rhythm-card span.truncate,
+    .theme-light .rhythm-card span.truncate {
+      color: var(--text-title) !important;
+    }
+    body.theme-light .rhythm-card p,
+    .theme-light .rhythm-card p {
+      color: var(--muted) !important;
+    }
+    body.theme-light .rhythm-card span.bg-slate-800,
+    .theme-light .rhythm-card span.bg-slate-800 {
+      background: #e0f2fe !important;
+      border: 1px solid #bae6fd !important;
+      color: #0284c7 !important;
+    }
+
+    /* Blocos de Regras da Partida (Blocos A, B, C): cartões brancos com borda suave */
+    body.theme-light #sectionSetupRules .space-y-3\.5,
+    .theme-light #sectionSetupRules .space-y-3\.5 {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+      color: var(--text) !important;
+    }
+    body.theme-light #sectionSetupRules .border-b,
+    .theme-light #sectionSetupRules .border-b {
+      border-color: var(--line) !important;
+    }
+    body.theme-light #roundDurationBadge,
+    .theme-light #roundDurationBadge {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--lime) !important;
+    }
+
+    /* Atalhos rápidos de tempo de resposta */
+    body.theme-light .duration-preset-btn,
+    .theme-light .duration-preset-btn {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--text) !important;
+    }
+    body.theme-light .duration-preset-btn:hover,
+    .theme-light .duration-preset-btn:hover {
+      background: var(--panel-subtle) !important;
+      border-color: var(--line-strong) !important;
+      color: var(--text-title) !important;
+    }
+    body.theme-light .duration-preset-btn.is-active,
+    .theme-light .duration-preset-btn.is-active {
+      background: var(--primary-bg) !important;
+      border-color: var(--lime) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px var(--primary-shadow) !important;
+    }
+
+    /* Sequência das rodadas */
+    body.theme-light #sequenceRandomNotice,
+    .theme-light #sequenceRandomNotice {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+    body.theme-light #sequenceRandomNotice p.font-bold,
+    .theme-light #sequenceRandomNotice p.font-bold {
+      color: var(--text-title) !important;
+    }
+    body.theme-light #sequenceRandomNotice p.text-slate-400,
+    .theme-light #sequenceRandomNotice p.text-slate-400 {
+      color: var(--muted) !important;
+    }
+    body.theme-light #sequenceEditor,
+    .theme-light #sequenceEditor {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+    body.theme-light #selectedRhythmOrder li,
+    .theme-light #selectedRhythmOrder li {
+      background: var(--panel-subtle) !important;
+      border: 1px solid var(--line) !important;
+      color: var(--text) !important;
+    }
+
+    /* Painel lateral de Resumo da Sessão */
+    body.theme-light #sectionSetupSummary,
+    .theme-light #sectionSetupSummary {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-panel) !important;
+    }
+    body.theme-light #summaryBadgeStatus,
+    .theme-light #summaryBadgeStatus {
+      background: #e0f2fe !important;
+      border: 1px solid #bae6fd !important;
+      color: #0284c7 !important;
+    }
+    body.theme-light #sectionSetupSummary .bg-slate-800.rounded-full,
+    .theme-light #sectionSetupSummary .bg-slate-800.rounded-full {
+      background: var(--line) !important;
+    }
+    body.theme-light #sumRhythmsBar,
+    .theme-light #sumRhythmsBar {
+      background: var(--lime) !important;
+    }
+    body.theme-light #sectionSetupSummary .grid > div,
+    .theme-light #sectionSetupSummary .grid > div {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+    body.theme-light #summaryRulesBadges span,
+    .theme-light #summaryRulesBadges span,
+    body.theme-light #summaryRhythmsChips span,
+    .theme-light #summaryRhythmsChips span {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--text) !important;
+    }
+    body.theme-light #btnPreviewRound,
+    .theme-light #btnPreviewRound {
+      background: #ffffff !important;
+      border-color: var(--cyan) !important;
+      color: var(--cyan) !important;
+    }
+    body.theme-light #btnPreviewRound:hover,
+    .theme-light #btnPreviewRound:hover {
+      background: var(--panel-subtle) !important;
+      color: var(--text-title) !important;
+    }
+
+    body.theme-light .mobile-setup-bar,
+    .theme-light .mobile-setup-bar {
+      background: rgba(255, 255, 255, 0.96) !important;
+      border-top: 1px solid var(--line) !important;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+    }
+    body.theme-light .mobile-setup-bar .text-slate-400,
+    .theme-light .mobile-setup-bar .text-slate-400 {
+      color: var(--muted) !important;
+    }
+    body.theme-light .mobile-setup-bar .text-white,
+    .theme-light .mobile-setup-bar .text-white {
+      color: var(--text-title) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -3664,7 +4305,7 @@
 
       <!-- Layout Principal em 2 Colunas no Desktop -->
       <div class="grid lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_390px] gap-6 items-start">
-        
+
         <!-- Coluna da Esquerda: Ritmos, Regras e Sequência -->
         <div class="space-y-6">
 
@@ -4321,7 +4962,7 @@
 
   <!-- Teacher explanation controls -->
   <div id="explainOverlay" class="explain-overlay hidden"><div class="zoom-box"><canvas id="zoomCanvas"></canvas><div id="zoomSelectionLayer" class="zoom-selecting"></div><div id="zoomRuler" class="zoom-ruler hidden"></div><div id="caliperInfo" class="hidden absolute left-4 bottom-4 z-10 bg-slate-900/90 border border-lime-400 text-lime-300 font-mono text-xs px-3 py-2 rounded-lg shadow-lg"></div><div class="zoom-controls"><button id="btnZoomReveal" class="primary px-3 py-2 text-xs font-black shadow-lg">👁 Revelar resposta ▶</button><button id="btnRuler" class="muted-btn">📏 Régua</button><button id="btnCloseZoom" class="muted-btn">✕ Fechar · Esc</button></div></div></div>
-  
+
 
   <!-- MODAL DE PRÉ-VISUALIZAÇÃO DA PARTIDA -->
   <div id="previewModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
@@ -4808,7 +5449,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       if ($('selectedCount')) $('selectedCount').textContent = String(n);
       if ($('mobileSumCount')) $('mobileSumCount').textContent = String(n);
       if (n && $('setupError')) $('setupError').classList.add('hidden');
-      
+
       // Update each category badge count
       document.querySelectorAll('.category-group').forEach(grp => {
         const cat = grp.dataset.categoryBlock;
@@ -5137,7 +5778,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function openPreviewModal(){
       const checked = [...document.querySelectorAll('#rhythmLibrary input:checked')].map(x => x.value);
       const availableIds = checked.length ? checked : ECG_RHYTHMS.map(r => r.id);
-      
+
       const select = $('previewRhythmSelect');
       if (select) {
         select.innerHTML = availableIds.map(id => {
@@ -6096,7 +6737,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       }
       ecgEngine=new ECG_CORE.RhythmSimulator(rhythm,defs,Math.random()*1e9|0);
       ecgEngine.setSignal(1,true);
-      
+
       // Pré-processar ~12 s de sinal (motor a 250 Hz = 3000 amostras) para preencher a tela na escala padrão de 25 mm/s
       const targetSeconds=12.0;
       const preSteps=Math.round(targetSeconds/0.04);
@@ -6869,7 +7510,7 @@ function animatePoints(points) {
     $('btnCollapseAllCategories').onclick = () => {
       document.querySelectorAll('.category-group').forEach(grp => grp.classList.add('collapsed'));
     };
-    
+
     // Compatibility hooks
     if ($('btnSelectBlocks')) {
       $('btnSelectBlocks').onclick = () => {
@@ -7051,7 +7692,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
     if ($('btnPodiumRestart')) $('btnPodiumRestart').onclick = () => switchView('viewHostSetup');
     if ($('btnMoreConfetti')) $('btnMoreConfetti').onclick = () => launchConfetti(5000);
     if ($('podiumBack')) $('podiumBack').onclick = () => switchView('viewHome');
-    
+
     if ($('btnToggleSound')) $('btnToggleSound').onclick = toggleSound;
     if ($('btnToggleSoundProjection')) $('btnToggleSoundProjection').onclick = toggleSound;
 
