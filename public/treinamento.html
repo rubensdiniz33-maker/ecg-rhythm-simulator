@@ -5146,13 +5146,16 @@
     #viewHostSetup .setup-step-icon { flex:none; display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:34px; padding:0 8px; border:1px solid rgba(84,210,231,.35); border-radius:11px; background:rgba(84,210,231,.10); color:var(--cyan); font:900 13px ui-monospace,monospace; }
     #viewHostSetup .setup-step-icon-small { min-width:0; height:26px; font-size:9px; }
     #viewHostSetup .preset-card { min-height:122px; border-color:var(--line-strong); background:var(--panel-card); box-shadow:var(--shadow-card); }
+    #viewHostSetup .preset-card { position:relative; }
     #viewHostSetup .preset-card.active { border-color:var(--cyan)!important; background:linear-gradient(145deg,rgba(84,210,231,.12),var(--panel-card))!important; box-shadow:0 0 0 1px var(--cyan) inset,0 0 18px rgba(84,210,231,.12)!important; }
+    #viewHostSetup .preset-card.active::after { content:"✓"; position:absolute; right:10px; bottom:9px; width:19px; height:19px; display:grid; place-items:center; border-radius:6px; background:var(--cyan); color:#061219; font-size:12px; font-weight:900; }
     #viewHostSetup .rhythm-card { padding:9px 11px; border-radius:11px; }
     #viewHostSetup .rhythm-card.selected { border-color:var(--cyan); background:rgba(84,210,231,.08); box-shadow:0 0 0 1px var(--cyan) inset; }
     #viewHostSetup .rhythm-card input { accent-color:var(--cyan); }
     #viewHostSetup .category-group { border-color:var(--line); background:var(--panel-solid); }
     #viewHostSetup .category-header { background:var(--panel-subtle); }
     #viewHostSetup .setup-summary-panel { position:sticky; top:16px; max-height:calc(100vh - 32px); overflow:auto; }
+    #viewHostSetup #summaryRhythmsChips { max-height:130px; overflow:auto; }
     #viewHostSetup .setup-review-card { border:1px solid var(--line); border-radius:13px; padding:14px; background:var(--panel-card); }
     #viewHostSetup .setup-review-card h3 { font-size:12px; font-weight:900; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
     #viewHostSetup .setup-review-edit { color:var(--cyan); font-size:11px; font-weight:800; }
@@ -5358,6 +5361,7 @@
           <!-- ÁREA 2: RITMOS CLÍNICOS                  -->
           <!-- ========================================== -->
           <section id="sectionSetupRhythms" data-setup-panel="rhythms" class="hidden panel p-5 sm:p-6 space-y-6" aria-labelledby="rhythmsSectionHeading">
+            <div id="rhythmSetupError" class="hidden text-xs text-rose-300 bg-rose-950/60 border border-rose-800 rounded-xl p-3" role="alert">Selecione pelo menos um ritmo para continuar e criar a sala.</div>
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
               <div class="flex items-center gap-3">
                 <span class="setup-step-icon">2</span>
@@ -5616,7 +5620,7 @@
             </div>
 
             <!-- Badges das Regras Ativas -->
-            <div class="hidden pt-2 border-t border-slate-800/80">
+            <div class="pt-2 border-t border-slate-800/80">
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Regras Ativas</span>
               <div class="flex flex-wrap gap-1.5" id="summaryRulesBadges">
                 <span id="sumBadgeMode" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">Sorteio aleatório</span>
@@ -5629,8 +5633,8 @@
             </div>
 
             <!-- Lista compacta de ritmos selecionados (sem scroll interno desnecessário) -->
-            <div class="hidden pt-2 border-t border-slate-800/80">
-              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+            <div class="pt-2 border-t border-slate-800/80">
+              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5>
                 <span>Ritmos Selecionados</span>
                 <span id="sumRhythmsPreviewCount" class="text-slate-500 font-mono">0 itens</span>
               </div>
@@ -8759,7 +8763,6 @@ function animatePoints(points) {
     $('reviewSummaryContent')?.addEventListener('click',(event)=>{const button=event.target.closest('[data-go-step]');if(button)showSetupTab(button.dataset.goStep);});
     $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
     $('mobileCreateRoomButton')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
-    $('mobileSummaryToggle')?.addEventListener('click',()=>{const details=$('mobileSummaryDetails'),bar=$('mobileSetupBar'),button=$('mobileSummaryToggle');const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Fechar resumo⌃':'Resumo⌄';details?.classList.toggle('hidden',!expanded);bar?.classList.toggle('is-expanded',expanded);});
     $('btnCreateRoomFromReview')?.addEventListener('click',()=> $('btnCreateRoom')?.click());
     // Settings listeners
     $('gameMode').onchange = () => { toggleSequenceEditor(); updateSessionSummary(); };
@@ -8823,10 +8826,13 @@ function animatePoints(points) {
     $('btnCreateRoom').onclick = () => {
       state.selectedRhythmIds = [...document.querySelectorAll('#rhythmLibrary input:checked')].map(x => x.value);
       if (!state.selectedRhythmIds.length) {
-        $('setupError').classList.remove('hidden');
-        $('setupError').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        $('setupError')?.classList.remove('hidden');
+        $('rhythmSetupError')?.classList.remove('hidden');
+        showSetupTab('rhythms');
+        $('rhythmSetupError')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+      $('rhythmSetupError')?.classList.add('hidden');
       state.gameMode = $('gameMode').value;
       state.difficulty = $('difficultySelect').value;
       state.roundDuration = state.roundDuration || Number($('roundDurationSelect')?.value) || 25;
