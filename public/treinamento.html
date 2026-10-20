@@ -4823,6 +4823,7 @@
     .live-competition-actions{display:flex;align-items:center;gap:8px;flex:none}
     .live-competition-icon-btn{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(148,163,184,.28);border-radius:11px;background:rgba(255,255,255,.06);color:#dbeafe;font-size:16px;font-weight:900;line-height:1;transition:background .15s,border-color .15s,color .15s}
     .live-competition-icon-btn:hover{background:rgba(56,189,248,.18);border-color:rgba(125,211,252,.75);color:#fff}
+    .live-competition-close-btn{font-size:22px;background:rgba(248,113,113,.09);border-color:rgba(248,113,113,.28);color:#fecaca}.live-competition-close-btn:hover{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.7);color:#fff}
     .live-competition-panel.is-collapsed .live-competition-heading,.live-competition-panel.is-collapsed .live-competition-message,.live-competition-panel.is-collapsed .live-competition-list,.live-competition-panel.is-collapsed .live-competition-subhead{display:none}
     .live-competition-panel.is-collapsed{width:100vw;height:100dvh;padding-bottom:9px}
     .live-competition-kicker{font-size:clamp(10px,1vw,14px);letter-spacing:.24em;font-weight:1000;color:#67e8f9;text-shadow:0 0 18px rgba(34,211,238,.45)}
@@ -6267,7 +6268,7 @@
 
           <!-- Ranking competitivo na tela principal do professor -->
           <aside id="liveCompetitionPanel" class="live-competition-panel hidden" aria-live="polite" aria-label="Ranking parcial da turma">
-            <div class="live-competition-topline"><span class="live-competition-kicker">ARENA ECG · AO VIVO</span><div class="live-competition-actions"><span id="liveCompetitionRound" class="live-competition-round"></span><button id="liveCompetitionMuteBtn" class="live-competition-icon-btn" type="button" title="Silenciar sons do ranking parcial" aria-label="Silenciar sons do ranking parcial" aria-pressed="false">🔊</button><button id="liveCompetitionCollapseBtn" class="live-competition-icon-btn" type="button" title="Recolher ranking parcial" aria-label="Recolher ranking parcial" aria-expanded="true">⌃</button></div></div>
+            <div class="live-competition-topline"><span class="live-competition-kicker">ARENA ECG · AO VIVO</span><div class="live-competition-actions"><span id="liveCompetitionRound" class="live-competition-round"></span><button id="liveCompetitionMuteBtn" class="live-competition-icon-btn" type="button" title="Silenciar sons do ranking parcial" aria-label="Silenciar sons do ranking parcial" aria-pressed="false">🔊</button><button id="liveCompetitionCloseBtn" class="live-competition-icon-btn live-competition-close-btn" type="button" title="Fechar ranking parcial" aria-label="Fechar ranking parcial">×</button><button id="liveCompetitionCollapseBtn" class="live-competition-icon-btn" type="button" title="Recolher ranking parcial" aria-label="Recolher ranking parcial" aria-expanded="true">⌃</button></div></div>
             <div class="live-competition-heading">Classificação</div>
             <div class="live-competition-subhead">Top 5 · Pontuação acumulada</div>
             <div id="liveCompetitionMessage" class="live-competition-message"></div>
@@ -6690,7 +6691,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null, lastHeartSoundAt=0;
     const LIVE_COMPETITION_MIN_VISIBLE_MS=5000;
-    let liveCompetitionHideTimer=null,liveCompetitionShownAt=0,liveCompetitionCollapsed=false,liveCompetitionMuted=false;
+    let liveCompetitionHideTimer=null,liveCompetitionShownAt=0,liveCompetitionCollapsed=false,liveCompetitionMuted=false,liveCompetitionDismissedRound=null;
     let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
@@ -8099,7 +8100,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     }
     function updateLeaderboard(forceReveal=false){
       const panel=$('liveCompetitionPanel');
-      const requestedShow=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound());
+      const requestedShow=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound()&&liveCompetitionDismissedRound!==state.roundNumber);
       const currentlyVisible=!!(panel&&panel.style.display==='flex'&&!panel.classList.contains('hidden'));
       const show=!!(requestedShow||(currentlyVisible&&Date.now()-liveCompetitionShownAt<LIVE_COMPETITION_MIN_VISIBLE_MS));
       if(panel){
@@ -8144,6 +8145,10 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         }).join('')||'<li class="live-rank-empty">Aguardando participantes...</li>';
       }
     }
+    if($('liveCompetitionCloseBtn'))$('liveCompetitionCloseBtn').addEventListener('click',()=>{
+      liveCompetitionDismissedRound=state.roundNumber;
+      hideLiveCompetitionPanel();
+    });
     if($('liveCompetitionCollapseBtn'))$('liveCompetitionCollapseBtn').addEventListener('click',()=>{
       const panel=$('liveCompetitionPanel');if(!panel)return;
       liveCompetitionCollapsed=!liveCompetitionCollapsed;
