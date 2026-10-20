@@ -8982,7 +8982,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
         if (msg.studentId !== state.studentId || msg.round !== state.roundNumber || msg.choiceId !== state.studentLastChoice) return;
         const selected = $('studentChoices')?.querySelector(`[data-choice="${msg.choiceId}"]`);
         const status = selected?.querySelector('.answer-status');
-        if (status) status.textContent = 'Resposta registrada';
+        if (status) status.textContent = 'Aguardando gabarito';
         if (selected) selected.dataset.answerConfirmed = 'true';
       }
       else if (msg.type === 'LOBBY_COUNT') {
@@ -9060,7 +9060,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       grid.innerHTML = (msg.choices || []).map(c => `
         <button type="button" data-choice="${c.id}" class="answer-tile ${c.color}">
           <span class="shape">${c.shape}</span>
-          <span class="answer-status">Aguardando confirmação...</span>
+          <span class="answer-status">Aguardando gabarito</span>
         </button>
       `).join('');
 
