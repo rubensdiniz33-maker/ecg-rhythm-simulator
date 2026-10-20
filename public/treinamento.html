@@ -7632,7 +7632,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       const qHeader = document.querySelector('.projection-question');
       if (qHeader) {
         qHeader.classList.remove('is-revealed');
-        qHeader.textContent = (rhythm.id === 'aesp' ? 'PACIENTE EM PCR (SEM PULSO): QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
+        qHeader.textContent = (rhythm.id === 'aesp' ? 'OBSERVAÇÃO: SEM PULSO PALPÁVEL | QUE RITMO É ESSE?' : 'QUE RITMO É ESSE?');
       }
       applyExplanationMode('off');
       if($('btnToggleAnimation'))$('btnToggleAnimation').classList.remove('hidden');
