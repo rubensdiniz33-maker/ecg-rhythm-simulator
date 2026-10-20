@@ -7857,7 +7857,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
       // Preenche os dados clínicos sem duplicar a frequência cardíaca.
       if($('revealName')) $('revealName').textContent = correct.name;
       if($('revealRate')) $('revealRate').textContent = '';
-      if($('revealFeature')) $('revealFeature').textContent = CLINICAL[correct.id]?.points || 'Critérios em análise.';
+      if($('revealFeature')) $('revealFeature').textContent = correct.id === 'aesp' ? `OBSERVAÇÃO: SEM PULSO PALPÁVEL. ${CLINICAL[correct.id]?.points || 'Atividade elétrica organizada sem pulso.'}` : (CLINICAL[correct.id]?.points || 'Critérios em análise.');
       if($('revealConduct')) $('revealConduct').textContent = CLINICAL[correct.id]?.conduct || 'Manter monitorização e suporte avançado.';
 
       // Abre gaveta de explicação apenas se configurada para 'summary' ou 'full' (por padrão 'off' fica desligada)
