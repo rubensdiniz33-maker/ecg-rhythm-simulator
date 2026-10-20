@@ -4816,7 +4816,7 @@
 
   
     /* Tela especial de ranking parcial entre questões: projeção exclusiva, Top 5 e impacto visual */
-    .live-competition-panel{position:fixed;inset:0;z-index:1400;width:100vw;height:100dvh;max-height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:0;padding:clamp(22px,4.5vh,58px) clamp(18px,7vw,120px);overflow:hidden;border:0;border-radius:0;background:radial-gradient(ellipse at 50% 0%,rgba(14,165,233,.2),transparent 48%),radial-gradient(ellipse at 50% 100%,rgba(132,204,22,.12),transparent 45%),linear-gradient(145deg,#050b16 0%,#0a1424 52%,#030711 100%);color:#f8fafc;box-shadow:inset 0 0 0 1px rgba(125,211,252,.22),inset 0 0 100px rgba(14,165,233,.06);backdrop-filter:blur(18px);animation:liveCompetitionEnter .5s cubic-bezier(.16,1,.3,1) both}
+    .live-competition-panel{position:fixed;left:50%;top:50%;z-index:1400;width:min(92vw,960px);height:auto;max-height:86dvh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:0;padding:clamp(18px,3vh,34px) clamp(16px,3.2vw,44px);overflow:auto;overscroll-behavior:contain;border:1px solid rgba(125,211,252,.3);border-radius:clamp(18px,2vw,28px);background:radial-gradient(ellipse at 50% 0%,rgba(14,165,233,.2),transparent 48%),radial-gradient(ellipse at 50% 100%,rgba(132,204,22,.12),transparent 45%),linear-gradient(145deg,#050b16 0%,#0a1424 52%,#030711 100%);color:#f8fafc;box-shadow:0 28px 100px rgba(0,0,0,.55),0 0 0 1px rgba(125,211,252,.08),inset 0 0 55px rgba(14,165,233,.06);backdrop-filter:blur(18px);transform:translate(-50%,-50%);animation:liveCompetitionEnter .42s cubic-bezier(.16,1,.3,1) both}
     .live-competition-panel:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#22d3ee 0%,#60a5fa 30%,#c4f56a 65%,#facc15 100%);background-size:200% 100%;animation:liveCompetitionBeam 1.8s linear infinite}
     .live-competition-panel.hidden{display:none}
     .live-competition-topline{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(100%,1080px);margin:0 auto;padding:0 0 20px}
@@ -4825,7 +4825,7 @@
     .live-competition-icon-btn:hover{background:rgba(56,189,248,.18);border-color:rgba(125,211,252,.75);color:#fff}
     .live-competition-close-btn{font-size:22px;background:rgba(248,113,113,.09);border-color:rgba(248,113,113,.28);color:#fecaca}.live-competition-close-btn:hover{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.7);color:#fff}
     .live-competition-panel.is-collapsed .live-competition-heading,.live-competition-panel.is-collapsed .live-competition-message,.live-competition-panel.is-collapsed .live-competition-list,.live-competition-panel.is-collapsed .live-competition-subhead{display:none}
-    .live-competition-panel.is-collapsed{width:100vw;height:100dvh;padding-bottom:9px}
+    .live-competition-panel.is-collapsed{width:min(92vw,520px);max-height:78dvh;padding:14px 18px}
     .live-competition-kicker{font-size:clamp(10px,1vw,14px);letter-spacing:.24em;font-weight:1000;color:#67e8f9;text-shadow:0 0 18px rgba(34,211,238,.45)}
     .live-competition-round{font-size:11px;letter-spacing:.14em;font-weight:900;color:#94a3b8}
     .live-competition-heading{position:relative;width:min(100%,1080px);margin:0 auto;font-size:clamp(38px,5vw,68px);line-height:.98;font-weight:1000;letter-spacing:-.055em;text-transform:uppercase;text-align:center;background:linear-gradient(180deg,#fff 0%,#cceeff 55%,#7dd3fc 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(56,189,248,.18))}
@@ -4853,13 +4853,15 @@
     .live-rank-movement.up{color:#86efac;background:rgba(16,185,129,.18);box-shadow:0 0 16px rgba(16,185,129,.12)}.live-rank-movement.down{color:#fca5a5;background:rgba(239,68,68,.14)}
     .live-rank-streak{font-size:clamp(8px,.75vw,10px);font-weight:950;color:#fcd34d;white-space:nowrap;letter-spacing:.02em}
     .live-rank-empty{padding:20px;color:#cbd5e1;font-size:16px;text-align:center}
-    @keyframes liveCompetitionEnter{from{opacity:0;transform:scale(1.025);filter:brightness(1.5)}to{opacity:1;transform:scale(1);filter:brightness(1)}}
+    @keyframes liveCompetitionEnter{from{opacity:0;transform:translate(-50%,-47%) scale(.94);filter:brightness(1.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1);filter:brightness(1)}}
+     @keyframes liveCompetitionExit{from{opacity:1;transform:translate(-50%,-50%) scale(1);filter:brightness(1)}to{opacity:0;transform:translate(-50%,-46%) scale(.95);filter:brightness(.7)}}
+     .live-competition-panel.is-exiting{pointer-events:none;animation:liveCompetitionExit .28s cubic-bezier(.4,0,1,1) both}
     @keyframes liveCompetitionRow{from{opacity:0;transform:translateY(12px) scale(.985);filter:brightness(1.35)}to{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}}
     @keyframes liveCompetitionPulse{0%{transform:scale(.985)}45%{transform:scale(1.012)}100%{transform:scale(1)}}
     @keyframes liveCompetitionBeam{from{background-position:0% 50%}to{background-position:200% 50%}}
-    @media(max-width:640px){.live-competition-panel{padding:24px 14px}.live-competition-topline{padding-bottom:16px}.live-competition-heading{font-size:clamp(32px,9vw,48px)}.live-competition-subhead{margin:12px auto 16px;letter-spacing:.12em}.live-competition-message{margin-bottom:12px}.live-rank-row{gap:7px;padding:10px 8px}.live-rank-player strong{font-size:clamp(13px,4vw,17px)}.live-rank-player small{font-size:8px}.live-rank-score{font-size:clamp(13px,4vw,18px)}.live-rank-avatar{display:none}.live-rank-streak{display:none}}
-    @media(max-height:650px){.live-competition-panel{padding-top:16px;padding-bottom:16px}.live-competition-topline{padding-bottom:8px}.live-competition-heading{font-size:clamp(30px,5vh,46px)}.live-competition-subhead{margin:8px auto 10px}.live-competition-message{margin-bottom:8px}.live-rank-list{gap:5px}.live-rank-row{padding:7px 10px}}
-    @media(prefers-reduced-motion:reduce){.live-competition-panel,.live-competition-panel:before,.live-rank-row,.live-competition-message.has-movement{animation:none!important}}
+    @media(max-width:640px){.live-competition-panel{width:calc(100vw - 24px);max-height:90dvh;padding:18px 12px;border-radius:18px}.live-competition-topline{padding-bottom:16px}.live-competition-heading{font-size:clamp(32px,9vw,48px)}.live-competition-subhead{margin:12px auto 16px;letter-spacing:.12em}.live-competition-message{margin-bottom:12px}.live-rank-row{gap:7px;padding:10px 8px}.live-rank-player strong{font-size:clamp(13px,4vw,17px)}.live-rank-player small{font-size:8px}.live-rank-score{font-size:clamp(13px,4vw,18px)}.live-rank-avatar{display:none}.live-rank-streak{display:none}}
+    @media(max-height:650px){.live-competition-panel{max-height:92dvh;padding-top:12px;padding-bottom:12px}.live-competition-topline{padding-bottom:8px}.live-competition-heading{font-size:clamp(30px,5vh,46px)}.live-competition-subhead{margin:8px auto 10px}.live-competition-message{margin-bottom:8px}.live-rank-list{gap:5px}.live-rank-row{padding:7px 10px}}
+    @media(prefers-reduced-motion:reduce){.live-competition-panel,.live-competition-panel:before,.live-rank-row,.live-competition-message.has-movement{animation:none!important}.live-competition-panel{transform:translate(-50%,-50%)!important}}
   
     /* Confirmação interna do Arena ECG */
     .arena-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(2,6,23,.76);backdrop-filter:blur(8px)}
@@ -6691,7 +6693,7 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     };
     let audioCtx=null, soundOn=true, ecgFrame=null, ecgEngine=null, frameLast=0, toastTimer=null, lastHeartSoundAt=0;
     const LIVE_COMPETITION_MIN_VISIBLE_MS=5000;
-    let liveCompetitionHideTimer=null,liveCompetitionShownAt=0,liveCompetitionCollapsed=false,liveCompetitionMuted=false,liveCompetitionDismissedRound=null;
+    let liveCompetitionHideTimer=null,liveCompetitionExitTimer=null,liveCompetitionShownAt=0,liveCompetitionCollapsed=false,liveCompetitionMuted=false,liveCompetitionDismissedRound=null;
     let lastRateVariationAt=0, currentRateTarget=null;
     const CHANNEL_PREFIX='ecg-rhythm-room-';
     const STUDENT_SESSION_KEY='ecg-arena-student-session';
@@ -8062,12 +8064,19 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function hideLiveCompetitionPanel(){
       const panel=$('liveCompetitionPanel');
       if(!panel)return;
-      panel.classList.add('hidden');
-      panel.style.display='none';
+      if(liveCompetitionHideTimer){clearTimeout(liveCompetitionHideTimer);liveCompetitionHideTimer=null;}
+      if(panel.classList.contains('hidden')||panel.style.display==='none'||panel.classList.contains('is-exiting'))return;
+      panel.classList.add('is-exiting');
       panel.setAttribute('aria-hidden','true');
       panel.classList.remove('is-collapsed');
       liveCompetitionCollapsed=false;
-      if(liveCompetitionHideTimer){clearTimeout(liveCompetitionHideTimer);liveCompetitionHideTimer=null;}
+      if(liveCompetitionExitTimer)clearTimeout(liveCompetitionExitTimer);
+      liveCompetitionExitTimer=setTimeout(()=>{
+        panel.classList.add('hidden');
+        panel.classList.remove('is-exiting');
+        panel.style.display='none';
+        liveCompetitionExitTimer=null;
+      },280);
     }
     function playLiveCompetitionCue(){
       if(liveCompetitionMuted)return;
@@ -8101,12 +8110,21 @@ M=class{rng;tau;x=0;constructor(e,t){this.rng=e,this.tau=t,this.x=e.randn()}step
     function updateLeaderboard(forceReveal=false){
       const panel=$('liveCompetitionPanel');
       const requestedShow=!!((forceReveal||state.isRevealed)&&shouldShowRankingThisRound()&&liveCompetitionDismissedRound!==state.roundNumber);
-      const currentlyVisible=!!(panel&&panel.style.display==='flex'&&!panel.classList.contains('hidden'));
+      const exiting=!!(panel&&panel.classList.contains('is-exiting'));
+      const currentlyVisible=!!(panel&&panel.style.display==='flex'&&!panel.classList.contains('hidden')&&!exiting);
       const show=!!(requestedShow||(currentlyVisible&&Date.now()-liveCompetitionShownAt<LIVE_COMPETITION_MIN_VISIBLE_MS));
       if(panel){
-        panel.classList.toggle('hidden',!show);
-        panel.style.display=show?'flex':'none';
-        panel.setAttribute('aria-hidden',show?'false':'true');
+        if(show&&exiting){
+          if(liveCompetitionExitTimer){clearTimeout(liveCompetitionExitTimer);liveCompetitionExitTimer=null;}
+          panel.classList.remove('is-exiting');
+        }
+        if(!show&&currentlyVisible){
+          hideLiveCompetitionPanel();
+        }else{
+          panel.classList.toggle('hidden',!show);
+          panel.style.display=show?'flex':'none';
+          panel.setAttribute('aria-hidden',show?'false':'true');
+        }
         if(show&&!currentlyVisible){
           liveCompetitionShownAt=Date.now();
           panel.classList.remove('is-collapsed');
