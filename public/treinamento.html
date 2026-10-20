@@ -9383,31 +9383,7 @@ if ($('btnEndGame')) $('btnEndGame').onclick = confirmAndEndGame;
     }
     const params=new URLSearchParams(location.search);const savedStudent=readStudentSession();if(savedStudent&&(!params.get('pin')||params.get('pin')===savedStudent.pin)&&params.get('host')!=='1'){showJoin(savedStudent.pin);$('pinInput').value=savedStudent.pin;$('userNameInput').value=savedStudent.name||'';state.studentAvatar=savedStudent.avatar||'stetho';state.studentScore=Number(savedStudent.score)||0;state.studentStreak=Number(savedStudent.streak)||0;const savedAvatarBtn=$('avatarPicker')?.querySelector('[data-avatar="'+state.studentAvatar+'"]');if(savedAvatarBtn){$('avatarPicker').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));savedAvatarBtn.classList.add('selected')}setStudentReconnectStatus(true);submitJoin({preventDefault(){}})}else if(params.get('pin')){showJoin(params.get('pin'));checkRoomBeforeJoin(params.get('pin'))}else if(params.get('host')==='1'){renderRhythmLibrary();loadStoredConfig();restoreSetupPreferences();updateSessionSummary();showSetupTab('model');switchView('viewHostSetup')}else switchView('viewHome');
   
-    // Feedback de clique da Home: breve pulso antes de executar a ação existente.
-    (() => {
-      const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      ['btnStartHost', 'btnGoToJoin'].forEach((id) => {
-        const button = document.getElementById(id);
-        if (!button) return;
-        button.addEventListener('click', (event) => {
-          if (button.dataset.arenaReplay === '1') {
-            delete button.dataset.arenaReplay;
-            return;
-          }
-          if (reducedMotion()) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          button.classList.remove('is-launching');
-          void button.offsetWidth;
-          button.classList.add('is-launching');
-          window.setTimeout(() => {
-            button.classList.remove('is-launching');
-            button.dataset.arenaReplay = '1';
-            button.click();
-          }, 180);
-        }, true);
-      });
-    })();
+
 
   </script>
 </body>
