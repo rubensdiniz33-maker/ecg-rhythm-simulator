@@ -82,8 +82,8 @@ Error generating stack: `+e.message+`
     panel.querySelector("#iam-pattern-close").addEventListener("click",close);
     overlay.addEventListener("click",function(e){if(e.target===overlay)close();});
     document.addEventListener("keydown",function(e){if(e.key==="Escape"&&opened)close();});
-    ps.addEventListener("change",function(){active=ps.value;start=Date.now();draw();});
-    ls.addEventListener("change",function(){lead=ls.value;draw();});
+    ps.addEventListener("change",function(){active=ps.value;start=Date.now();});
+    ls.addEventListener("change",function(){lead=ls.value;});
     draw();
   }
   function close(){opened=false;var o=document.getElementById("iam-pattern-overlay");if(o)o.style.display="none";if(raf)cancelAnimationFrame(raf);}
