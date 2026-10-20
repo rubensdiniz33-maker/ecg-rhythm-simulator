@@ -28,5 +28,99 @@ Error generating stack: `+e.message+`
   </head>
   <body>
     <div id="root"></div>
-  </body>
+  <style id="iam-pattern-lab-style">
+#iam-pattern-launch{position:fixed;right:18px;bottom:18px;z-index:99980;border:1px solid #3c8d83;background:#103b37;color:#eafffb;border-radius:12px;padding:12px 16px;font:700 13px system-ui,sans-serif;box-shadow:0 8px 28px #0005;cursor:pointer}
+#iam-pattern-launch:hover{background:#18534c}
+#iam-pattern-overlay{position:fixed;inset:0;z-index:100100;background:rgba(3,10,14,.88);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}
+#iam-pattern-panel{width:min(1120px,100%);max-height:94vh;overflow:auto;background:#0b151b;color:#e8f3f5;border:1px solid #24434b;border-radius:18px;box-shadow:0 25px 90px #0009;font-family:system-ui,sans-serif}
+#iam-pattern-panel *{box-sizing:border-box}
+#iam-pattern-panel header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px 14px;border-bottom:1px solid #203940}
+#iam-pattern-panel h2{font-size:20px;margin:0 0 5px;font-weight:750}
+#iam-pattern-panel .iam-sub{font-size:12px;color:#9bb3b9;line-height:1.5}
+#iam-pattern-close{background:#1a2a31;color:#d8e8eb;border:1px solid #38515a;border-radius:9px;padding:8px 11px;cursor:pointer}
+#iam-pattern-controls{display:grid;grid-template-columns:2fr 1fr;gap:12px;padding:16px 22px}
+#iam-pattern-controls label{display:flex;flex-direction:column;gap:6px;color:#a8c1c6;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+#iam-pattern-controls select{width:100%;background:#10242b;color:#e7f4f5;border:1px solid #31515b;border-radius:9px;padding:11px;font-size:13px}
+#iam-pattern-canvas-wrap{padding:0 22px}
+#iam-pattern-canvas{width:100%;height:auto;display:block;border:1px solid #31524d;border-radius:10px;background:#06120f}
+#iam-pattern-stage{padding:13px 22px 4px;font-size:14px;font-weight:700;color:#8ce4c8}
+#iam-pattern-description{padding:6px 22px 16px;color:#c0d0d4;font-size:13px;line-height:1.6;min-height:52px}
+#iam-pattern-warning{margin:0 22px 20px;padding:12px 14px;border-left:3px solid #d7a64b;background:#201d14;color:#e8d8b7;font-size:11px;line-height:1.55;border-radius:0 8px 8px 0}
+@media(max-width:600px){#iam-pattern-controls{grid-template-columns:1fr}#iam-pattern-panel header{padding:16px}#iam-pattern-controls,#iam-pattern-canvas-wrap{padding-left:14px;padding-right:14px}#iam-pattern-description,#iam-pattern-stage{padding-left:14px;padding-right:14px}#iam-pattern-warning{margin-left:14px;margin-right:14px}#iam-pattern-launch{right:10px;bottom:10px}}
+</style>
+<script id="iam-pattern-lab-script">
+(function(){
+  if(window.__iamPatternLabLoaded)return;
+  window.__iamPatternLabLoaded=true;
+  var patterns=[
+    {id:"supra",name:"1. Supradesnivelamento do ST",stage:"ST elevado",desc:"Elevação do segmento ST após o QRS. A altura, o formato e o ponto de referência variam conforme o traçado e o contexto clínico."},
+    {id:"infra",name:"2. Infradesnivelamento do ST",stage:"ST deprimido",desc:"Segmento ST abaixo da linha de base. A morfologia pode ser horizontal ou descendente; a interpretação depende do contexto e de outros dados."},
+    {id:"hyper",name:"3. Ondas T hiperagudas",stage:"T hiperaguda",desc:"Ondas T altas, largas e relativamente simétricas em relação ao traçado de base. É uma representação didática, não um critério diagnóstico isolado."},
+    {id:"dewinter",name:"4. Padrão de De Winter",stage:"ST ascendente + T alta",desc:"Representação esquemática de depressão ascendente do ST que se continua em ondas T altas e simétricas. O padrão clássico é avaliado em derivações específicas, não por uma derivação isolada."},
+    {id:"wellens",name:"5. Padrão de Wellens",stage:"T bifásica/invertida",desc:"Representação de alteração de onda T compatível com o padrão didático de Wellens. O reconhecimento clínico exige contexto, ECG completo e avaliação profissional."},
+    {id:"tinvert",name:"6. Inversão da onda T",stage:"T negativa",desc:"Onda T negativa após o complexo QRS. É um achado inespecífico quando considerado isoladamente e deve ser interpretado no contexto."},
+    {id:"qwave",name:"7. Ondas Q patológicas",stage:"Q profunda/alargada",desc:"Complexo com onda Q aumentada em profundidade e duração para fins didáticos. A avaliação real depende de critérios de duração, amplitude e derivações."},
+    {id:"evolving",name:"8. Padrão evolutivo",stage:"Evolução em 3 fases",desc:"Animação didática que percorre T hiperaguda, elevação do ST e, por fim, onda Q com inversão de T. A evolução real varia entre pacientes."}
+  ];
+  var leads=["DI","DII","DIII","aVR","aVL","aVF","V1","V2","V3","V4","V5","V6"];
+  var active="supra",lead="DII",opened=false,raf=0,start=Date.now();
+  function el(tag,attrs,html){var n=document.createElement(tag);Object.keys(attrs||{}).forEach(function(k){if(k==="style")n.style.cssText=attrs[k];else n.setAttribute(k,attrs[k]);});if(html!==undefined)n.innerHTML=html;return n;}
+  function build(){
+    if(document.getElementById("iam-pattern-launch"))return;
+    var launch=el("button",{id:"iam-pattern-launch",type:"button"},"Padrões de IAM · teste");
+    var overlay=el("div",{id:"iam-pattern-overlay",role:"dialog","aria-modal":"true","aria-label":"Laboratório didático de padrões de IAM"});
+    var panel=el("section",{id:"iam-pattern-panel"});
+    panel.innerHTML='<header><div><h2>Laboratório de padrões de IAM</h2><div class="iam-sub">Módulo experimental integrado ao simulador · análise de uma derivação por vez</div></div><button id="iam-pattern-close" type="button">Fechar</button></header><div id="iam-pattern-controls"><label for="iam-pattern-select">Padrão eletrocardiográfico<select id="iam-pattern-select"></select></label><label for="iam-lead-select">Derivação exibida<select id="iam-lead-select"></select></label></div><div id="iam-pattern-canvas-wrap"><canvas id="iam-pattern-canvas" width="1000" height="330" aria-label="Traçado eletrocardiográfico esquemático"></canvas></div><div id="iam-pattern-stage" aria-live="polite"></div><div id="iam-pattern-description"></div><div id="iam-pattern-warning"><strong>Uso educacional:</strong> traçados esquemáticos e sintéticos, não destinados a diagnóstico. Não representam todos os critérios reais nem substituem ECG clínico. De Winter e Wellens não podem ser confirmados com segurança a partir de uma única derivação isolada.</div>';
+    overlay.appendChild(panel);document.body.appendChild(overlay);document.body.appendChild(launch);
+    var ps=panel.querySelector("#iam-pattern-select"),ls=panel.querySelector("#iam-lead-select");
+    patterns.forEach(function(p){ps.appendChild(el("option",{value:p.id},p.name));});
+    leads.forEach(function(l){ls.appendChild(el("option",{value:l},l));});
+    ps.value=active;ls.value=lead;
+    launch.addEventListener("click",function(){opened=true;overlay.style.display="flex";start=Date.now();draw();});
+    panel.querySelector("#iam-pattern-close").addEventListener("click",close);
+    overlay.addEventListener("click",function(e){if(e.target===overlay)close();});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape"&&opened)close();});
+    ps.addEventListener("change",function(){active=ps.value;start=Date.now();});
+    ls.addEventListener("change",function(){lead=ls.value;});
+    draw();
+  }
+  function close(){opened=false;var o=document.getElementById("iam-pattern-overlay");if(o)o.style.display="none";if(raf)cancelAnimationFrame(raf);}
+  function gauss(x,m,s){var z=(x-m)/s;return Math.exp(-.5*z*z);}
+  function stateFor(p,t){if(p!=="evolving")return p;var phase=Math.floor(((t-start)/4000)%3);return ["hyper","supra","qwave"][phase];}
+  function signal(x,p,beat){
+    var phase=((x%1)+1)%1;
+    var q=-.13*gauss(phase,.205,.012),r=.92*gauss(phase,.235,.014),s=-.28*gauss(phase,.265,.016);
+    var base=.055*Math.sin(phase*6.283);
+    var st=0,tw=.25*gauss(phase,.59,.055);
+    if(p==="supra"){st=.24*Math.max(0,Math.min(1,(phase-.29)/.05));st*=phase<.34?1:(phase<.49?1:Math.max(.35,1-(phase-.49)*2));tw=.29*gauss(phase,.60,.06);}
+    if(p==="infra"){st=-.16*(phase>.30&&phase<.52?1:0);tw=.19*gauss(phase,.61,.06);}
+    if(p==="hyper"){tw=.62*gauss(phase,.59,.09);}
+    if(p==="dewinter"){st=phase>.29&&phase<.48?-.10+Math.max(0,phase-.29)*.8:0;tw=.67*gauss(phase,.59,.085);}
+    if(p==="wellens"){tw=-.48*gauss(phase,.60,.07)+.15*gauss(phase,.50,.025);}
+    if(p==="tinvert"){tw=-.38*gauss(phase,.60,.065);}
+    if(p==="qwave"){q=-.52*gauss(phase,.198,.025);r=.68*gauss(phase,.238,.015);tw=-.24*gauss(phase,.60,.06);}
+    if(p==="evolving"){return signal(x,stateFor("evolving",Date.now()),beat);}
+    return base+q+r+s+st+tw+.10*gauss(phase,.145,.025);
+  }
+  function draw(){
+    var canvas=document.getElementById("iam-pattern-canvas");if(!canvas)return;
+    var c=canvas.getContext("2d"),W=canvas.width,H=canvas.height,now=Date.now(),p=patterns.find(function(x){return x.id===active;})||patterns[0],stage=stateFor(active,now);
+    c.clearRect(0,0,W,H);c.fillStyle="#06120f";c.fillRect(0,0,W,H);
+    for(var x=0;x<=W;x+=10){c.strokeStyle=x%50===0?"#285048":"#142e29";c.lineWidth=x%50===0?1:.55;c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+    for(var y=0;y<=H;y+=10){c.strokeStyle=y%50===0?"#285048":"#142e29";c.lineWidth=y%50===0?1:.55;c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+    c.fillStyle="#9cbcb2";c.font="bold 18px system-ui";c.fillText(lead+" · traçado esquemático",22,28);
+    c.strokeStyle="#79f5b7";c.lineWidth=2.4;c.shadowColor="#45f7a6";c.shadowBlur=5;c.beginPath();
+    var scroll=(now-start)/1000*.12;
+    for(var i=0;i<=W;i++){var t=i/W*4+scroll,v=signal(t,stage,0),py=H*.55-v*105;if(i===0)c.moveTo(i,py);else c.lineTo(i,py);}
+    c.stroke();c.shadowBlur=0;
+    c.fillStyle="#6c978b";c.font="12px system-ui";c.fillText("Representação sintética · não calibrada para interpretação clínica",22,H-16);
+    var stageText=active==="evolving"?({hyper:"Fase 1/3 · ondas T hiperagudas",supra:"Fase 2/3 · elevação do ST",qwave:"Fase 3/3 · onda Q e inversão de T"}[stage]):p.stage;
+    document.getElementById("iam-pattern-stage").textContent=stageText+" · "+lead;
+    document.getElementById("iam-pattern-description").textContent=p.desc;
+    if(opened)raf=requestAnimationFrame(draw);
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",build);else build();
+})();
+</script>
+</body>
 </html>
